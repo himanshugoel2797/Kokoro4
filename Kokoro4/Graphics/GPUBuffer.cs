@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using System.Runtime.InteropServices;
 
-namespace Messier.Graphics
+namespace Kokoro.Graphics
 {
     public class GPUBuffer : IDisposable
     {

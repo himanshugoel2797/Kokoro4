@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 
-namespace Messier.Graphics
+namespace Kokoro.Graphics
 {
     public class FramebufferTextureSource : ITextureSource
     {

@@ -1,4 +1,4 @@
-﻿using Messier.Graphics.Input.LowLevel;
+﻿using Kokoro.Graphics.Input.LowLevel;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using System;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Messier.Graphics
+namespace Kokoro.Graphics
 {
     public enum FaceWinding
     {

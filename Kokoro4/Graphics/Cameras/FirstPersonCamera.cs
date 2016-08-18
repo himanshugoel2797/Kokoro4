@@ -1,4 +1,4 @@
-﻿using Messier.Graphics.Input;
+﻿using Kokoro.Graphics.Input;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 using Key = OpenTK.Input.Key;
 
-namespace Messier.Graphics.Cameras
+namespace Kokoro.Graphics.Cameras
 {
     /// <summary>
     /// Represents a First Person Camera

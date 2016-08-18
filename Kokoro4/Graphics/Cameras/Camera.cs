@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messier.Graphics.Cameras
+namespace Kokoro.Graphics.Cameras
 {
     public class Camera
     {

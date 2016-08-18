@@ -1,4 +1,4 @@
-﻿using Messier.Graphics.Input.LowLevel;
+﻿using Kokoro.Graphics.Input.LowLevel;
 using OpenTK.Input;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messier.Graphics.Input
+namespace Kokoro.Graphics.Input
 {
     /// <summary>
     /// Provides methods to obtain and handle keyboard input

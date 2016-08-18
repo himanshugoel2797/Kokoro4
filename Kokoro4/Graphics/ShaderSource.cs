@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using System.IO;
 
-namespace Messier.Graphics
+namespace Kokoro.Graphics
 {
     public class ShaderSource : IDisposable
     {

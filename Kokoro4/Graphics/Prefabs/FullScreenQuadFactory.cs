@@ -1,11 +1,11 @@
-﻿using Messier.Engine.SceneGraph;
+﻿using Kokoro.Engine.SceneGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messier.Graphics.Prefabs
+namespace Kokoro.Graphics.Prefabs
 {
     public class FullScreenQuadFactory
     {

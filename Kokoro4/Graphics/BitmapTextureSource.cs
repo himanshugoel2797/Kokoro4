@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Messier.Graphics
+namespace Kokoro.Graphics
 {
     public class BitmapTextureSource : ITextureSource, IDisposable
     {

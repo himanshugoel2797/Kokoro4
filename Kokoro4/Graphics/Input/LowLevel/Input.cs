@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Input;
 
-namespace Messier.Graphics.Input.LowLevel
+namespace Kokoro.Graphics.Input.LowLevel
 {
     public static class InputLL
     {

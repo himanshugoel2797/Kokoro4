@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messier.Graphics
+namespace Kokoro.Graphics
 {
     public static class GPUStateMachine
     {
