@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Engine.SceneGraph
+namespace Kokoro.Engine
 {
     public class EngineObject : IDisposable
     {

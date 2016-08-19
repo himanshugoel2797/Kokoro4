@@ -214,7 +214,6 @@ namespace Kokoro.Graphics
 
         private static void Game_UpdateFrame(object sender, FrameEventArgs e)
         {
-            BufferStreamer.ExecuteTasks((long)(e.Time * 1000));
             Update?.Invoke(e.Time);
         }
 
