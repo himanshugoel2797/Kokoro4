@@ -9,11 +9,8 @@ namespace Kokoro.SceneGraph
 {
     public class Node
     {
-        public Vector3 Position { get; set; }
-        public Quaternion Rotation { get; set; }
-        public Vector3 Scale { get; set; }
-
-        public Matrix4 Transform { get; set; }
+        public Matrix4 Transform { get; protected set; }
+        public Matrix4 NetTransform { get; private set; }
 
         public Node Parent { get; set; }
         public List<Node> Children { get; set; }
@@ -24,11 +21,18 @@ namespace Kokoro.SceneGraph
         {
             Parent = parent;
             Children = new List<Node>();
-            Position = Vector3.Zero;
-            Rotation = Quaternion.Identity;
-            Scale = Vector3.One;
             Transform = Matrix4.Identity;
+            NetTransform = Transform;
             Name = name;
+        }
+
+        public void UpdateTree()
+        {
+            //Update the current transform
+            if (Parent != null)
+                NetTransform = Parent.NetTransform * Transform;
+
+            Children.AsParallel().ForAll(a => a?.UpdateTree());
         }
     }
 }

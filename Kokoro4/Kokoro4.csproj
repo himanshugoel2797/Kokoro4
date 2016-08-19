@@ -112,6 +112,9 @@
     <Compile Include="Engine\EngineObject.cs" />
     <Compile Include="Engine\ObjectBatch.cs" />
     <Compile Include="SceneGraph\Node.cs" />
+    <Compile Include="SceneGraph\PositionNode.cs" />
+    <Compile Include="SceneGraph\RotationNode.cs" />
+    <Compile Include="SceneGraph\ScaleNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphics\Shaders\Atmosphere\fragment.glsl">
