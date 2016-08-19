@@ -9,13 +9,18 @@ namespace Kokoro.SceneGraph
 {
     public class Node
     {
+        private object _transform_lock, dirty_lock, net_transform_lock;
+
         private bool _dirty;
         private bool dirty
         {
             get { return _dirty; }
             set
             {
-                _dirty = value;
+                lock (dirty_lock)
+                {
+                    _dirty = value;
+                }
 
                 if (_dirty)
                 {
@@ -32,8 +37,11 @@ namespace Kokoro.SceneGraph
             }
             protected set
             {
-                dirty = (_transform != value);
-                _transform = value;
+                lock (_transform_lock)
+                {
+                    dirty = (_transform != value);
+                    _transform = value;
+                }
             }
         }
         public Matrix4 NetTransform { get; private set; }
@@ -45,6 +53,10 @@ namespace Kokoro.SceneGraph
 
         public Node(Node parent, string name)
         {
+            _transform_lock = new object();
+            dirty_lock = new object();
+            net_transform_lock = new object();
+
             Parent = parent;
             Children = new List<Node>();
             Transform = Matrix4.Identity;
@@ -58,7 +70,9 @@ namespace Kokoro.SceneGraph
             //Update the current transform
             if (Parent != null && dirty)
             {
-                NetTransform = Parent.NetTransform * Transform;
+                lock(net_transform_lock)
+                    NetTransform = Parent.NetTransform * Transform;
+
                 dirty = false;
             }
 
