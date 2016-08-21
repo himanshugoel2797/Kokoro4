@@ -175,6 +175,18 @@ namespace Kokoro.Graphics
             }
         }
 
+        static int workGroupSize = 0;
+        public static int ComputeWorkGroupSize
+        {
+            get
+            {
+                if (workGroupSize == 0)
+                    workGroupSize = GL.GetInteger((GetPName)All.MaxComputeWorkGroupCount);
+
+                return workGroupSize;
+            }
+        }
+
         static GraphicsDevice()
         {
             game = new GameWindow((int)(16f / 9f * 540), 540);
@@ -288,6 +300,12 @@ namespace Kokoro.Graphics
         {
             if (feedbackPrimitive == PrimitiveType.Points || feedbackPrimitive == PrimitiveType.Lines || feedbackPrimitive == PrimitiveType.Triangles) feedbackPrimitive = type;
             else throw new Exception();
+        }
+
+        public static void DispatchComputeJob(ShaderProgram prog, int x, int y, int z)
+        {
+            GL.UseProgram(prog.id);
+            GL.DispatchCompute(x, y, z);
         }
 
         public static void Draw(PrimitiveType type, int first, int count, bool indexed)
