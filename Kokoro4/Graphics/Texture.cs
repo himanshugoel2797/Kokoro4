@@ -30,28 +30,34 @@ namespace Kokoro.Graphics
 
         public Texture()
         {
-            id = GL.GenTexture();
+            id = 0;
             GraphicsDevice.Cleanup += Dispose;
         }
 
-        public void SetData(ITextureSource src)
+        public void SetData(ITextureSource src, int level)
         {
-            GPUStateMachine.BindTexture(0, src.GetTextureTarget(), id);
+            bool inited = false;
+            if (id == 0)
+            {
+                GL.CreateTextures(src.GetTextureTarget(), 1, out id);
+                inited = true;
+            }
+            
             switch (src.GetDimensions())
             {
                 case 1:
-                    GL.TexImage1D(src.GetTextureTarget(), src.GetLevels(), src.GetInternalFormat(), src.GetWidth(), 0, src.GetFormat(), src.GetType(), src.GetPixelData());
+                    if(inited)GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
+                    GL.TextureSubImage1D(id, level, 0, src.GetWidth(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
                     break;
                 case 2:
-                    GL.TexImage2D(src.GetTextureTarget(), src.GetLevels(), src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), 0, src.GetFormat(), src.GetType(), src.GetPixelData());
+                    if(inited)GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
+                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
                     break;
                 case 3:
-                    GL.TexImage3D(src.GetTextureTarget(), src.GetLevels(), src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth(), 0, src.GetFormat(), src.GetType(), src.GetPixelData());
+                    if(inited)GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
+                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
                     break;
             }
-
-            GL.GenerateMipmap((GenerateMipmapTarget)src.GetTextureTarget());
-            GPUStateMachine.UnbindTexture(0, src.GetTextureTarget());
 
             this.Width = src.GetWidth();
             this.Height = src.GetHeight();
@@ -65,25 +71,19 @@ namespace Kokoro.Graphics
 
         public void SetTileMode(bool tileX, bool tileY)
         {
-            GPUStateMachine.BindTexture(0, texTarget, id);
-            GL.TexParameter(texTarget, TextureParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
-            GL.TexParameter(texTarget, TextureParameterName.TextureWrapT, tileY ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
-            GPUStateMachine.UnbindTexture(0, texTarget);
+            GL.TextureParameter(id, TextureParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
+            GL.TextureParameter(id, TextureParameterName.TextureWrapT, tileY ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
         }
 
         public void SetEnableLinearFilter(bool linear)
         {
-            GPUStateMachine.BindTexture(0, texTarget, id);
-            GL.TexParameter(texTarget, TextureParameterName.TextureMagFilter, linear ? (int)TextureMagFilter.Linear : (int)TextureMagFilter.Nearest);
-            GL.TexParameter(texTarget, TextureParameterName.TextureMinFilter, linear ? (int)TextureMinFilter.Linear : (int)TextureMinFilter.Nearest);
-            GPUStateMachine.UnbindTexture(0, texTarget);
+            GL.TextureParameter(id, TextureParameterName.TextureMagFilter, linear ? (int)TextureMagFilter.Linear : (int)TextureMagFilter.Nearest);
+            GL.TextureParameter(id, TextureParameterName.TextureMinFilter, linear ? (int)TextureMinFilter.Linear : (int)TextureMinFilter.Nearest);
         }
 
         public void SetAnisotropicFilter(float taps)
         {
-            GPUStateMachine.BindTexture(0, texTarget, id);
-            GL.TexParameter(texTarget, (TextureParameterName)All.TextureMaxAnisotropyExt, taps);
-            GPUStateMachine.UnbindTexture(0, texTarget);
+            GL.TextureParameter(id, (TextureParameterName)All.TextureMaxAnisotropyExt, taps);
         }
 
         #region IDisposable Support

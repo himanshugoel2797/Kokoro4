@@ -27,6 +27,7 @@ namespace Kokoro.Engine
             uvs = new GPUBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer);
             norms = new GPUBuffer(OpenTK.Graphics.OpenGL4.BufferTarget.ArrayBuffer);
             textures = new List<Texture>();
+            mesh.SetElementBufferObject(indices);
         }
 
         public EngineObject(EngineObject src, bool lockChanges)
@@ -83,9 +84,6 @@ namespace Kokoro.Engine
         {
             for (int i = 0; i < textures.Count; i++)
                 GraphicsDevice.SetTexture(i, textures[i]);
-
-            GraphicsDevice.SetIndexBuffer(indices);
-            GraphicsDevice.SetVertexArray(mesh);
         }
 
         #region IDisposable Support

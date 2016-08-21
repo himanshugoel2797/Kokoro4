@@ -18,6 +18,6 @@ namespace Kokoro.Graphics
         PixelInternalFormat GetInternalFormat();
         PixelFormat GetFormat();
         PixelType GetType();
-        IntPtr GetPixelData();
+        IntPtr GetPixelData(int level);
     }
 }

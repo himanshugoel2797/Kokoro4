@@ -13,20 +13,21 @@ namespace Kokoro.Graphics
 
         public VertexArray()
         {
-            id = GL.GenVertexArray();
+            GL.CreateVertexArrays(1, out id);
             GraphicsDevice.Cleanup += Dispose;
+        }
+
+        public void SetElementBufferObject(GPUBuffer buffer)
+        {
+            GL.VertexArrayElementBuffer(id, buffer.id);
         }
 
         public void SetBufferObject(int index, GPUBuffer buffer, int elementCount, VertexAttribPointerType type)
         {
-            GPUStateMachine.BindVertexArray(id);
+            GL.EnableVertexArrayAttrib(id, index);
 
-            GL.EnableVertexAttribArray(index);
-            GPUStateMachine.BindBuffer(buffer.target, buffer.id);
-            GL.VertexAttribPointer(index, elementCount, type, false, 0, 0);
-            GPUStateMachine.UnbindBuffer(buffer.target);
-
-            GPUStateMachine.UnbindVertexArray();
+            GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, 0);
+            GL.VertexArrayAttribFormat(id, index, elementCount, (VertexAttribType)type, false, 0);
         }
 
         #region IDisposable Support

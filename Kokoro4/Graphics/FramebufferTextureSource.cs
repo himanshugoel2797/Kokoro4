@@ -48,7 +48,7 @@ namespace Kokoro.Graphics
             return levels;
         }
 
-        public IntPtr GetPixelData()
+        public IntPtr GetPixelData(int level)
         {
             return IntPtr.Zero;
         }

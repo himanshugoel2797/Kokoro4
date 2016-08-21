@@ -252,14 +252,6 @@ namespace Kokoro.Graphics
             curVarray = varray;
         }
 
-        public static void SetIndexBuffer(GPUBuffer indices)
-        {
-            if (indices.target != BufferTarget.ElementArrayBuffer) throw new ArgumentException("Argument must be an index buffer!");
-
-            if (curIndices != null && indices.id != curIndices.id) GPUStateMachine.UnbindBuffer(BufferTarget.ElementArrayBuffer);
-            curIndices = indices;
-        }
-
         public static void SetUniformBuffer(GPUBuffer buf, int bufIndex, int baseOff, int size)
         {
             if (buf.target != BufferTarget.UniformBuffer) throw new ArgumentException("Argument must be a uniform buffer!");
@@ -307,7 +299,7 @@ namespace Kokoro.Graphics
             else throw new Exception();
         }
 
-        public static void Draw(PrimitiveType type, int first, int count)
+        public static void Draw(PrimitiveType type, int first, int count, bool indexed)
         {
             if (count == 0) return;
 
@@ -319,16 +311,13 @@ namespace Kokoro.Graphics
             for (int i = 0; i < textures.Count; i++) GPUStateMachine.BindTexture(i, textures[i].texTarget, textures[i].id);
             for (int i = 0; i < feedbackBufs.Count; i++) GPUStateMachine.BindBuffer(BufferTarget.TransformFeedbackBuffer, feedbackBufs[i].Item1.id, i, (IntPtr)feedbackBufs[i].Item2, (IntPtr)feedbackBufs[i].Item3);
 
-
-
             GPUStateMachine.BindFramebuffer(curFramebuffer.id);
             if (feedbackBufs.Count > 0) GL.BeginTransformFeedback((TransformFeedbackPrimitiveType)feedbackPrimitive);
 
             GL.UseProgram(curProg.id);
             GPUStateMachine.BindVertexArray(curVarray.id);
-            if (curIndices != null) GPUStateMachine.BindBuffer(BufferTarget.ElementArrayBuffer, curIndices.id);
 
-            if (curIndices != null) GL.DrawElements(type, count, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            if (indexed) GL.DrawElements(type, count, DrawElementsType.UnsignedInt, IntPtr.Zero);
             else GL.DrawArrays(type, first, count);
 
             if (feedbackBufs.Count > 0) GL.EndTransformFeedback();

@@ -18,9 +18,7 @@ namespace Kokoro.Graphics
 
         public void SetStorage(GPUBuffer storage, SizedInternalFormat internalFormat)
         {
-            GPUStateMachine.BindTexture(0, TextureTarget.TextureBuffer, id);
-            GL.TexBuffer(TextureBufferTarget.TextureBuffer, internalFormat, storage.id);
-            GPUStateMachine.UnbindTexture(0, TextureTarget.TextureBuffer);
+            GL.TextureBuffer(id, internalFormat, storage.id);
         }
     }
 }

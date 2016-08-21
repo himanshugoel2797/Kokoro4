@@ -23,7 +23,7 @@ namespace Kokoro.Graphics
 
         public Framebuffer(int width, int height)
         {
-            id = GL.GenFramebuffer();
+            GL.CreateFramebuffers(1, out id);
             bindings = new Dictionary<FramebufferAttachment, Texture>();
             GraphicsDevice.Cleanup += Dispose;
         }
@@ -33,13 +33,12 @@ namespace Kokoro.Graphics
             set
             {
                 bindings[attachment] = value;
-                GPUStateMachine.BindFramebuffer(id);
-                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, value.texTarget, value.id, 0);
+                GL.NamedFramebufferTexture(id, attachment, value.id, 0);
 
-                GL.DrawBuffers(bindings.Keys.Count,
+                GL.NamedFramebufferDrawBuffers(id, bindings.Keys.Count,
                     bindings.Keys.OrderByDescending((a) => (int)a).Reverse().Cast<DrawBuffersEnum>().ToArray());
-
-                if(GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
+                
+                if(GL.CheckNamedFramebufferStatus(id, FramebufferTarget.Framebuffer) != (All)FramebufferErrorCode.FramebufferComplete)
                 {
                     throw new Exception("Incomplete Framebuffer!");
                 }

@@ -41,7 +41,7 @@ namespace Kokoro.Graphics.Cameras
 
         private Matrix4 UpdateViewMatrix()
         {
-            Matrix4 cameraRotation = Matrix4.CreateRotationX(updownRot) * Matrix4.CreateRotationY(leftrightRot);
+            Matrix3 cameraRotation = Matrix3.CreateRotationX(updownRot) * Matrix3.CreateRotationY(leftrightRot);
 
             Vector3 cameraOriginalTarget = new Vector3(0, 0, -1);
             Vector3 cameraOriginalUpVector = new Vector3(0, 1, 0);

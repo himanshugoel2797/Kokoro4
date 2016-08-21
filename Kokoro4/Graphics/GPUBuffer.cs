@@ -19,7 +19,7 @@ namespace Kokoro.Graphics
 
         public GPUBuffer(BufferTarget target)
         {
-            id = GL.GenBuffer();
+            GL.CreateBuffers(1, out id);
             this.target = target;
             GraphicsDevice.Cleanup += Dispose;
             addr = IntPtr.Zero;
@@ -27,16 +27,13 @@ namespace Kokoro.Graphics
 
         public GPUBuffer(BufferTarget target, int size, bool read)
         {
-            id = GL.GenBuffer();
+            GL.CreateBuffers(1, out id);
             this.target = target;
 
             this.size = size;
-
-            GPUStateMachine.BindBuffer(target, id);
-            GL.BufferStorage(target, (IntPtr)size, IntPtr.Zero, BufferStorageFlags.MapPersistentBit | BufferStorageFlags.MapWriteBit | (read ? BufferStorageFlags.MapReadBit : 0));
-
-            addr = GL.MapBufferRange(target, IntPtr.Zero, (IntPtr)size, BufferAccessMask.MapPersistentBit | BufferAccessMask.MapUnsynchronizedBit | BufferAccessMask.MapInvalidateBufferBit | BufferAccessMask.MapFlushExplicitBit | BufferAccessMask.MapWriteBit | (read ? BufferAccessMask.MapReadBit : 0));
-            GPUStateMachine.UnbindBuffer(target);
+            
+            GL.NamedBufferStorage(id, size, IntPtr.Zero, BufferStorageFlags.MapPersistentBit | BufferStorageFlags.MapWriteBit | (read ? BufferStorageFlags.MapReadBit : 0));
+            addr = GL.MapNamedBufferRange(id, IntPtr.Zero, size, BufferAccessMask.MapPersistentBit | BufferAccessMask.MapUnsynchronizedBit | BufferAccessMask.MapInvalidateBufferBit | BufferAccessMask.MapFlushExplicitBit | BufferAccessMask.MapWriteBit | (read ? BufferAccessMask.MapReadBit : 0));
         }
 
         public void BufferData<T>(int offset, T[] data, BufferUsageHint hint) where T : struct
@@ -50,11 +47,7 @@ namespace Kokoro.Graphics
             if (addr == IntPtr.Zero)
             {
                 if (data.Length < 1) throw new Exception("Buffer is empty!");
-                GPUStateMachine.BindBuffer(target, id);
-
-                GL.BufferData(target, (IntPtr)size, data, hint);
-
-                GPUStateMachine.UnbindBuffer(target);
+                GL.NamedBufferData(id, size, data, hint);
             }
             else
             {
@@ -74,23 +67,17 @@ namespace Kokoro.Graphics
 
         public void UnMapBuffer()
         {
-            GPUStateMachine.BindBuffer(target, id);
-            GL.UnmapBuffer(target);
-            GPUStateMachine.UnbindBuffer(target);
+            GL.UnmapNamedBuffer(id);
         }
 
         public void MapBuffer(bool read)
         {
-            GPUStateMachine.BindBuffer(target, id);
-            addr = GL.MapBufferRange(target, IntPtr.Zero, (IntPtr)size, BufferAccessMask.MapPersistentBit | BufferAccessMask.MapUnsynchronizedBit | BufferAccessMask.MapFlushExplicitBit | BufferAccessMask.MapInvalidateBufferBit | BufferAccessMask.MapWriteBit | (read ? BufferAccessMask.MapReadBit : 0));
-            GPUStateMachine.UnbindBuffer(target);
+            addr = GL.MapNamedBufferRange(id, IntPtr.Zero, size, BufferAccessMask.MapPersistentBit | BufferAccessMask.MapUnsynchronizedBit | BufferAccessMask.MapFlushExplicitBit | BufferAccessMask.MapInvalidateBufferBit | BufferAccessMask.MapWriteBit | (read ? BufferAccessMask.MapReadBit : 0));
         }
 
         public void MapBuffer(bool read, int offset, int size)
         {
-            GPUStateMachine.BindBuffer(target, id);
-            addr = GL.MapBufferRange(target, (IntPtr)offset, (IntPtr)size, BufferAccessMask.MapPersistentBit | BufferAccessMask.MapUnsynchronizedBit | BufferAccessMask.MapFlushExplicitBit | BufferAccessMask.MapInvalidateBufferBit | BufferAccessMask.MapWriteBit | (read ? BufferAccessMask.MapReadBit : 0));
-            GPUStateMachine.UnbindBuffer(target);
+            addr = GL.MapNamedBufferRange(id, (IntPtr)offset, size, BufferAccessMask.MapPersistentBit | BufferAccessMask.MapUnsynchronizedBit | BufferAccessMask.MapFlushExplicitBit | BufferAccessMask.MapInvalidateBufferBit | BufferAccessMask.MapWriteBit | (read ? BufferAccessMask.MapReadBit : 0));
         }
 
 
@@ -112,8 +99,7 @@ namespace Kokoro.Graphics
                     addr = IntPtr.Zero;
                     try
                     {
-                        GL.BindBuffer(target, id);
-                        GL.UnmapBuffer(target);
+                        GL.UnmapNamedBuffer(id);
                     }
                     catch (Exception)
                     {

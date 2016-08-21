@@ -26,13 +26,13 @@ namespace Kokoro.Graphics
                                  c3 = new CubeMapTextureSource(CubeMapFace.NegativeX, b3), 
                                  c4 = new CubeMapTextureSource(CubeMapFace.NegativeY, b4), 
                                  c5 = new CubeMapTextureSource(CubeMapFace.NegativeZ, b5);
-
-            t.SetData(c0);
-            t.SetData(c1);
-            t.SetData(c2);
-            t.SetData(c3);
-            t.SetData(c4);
-            t.SetData(c5);
+            
+            t.SetData(c0, 0);
+            t.SetData(c1, 0);
+            t.SetData(c2, 0);
+            t.SetData(c3, 0);
+            t.SetData(c4, 0);
+            t.SetData(c5, 0);
 
             return t;
         }
@@ -81,9 +81,9 @@ namespace Kokoro.Graphics
             return texSrc.GetLevels();
         }
 
-        public IntPtr GetPixelData()
+        public IntPtr GetPixelData(int level)
         {
-            return texSrc.GetPixelData();
+            return texSrc.GetPixelData(level);
         }
 
 
