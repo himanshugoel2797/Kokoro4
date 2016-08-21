@@ -7,8 +7,30 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Graphics
 {
+    public enum TextureResidency
+    {
+        NonResident,
+        Resident
+    }
+
+    public class TextureHandle
+    {
+        internal long hndl = 0;
+
+        internal TextureHandle(long hndl)
+        {
+            this.hndl = hndl;
+        }
+
+        public static implicit operator long(TextureHandle handle)
+        {
+            return handle.hndl;
+        }
+    }
+
     public class Texture : IDisposable
     {
+
         internal int id;
         internal PixelInternalFormat internalformat;
         internal TextureTarget texTarget;
@@ -18,6 +40,8 @@ namespace Kokoro.Graphics
         public int Height { get; internal set; }
         public int Depth { get; internal set; }
         public int LevelCount { get; internal set; }
+
+        public TextureHandle Handle { get; private set; }
 
         public static float MaxAnisotropy { get; internal set; }
 
@@ -34,7 +58,16 @@ namespace Kokoro.Graphics
             GraphicsDevice.Cleanup += Dispose;
         }
 
-        public void SetData(ITextureSource src, int level)
+        public void SetResidency(TextureResidency residency)
+        {
+            if(Handle == null)
+                Handle = new TextureHandle(GL.Arb.GetTextureHandle(id));
+
+            if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(Handle.hndl);
+            else GL.Arb.MakeTextureHandleNonResident(Handle.hndl);
+        }
+
+        public virtual void SetData(ITextureSource src, int level)
         {
             bool inited = false;
             if (id == 0)
@@ -42,19 +75,19 @@ namespace Kokoro.Graphics
                 GL.CreateTextures(src.GetTextureTarget(), 1, out id);
                 inited = true;
             }
-            
+
             switch (src.GetDimensions())
             {
                 case 1:
-                    if(inited)GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
+                    if (inited) GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
                     GL.TextureSubImage1D(id, level, 0, src.GetWidth(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
                     break;
                 case 2:
-                    if(inited)GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
+                    if (inited) GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
                     GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
                     break;
                 case 3:
-                    if(inited)GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
+                    if (inited) GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
                     GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
                     break;
             }

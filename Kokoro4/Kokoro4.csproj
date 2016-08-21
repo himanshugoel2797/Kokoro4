@@ -61,6 +61,7 @@
     <Compile Include="Graphics\Fence.cs" />
     <Compile Include="Graphics\Framebuffer.cs" />
     <Compile Include="Graphics\FramebufferTextureSource.cs" />
+    <Compile Include="Graphics\GBuffer.cs" />
     <Compile Include="Graphics\GPUBuffer.cs" />
     <Compile Include="Graphics\GPUStateMachine.cs" />
     <Compile Include="Graphics\GraphicsContext.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Graphics\ShaderProgram.cs" />
     <Compile Include="Graphics\ShaderSource.cs" />
     <Compile Include="Graphics\SimplexNoise.cs" />
+    <Compile Include="Graphics\SparseTexture.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\ShaderStorageBuffer.cs" />
     <Compile Include="Graphics\UniformBuffer.cs" />
@@ -316,6 +318,9 @@
     <None Include="Graphics\Shaders\SSR\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Engine\Graphics\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

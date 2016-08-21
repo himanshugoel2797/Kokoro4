@@ -23,7 +23,6 @@ namespace Kokoro.Graphics
         static ShaderProgram curProg;
         static Framebuffer curFramebuffer;
         static GameWindow game;
-        static List<Texture> textures;
         static List<Tuple<GPUBuffer, int, int>> feedbackBufs;
         static PrimitiveType feedbackPrimitive;
 
@@ -188,7 +187,6 @@ namespace Kokoro.Graphics
             curVarray = null;
             curProg = null;
             curFramebuffer = Framebuffer.Default;
-            textures = new List<Texture>();
             feedbackBufs = new List<Tuple<GPUBuffer, int, int>>();
         }
 
@@ -266,24 +264,10 @@ namespace Kokoro.Graphics
             curVarray = varray;
         }
 
-        public static void SetBufferTexture(int slot, BufferTexture b)
-        {
-            if (b != null) GPUStateMachine.BindTexture(slot, TextureTarget.TextureBuffer, b.id);
-            else GPUStateMachine.BindTexture(slot, TextureTarget.TextureBuffer, 0);
-        }
-
         public static void SetFramebuffer(Framebuffer framebuf)
         {
             if (curFramebuffer != null && curFramebuffer.id != framebuf.id) GPUStateMachine.UnbindFramebuffer();
             curFramebuffer = framebuf;
-        }
-
-        public static void SetTexture(int slot, Texture tex)
-        {
-            while (textures.Count <= slot)
-                textures.Add(null);
-
-            textures[slot] = tex;
         }
 
         public static void SetFeedbackBuffer(int slot, GPUBuffer buf)
@@ -314,8 +298,7 @@ namespace Kokoro.Graphics
             if (curProg == null) return;
             if (curFramebuffer == null) return;
 
-
-            for (int i = 0; i < textures.Count; i++) GPUStateMachine.BindTexture(i, textures[i].texTarget, textures[i].id);
+            
             for (int i = 0; i < feedbackBufs.Count; i++) GPUStateMachine.BindBuffer(BufferTarget.TransformFeedbackBuffer, feedbackBufs[i].Item1.id, i, (IntPtr)feedbackBufs[i].Item2, (IntPtr)feedbackBufs[i].Item3);
 
             GPUStateMachine.BindFramebuffer(curFramebuffer.id);
@@ -330,11 +313,8 @@ namespace Kokoro.Graphics
             if (feedbackBufs.Count > 0) GL.EndTransformFeedback();
 
             for (int i = 0; i < feedbackBufs.Count; i++) GPUStateMachine.UnbindBuffer(BufferTarget.TransformFeedbackBuffer, i);
-            for (int i = 0; i < textures.Count; i++) GPUStateMachine.UnbindTexture(i, textures[i].texTarget);
 
-            textures.Clear();
             feedbackBufs.Clear();
-
         }
 
         public static void Clear()

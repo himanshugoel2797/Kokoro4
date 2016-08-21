@@ -11,6 +11,9 @@ namespace Kokoro.Graphics
     {
         private int width, height, levels;
 
+        public PixelType PixelType { get; set; }
+        public PixelInternalFormat InternalFormat { get; set; }
+
         public FramebufferTextureSource(int width, int height, int levels)
         {
             this.width = width;
@@ -40,7 +43,7 @@ namespace Kokoro.Graphics
 
         public PixelInternalFormat GetInternalFormat()
         {
-            return PixelInternalFormat.Rgba;
+            return InternalFormat;
         }
 
         public int GetLevels()
@@ -65,7 +68,7 @@ namespace Kokoro.Graphics
 
         PixelType ITextureSource.GetType()
         {
-            return PixelType.UnsignedByte;
+            return PixelType;
         }
     }
 }

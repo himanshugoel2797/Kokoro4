@@ -82,8 +82,6 @@ namespace Kokoro.Engine
 
         public void Bind()
         {
-            for (int i = 0; i < textures.Count; i++)
-                GraphicsDevice.SetTexture(i, textures[i]);
         }
 
         #region IDisposable Support
