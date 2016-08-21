@@ -182,7 +182,7 @@ namespace Kokoro.Graphics
             game.VSync = VSyncMode.Off;
             game.Resize += Window_Resize;
             game.Load += Game_Load;
-            game.RenderFrame += Game_RenderFrame;
+            game.RenderFrame += InitRender;
             game.UpdateFrame += Game_UpdateFrame;
 
             curVarray = null;
@@ -191,6 +191,7 @@ namespace Kokoro.Graphics
             textures = new List<Texture>();
             feedbackBufs = new List<Tuple<GPUBuffer, int, int>>();
         }
+
 
         public static void Run(double ups, double fps)
         {
@@ -214,6 +215,20 @@ namespace Kokoro.Graphics
         private static void Game_UpdateFrame(object sender, FrameEventArgs e)
         {
             Update?.Invoke(e.Time);
+        }
+
+        private static void InitRender(object sender, FrameEventArgs e)
+        {
+            int major_v = GL.GetInteger(GetPName.MajorVersion);
+            int minor_v = GL.GetInteger(GetPName.MinorVersion);
+            if(major_v < 4 | (major_v == 4 && minor_v < 5))
+            {
+                throw new Exception($"Unsupported OpenGL version ({major_v}.{minor_v}), minimum OpenGL 4.5 required.");
+            }
+
+            Game_RenderFrame(sender, e);
+            game.RenderFrame -= InitRender;
+            game.RenderFrame += Game_RenderFrame;
         }
 
         private static void Game_RenderFrame(object sender, FrameEventArgs e)

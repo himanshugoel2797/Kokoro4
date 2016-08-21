@@ -75,6 +75,7 @@
     <Compile Include="Graphics\ShaderSource.cs" />
     <Compile Include="Graphics\SimplexNoise.cs" />
     <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\ShaderStorageBuffer.cs" />
     <Compile Include="Graphics\UniformBuffer.cs" />
     <Compile Include="Graphics\VertexArray.cs" />
     <Compile Include="Math\BezierCurve.cs" />
