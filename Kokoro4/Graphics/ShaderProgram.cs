@@ -55,6 +55,19 @@ namespace Kokoro.Graphics
             GL.LinkProgram(id);
         }
 
+        public void Set(string name, TextureHandle handle)
+        {
+            int loc = 0;
+            if (!locs.ContainsKey(name))
+            {
+                loc = GL.GetProgramResourceLocation(id, ProgramInterface.Uniform, name);
+                locs[name] = loc;
+            }
+            else loc = locs[name];
+
+            if (loc >= 0) GL.Arb.ProgramUniformHandle(id, loc, handle);
+        }
+
         public void Set(string name, UniformBuffer ubo)
         {
             GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, ubo.buf.id, ubo.bindPoint, IntPtr.Zero, IntPtr.Zero);

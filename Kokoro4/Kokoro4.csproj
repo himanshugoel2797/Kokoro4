@@ -52,6 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\UI\UICompositor.cs" />
+    <Compile Include="Engine\UI\UIContainer.cs" />
+    <Compile Include="Engine\UI\UIContext.cs" />
+    <Compile Include="Engine\UI\UIControl.cs" />
     <Compile Include="Graphics\BitmapTextureSource.cs" />
     <Compile Include="Graphics\BufferTexture.cs" />
     <Compile Include="Graphics\Cameras\Camera.cs" />
@@ -78,6 +82,7 @@
     <Compile Include="Graphics\SparseTexture.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\ShaderStorageBuffer.cs" />
+    <Compile Include="Graphics\TextWriter.cs" />
     <Compile Include="Graphics\UniformBuffer.cs" />
     <Compile Include="Graphics\VertexArray.cs" />
     <Compile Include="Math\BezierCurve.cs" />
