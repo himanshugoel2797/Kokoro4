@@ -55,10 +55,11 @@ namespace Kokoro.Graphics
             GL.LinkProgram(id);
         }
 
-        public void SetUBO(string name, int index)
+        public void Set(string name, UniformBuffer ubo)
         {
+            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, ubo.buf.id, ubo.bindPoint, IntPtr.Zero, IntPtr.Zero);
             int loc = GL.GetUniformBlockIndex(id, name);
-            GL.UniformBlockBinding(id, loc, index);
+            GL.UniformBlockBinding(id, loc, ubo.bindPoint);
         }
 
         public void Set(string name, Vector3 vec)

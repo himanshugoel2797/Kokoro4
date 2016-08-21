@@ -32,7 +32,7 @@ namespace Kokoro.Graphics
             boundBuffers[BufferTarget.ArrayBuffer] = new List<Stack<int>>();
             boundBuffers[BufferTarget.ArrayBuffer].Add(new Stack<int>());
             boundBuffers[BufferTarget.ArrayBuffer][0].Push(0);
-            
+
             boundBuffers[BufferTarget.TextureBuffer] = new List<Stack<int>>();
             boundBuffers[BufferTarget.TextureBuffer].Add(new Stack<int>());
             boundBuffers[BufferTarget.TextureBuffer][0].Push(0);
@@ -87,7 +87,11 @@ namespace Kokoro.Graphics
             if (target != BufferTarget.TransformFeedbackBuffer && target != BufferTarget.UniformBuffer) throw new Exception("Incorrect Function Called, Use other Overload");
             if (boundBuffers[target][index].Count == 0) boundBuffers[target][index].Push(0);
 
-            if (boundBuffers[target][index].Peek() != id || id == 0) GL.BindBufferRange((BufferRangeTarget)target, index, id, off, size);
+            if (boundBuffers[target][index].Peek() != id || id == 0)
+            {
+                if (size == IntPtr.Zero) GL.BindBufferBase((BufferRangeTarget)target, index, id);
+                else GL.BindBufferRange((BufferRangeTarget)target, index, id, off, size);
+            }
             boundBuffers[target][index].Push(id);
         }
 

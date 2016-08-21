@@ -22,7 +22,6 @@ namespace Kokoro.Graphics
         static VertexArray curVarray;
         static ShaderProgram curProg;
         static Framebuffer curFramebuffer;
-        static GPUBuffer curIndices;
         static GameWindow game;
         static List<Texture> textures;
         static List<Tuple<GPUBuffer, int, int>> feedbackBufs;
@@ -250,13 +249,6 @@ namespace Kokoro.Graphics
         {
             if (curVarray != null && varray.id != curVarray.id) GPUStateMachine.UnbindVertexArray();
             curVarray = varray;
-        }
-
-        public static void SetUniformBuffer(GPUBuffer buf, int bufIndex, int baseOff, int size)
-        {
-            if (buf.target != BufferTarget.UniformBuffer) throw new ArgumentException("Argument must be a uniform buffer!");
-
-            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.id, bufIndex, (IntPtr)baseOff, (IntPtr)size);
         }
 
         public static void SetBufferTexture(int slot, BufferTexture b)

@@ -75,6 +75,7 @@
     <Compile Include="Graphics\ShaderSource.cs" />
     <Compile Include="Graphics\SimplexNoise.cs" />
     <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\UniformBuffer.cs" />
     <Compile Include="Graphics\VertexArray.cs" />
     <Compile Include="Math\BezierCurve.cs" />
     <Compile Include="Math\BezierCurveCubic.cs" />
@@ -113,7 +114,6 @@
     <Compile Include="Math\Vector4h.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\EngineObject.cs" />
-    <Compile Include="Engine\ObjectBatch.cs" />
     <Compile Include="SceneGraph\Node.cs" />
     <Compile Include="SceneGraph\PositionNode.cs" />
     <Compile Include="SceneGraph\RotationNode.cs" />
