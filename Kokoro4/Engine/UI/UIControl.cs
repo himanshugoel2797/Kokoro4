@@ -27,10 +27,13 @@ namespace Kokoro.Engine.UI
             }
         }
 
+        protected UIRenderer renderer;
+
         public UIControl()
         {
             Controls = new List<UIControl>();
             Visible = true;
+            renderer = new UIRenderer();
         }
 
         public virtual void Draw()

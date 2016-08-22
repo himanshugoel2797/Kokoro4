@@ -8,16 +8,13 @@ namespace Kokoro.Engine.UI
 {
     public class UIContainer : UIControl
     {
-        UIRenderer renderer;
-
-        public UIContainer()
-        {
-            renderer = new UIRenderer();
-        }
-
         public override void Draw()
         {
-            renderer.Apply(new Math.Vector4(1, 1, 1, 1), this.GlobalPosition, this.Size);
+            if (Visible)
+            {
+                renderer.Apply(new Math.Vector4(0.4f, 0.4f, 0.4f, 0.4f), this.GlobalPosition, this.Size);
+                base.Draw();
+            }
         }
     }
 }

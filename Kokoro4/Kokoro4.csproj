@@ -96,6 +96,7 @@
     <Compile Include="Engine\UI\UIContainer.cs" />
     <Compile Include="Engine\UI\UIContext.cs" />
     <Compile Include="Engine\UI\UIControl.cs" />
+    <Compile Include="Engine\UI\UILabel.cs" />
     <Compile Include="Engine\UI\UIRenderer.cs" />
     <Compile Include="Graphics\BitmapTextureSource.cs" />
     <Compile Include="Graphics\BufferTexture.cs" />
@@ -206,7 +207,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="Graphics\Shaders\FilledRectangle\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Shaders\TextureRectangle\fragment.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Graphics\Shaders\FrameBufferToG\fragment.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -215,10 +219,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="Graphics\Shaders\FrameBuffer\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\Shaders\FrameBuffer\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Graphics\Shaders\Fur\fragment.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

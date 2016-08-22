@@ -91,7 +91,7 @@ namespace Kokoro.Graphics
             tmpG.Flush();
             tmpG.Dispose();
 
-            var t = new BitmapTextureSource(bmp, 0);
+            var t = new BitmapTextureSource(bmp, 1);
             bmp.Dispose();
             return t;
         }

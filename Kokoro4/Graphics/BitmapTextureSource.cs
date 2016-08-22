@@ -54,7 +54,7 @@ namespace Kokoro.Graphics
 
         public PixelInternalFormat GetInternalFormat()
         {
-            return PixelInternalFormat.Rgba;
+            return PixelInternalFormat.Rgba8;
         }
 
         public int GetLevels()

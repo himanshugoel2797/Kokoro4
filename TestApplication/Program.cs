@@ -18,6 +18,7 @@ namespace TestApplication
         {
             UIContext ui_ctxt = null;
             UIContainer ui_cntnr = null;
+            UILabel ui_lbl = null;
 
             GraphicsDevice.Update += (double interval) =>
             {
@@ -37,9 +38,19 @@ namespace TestApplication
                 if(ui_cntnr == null)
                 {
                     ui_cntnr = new UIContainer();
-                    ui_cntnr.Size = new Kokoro.Math.Vector2(GraphicsDevice.WindowSize.Width, GraphicsDevice.WindowSize.Height);
+                    ui_cntnr.Size = new Kokoro.Math.Vector2(GraphicsDevice.WindowSize.Width/2, GraphicsDevice.WindowSize.Height/2);
 
                     ui_ctxt.Containers.Add(ui_cntnr);
+                }
+
+                if(ui_lbl == null)
+                {
+                    ui_lbl = new UILabel();
+                    ui_lbl.Text = "Hello World!";
+                    ui_lbl.TextSize = 12;
+                    ui_lbl.TextColor = System.Drawing.Color.Beige;
+
+                    ui_cntnr.Controls.Add(ui_lbl);
                 }
 
                 GraphicsDevice.ClearColor = new Kokoro.Math.Vector4(0, 0.5f, 1.0f, 0.0f);
