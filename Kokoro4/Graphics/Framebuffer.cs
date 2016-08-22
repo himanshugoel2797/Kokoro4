@@ -13,9 +13,19 @@ namespace Kokoro.Graphics
 
         static Framebuffer()
         {
-            Default = new Framebuffer(0, 0);
-            Default.id = 0;
-            Default.bindings[FramebufferAttachment.ColorAttachment0] = null;
+            Default = new Framebuffer(0, GraphicsDevice.WindowSize.Width, GraphicsDevice.WindowSize.Height);
+        }
+
+        internal static void RecreateDefaultFramebuffer()
+        {
+            Default = new Framebuffer(0, GraphicsDevice.WindowSize.Width, GraphicsDevice.WindowSize.Height);
+        }
+
+        private Framebuffer(int id, int w, int h)
+        {
+            Width = w;
+            Height = h;
+            this.id = id;
         }
 
         internal int id;

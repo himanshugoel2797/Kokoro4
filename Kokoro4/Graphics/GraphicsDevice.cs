@@ -289,6 +289,7 @@ namespace Kokoro.Graphics
         {
             GPUStateMachine.SetViewport(0, 0, game.Width, game.Height);
             InputLL.SetWinXY(game.Location.X, game.Location.Y, game.ClientSize.Width, game.ClientSize.Height);
+            Framebuffer.RecreateDefaultFramebuffer();
         }
 
         public static void SetViewport(int x, int y, int width, int height)
