@@ -124,7 +124,7 @@
     <Compile Include="Graphics\SparseTexture.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\ShaderStorageBuffer.cs" />
-    <Compile Include="Graphics\TextWriter.cs" />
+    <Compile Include="Graphics\TextDrawer.cs" />
     <Compile Include="Graphics\UniformBuffer.cs" />
     <Compile Include="Graphics\VertexArray.cs" />
     <Compile Include="Math\BezierCurve.cs" />
