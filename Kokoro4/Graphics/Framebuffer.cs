@@ -21,8 +21,14 @@ namespace Kokoro.Graphics
         internal int id;
         internal Dictionary<FramebufferAttachment, Texture> bindings;
 
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
         public Framebuffer(int width, int height)
         {
+            Width = width;
+            Height = height;
+
             GL.CreateFramebuffers(1, out id);
             bindings = new Dictionary<FramebufferAttachment, Texture>();
             GraphicsDevice.Cleanup += Dispose;
@@ -33,17 +39,16 @@ namespace Kokoro.Graphics
             set
             {
                 bindings[attachment] = value;
+
                 GL.NamedFramebufferTexture(id, attachment, value.id, 0);
 
                 GL.NamedFramebufferDrawBuffers(id, bindings.Keys.Count,
                     bindings.Keys.OrderByDescending((a) => (int)a).Reverse().Cast<DrawBuffersEnum>().ToArray());
-                
+
                 if(GL.CheckNamedFramebufferStatus(id, FramebufferTarget.Framebuffer) != (All)FramebufferErrorCode.FramebufferComplete)
                 {
                     throw new Exception("Incomplete Framebuffer!");
                 }
-
-                GPUStateMachine.UnbindFramebuffer();
             }
             get
             {

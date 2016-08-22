@@ -13,20 +13,23 @@ namespace Kokoro.Engine.UI
         Framebuffer ui_fbuf;
 
         public List<UIContainer> Containers { get; set; }
+        private UICompositor Compositor;
 
         public UIContext(int w, int h)
         {
             ui_col = new Texture();
 
-            FramebufferTextureSource ui_col_tex = new FramebufferTextureSource(w, h, 0)
+            FramebufferTextureSource ui_col_tex = new FramebufferTextureSource(w, h, 1)
             {
-                InternalFormat = OpenTK.Graphics.OpenGL4.PixelInternalFormat.Rgba8,
-                PixelType = OpenTK.Graphics.OpenGL4.PixelType.UnsignedInt8888
+                InternalFormat = OpenTK.Graphics.OpenGL4.PixelInternalFormat.Rgba,
+                PixelType = OpenTK.Graphics.OpenGL4.PixelType.UnsignedByte
             };
 
             ui_col.SetData(ui_col_tex, 0);
             ui_fbuf = new Framebuffer(w, h);
             ui_fbuf[OpenTK.Graphics.OpenGL4.FramebufferAttachment.ColorAttachment0] = ui_col;
+
+            Compositor = new UICompositor();
 
             Containers = new List<UIContainer>();
         }
@@ -34,8 +37,12 @@ namespace Kokoro.Engine.UI
         public void Draw()
         {
             bool depth_state = GraphicsDevice.DepthTestEnabled;
+            bool depth_write = GraphicsDevice.DepthWriteEnabled;
+            GraphicsDevice.DepthWriteEnabled = false;
             GraphicsDevice.DepthTestEnabled = false;
             GraphicsDevice.SetFramebuffer(ui_fbuf);
+            
+            GraphicsDevice.Clear();
 
             for(int i = 0; i < Containers.Count; i++)
             {
@@ -45,9 +52,10 @@ namespace Kokoro.Engine.UI
             GraphicsDevice.SetFramebuffer(Framebuffer.Default);
             //Now blend the UI on top
 
-
+            Compositor.Apply(ui_col);
 
             GraphicsDevice.DepthTestEnabled = depth_state;
+            GraphicsDevice.DepthWriteEnabled = depth_write;
         }
 
 

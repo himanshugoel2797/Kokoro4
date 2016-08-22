@@ -82,6 +82,7 @@ namespace Kokoro.Engine
 
         public void Bind()
         {
+            GraphicsDevice.SetVertexArray(mesh);
         }
 
         #region IDisposable Support

@@ -35,8 +35,6 @@ namespace Kokoro.Graphics
         internal int bindPoint = 0;
         internal Fence readyFence;
 
-        bool dirty = false;
-
         public UniformBuffer()
         {
             buf = new GPUBuffer(BufferTarget.UniformBuffer, UniformBufferSize, false);

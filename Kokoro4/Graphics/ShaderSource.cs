@@ -22,6 +22,8 @@ namespace Kokoro.Graphics
 
         public ShaderSource(ShaderType sType, string src)
         {
+            src = "#version 450 core\n#extension GL_ARB_bindless_texture : require\n" + src;
+
             id = GL.CreateShader(sType);
             GL.ShaderSource(id, src);
             GL.CompileShader(id);

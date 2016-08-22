@@ -26,8 +26,9 @@ namespace Kokoro.Graphics
         {
             GL.EnableVertexArrayAttrib(id, index);
 
-            GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, 0);
             GL.VertexArrayAttribFormat(id, index, elementCount, (VertexAttribType)type, false, 0);
+            GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, elementCount * 4);
+            GL.VertexArrayAttribBinding(id, index, index);
         }
 
         #region IDisposable Support

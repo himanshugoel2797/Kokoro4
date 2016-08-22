@@ -1,5 +1,4 @@
-﻿#version 430 core
-
+﻿
 // Interpolated values from the vertex shaders
 in vec2 UV;
 
@@ -8,8 +7,9 @@ in vec2 UV;
 layout(location = 0) out vec4 color;
 
 // Values that stay constant for the whole mesh.
-uniform sampler2D AlbedoMap;
+layout(bindless_sampler) uniform sampler2D AlbedoMap;
 
 void main(){
-	color = texture2D(AlbedoMap, UV);
+	color = vec4(1);
+	//color = texture(AlbedoMap, UV);
 }

@@ -20,6 +20,9 @@ namespace Kokoro.Engine.UI
         {
             get
             {
+                if (Parent == null)
+                    return Position;
+
                 return Parent.GlobalPosition + Position;
             }
         }

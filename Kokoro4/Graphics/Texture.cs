@@ -63,8 +63,8 @@ namespace Kokoro.Graphics
             if(Handle == null)
                 Handle = new TextureHandle(GL.Arb.GetTextureHandle(id));
 
-            if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(Handle.hndl);
-            else GL.Arb.MakeTextureHandleNonResident(Handle.hndl);
+            if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(Handle);
+            else GL.Arb.MakeTextureHandleNonResident(Handle);
         }
 
         public virtual void SetData(ITextureSource src, int level)

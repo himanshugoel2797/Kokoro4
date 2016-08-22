@@ -1,5 +1,5 @@
 ﻿using Kokoro.Graphics.Input.LowLevel;
-using OpenTK;
+using Kokoro.Math;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using GameWindow = OpenTK.GameWindow;
+using FrameEventArgs = OpenTK.FrameEventArgs;
+using VSyncMode = OpenTK.VSyncMode;
 
 namespace Kokoro.Graphics
 {
@@ -50,6 +54,20 @@ namespace Kokoro.Graphics
             {
                 game.Width = value.Width;
                 game.Height = value.Height;
+            }
+        }
+
+        static Vector4 clearColor;
+        public static Vector4 ClearColor
+        {
+            get
+            {
+                return clearColor;
+            }
+            set
+            {
+                clearColor = value;
+                GL.ClearColor(clearColor.X, clearColor.Y, clearColor.Z, clearColor.W);
             }
         }
 
@@ -175,6 +193,20 @@ namespace Kokoro.Graphics
             }
         }
 
+        static bool depthWrite = false;
+        public static bool DepthWriteEnabled
+        {
+            get
+            {
+                return depthWrite;
+            }
+            set
+            {
+                depthWrite = value;
+                GL.DepthMask(depthWrite);
+            }
+        }
+
         static int workGroupSize = 0;
         public static int ComputeWorkGroupSize
         {
@@ -189,7 +221,7 @@ namespace Kokoro.Graphics
 
         static GraphicsDevice()
         {
-            game = new GameWindow((int)(16f / 9f * 540), 540);
+            game = new GameWindow(1280, 720);
             game.VSync = VSyncMode.Off;
             game.Resize += Window_Resize;
             game.Load += Game_Load;
@@ -198,7 +230,6 @@ namespace Kokoro.Graphics
 
             curVarray = null;
             curProg = null;
-            curFramebuffer = Framebuffer.Default;
             feedbackBufs = new List<Tuple<GPUBuffer, int, int>>();
         }
 
@@ -248,6 +279,7 @@ namespace Kokoro.Graphics
 
         private static void Game_Load(object sender, EventArgs e)
         {
+            curFramebuffer = Framebuffer.Default;
             GL.Enable(EnableCap.DepthClamp);
             GL.Enable(EnableCap.TextureCubeMapSeamless);
             Load?.Invoke();
@@ -266,20 +298,20 @@ namespace Kokoro.Graphics
 
         public static void SetShaderProgram(ShaderProgram prog)
         {
-            if (curProg != null && prog.id != curProg.id) GL.UseProgram(0);
             curProg = prog;
         }
 
         public static void SetVertexArray(VertexArray varray)
         {
-            if (curVarray != null && varray.id != curVarray.id) GPUStateMachine.UnbindVertexArray();
             curVarray = varray;
+            GL.BindVertexArray(varray.id);
         }
 
         public static void SetFramebuffer(Framebuffer framebuf)
         {
-            if (curFramebuffer != null && curFramebuffer.id != framebuf.id) GPUStateMachine.UnbindFramebuffer();
             curFramebuffer = framebuf;
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, curFramebuffer.id);
+            SetViewport(0, 0, framebuf.Width, framebuf.Height);
         }
 
         public static void SetFeedbackBuffer(int slot, GPUBuffer buf)
@@ -319,11 +351,11 @@ namespace Kokoro.Graphics
             
             for (int i = 0; i < feedbackBufs.Count; i++) GPUStateMachine.BindBuffer(BufferTarget.TransformFeedbackBuffer, feedbackBufs[i].Item1.id, i, (IntPtr)feedbackBufs[i].Item2, (IntPtr)feedbackBufs[i].Item3);
 
-            GPUStateMachine.BindFramebuffer(curFramebuffer.id);
             if (feedbackBufs.Count > 0) GL.BeginTransformFeedback((TransformFeedbackPrimitiveType)feedbackPrimitive);
 
+            curProg.Set("WindowSize", new Vector2(WindowSize.Width, WindowSize.Height));
+
             GL.UseProgram(curProg.id);
-            GPUStateMachine.BindVertexArray(curVarray.id);
 
             if (indexed) GL.DrawElements(type, count, DrawElementsType.UnsignedInt, IntPtr.Zero);
             else GL.DrawArrays(type, first, count);
@@ -338,7 +370,6 @@ namespace Kokoro.Graphics
         public static void Clear()
         {
             // render graphics
-            GL.ClearColor(0, 0.5f, 1.0f, 0.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         }
 
