@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using GameWindow = OpenTK.GameWindow;
 using FrameEventArgs = OpenTK.FrameEventArgs;
 using VSyncMode = OpenTK.VSyncMode;
+using Kokoro.StateMachine;
 
 namespace Kokoro.Graphics
 {
@@ -83,9 +84,34 @@ namespace Kokoro.Graphics
                 gameName = value;
             }
         }
+
+        public static StateGroup GameLoop { get; set; }
+
         public static Action Load { get; set; }
-        public static Action<double> Render { get; set; }
-        public static Action<double> Update { get; set; }
+        public static Action<double> Render
+        {
+            get
+            {
+                return GameLoop?.Render;
+            }
+            set
+            {
+                if (GameLoop != null)
+                    GameLoop.Render = value;
+            }
+        }
+        public static Action<double> Update
+        {
+            get
+            {
+                return GameLoop?.Update;
+            }
+            set
+            {
+                if (GameLoop != null)
+                    GameLoop.Update = value;
+            }
+        }
         public static Action Cleanup { get; set; }
         public static OpenTK.Input.KeyboardDevice Keyboard { get { return game.Keyboard; } }
         public static OpenTK.Input.MouseDevice Mouse { get { return game.Mouse; } }
@@ -228,6 +254,8 @@ namespace Kokoro.Graphics
             game.RenderFrame += InitRender;
             game.UpdateFrame += Game_UpdateFrame;
 
+            GameLoop = new StateGroup();
+
             curVarray = null;
             curProg = null;
             feedbackBufs = new List<Tuple<GPUBuffer, int, int>>();
@@ -244,7 +272,7 @@ namespace Kokoro.Graphics
         public static void SwapBuffers()
         {
 #if DEBUG
-            if(renderer_name == "")
+            if (renderer_name == "")
                 renderer_name = GL.GetString(StringName.Renderer);
 
             game.Title = gameName + $" | {renderer_name} | FPS : {game.RenderFrequency:F2}, UPS : {game.UpdateFrequency:F2}";
@@ -266,7 +294,7 @@ namespace Kokoro.Graphics
         {
             int major_v = GL.GetInteger(GetPName.MajorVersion);
             int minor_v = GL.GetInteger(GetPName.MinorVersion);
-            if(major_v < 4 | (major_v == 4 && minor_v < 5))
+            if (major_v < 4 | (major_v == 4 && minor_v < 5))
             {
                 throw new Exception($"Unsupported OpenGL version ({major_v}.{minor_v}), minimum OpenGL 4.5 required.");
             }
@@ -354,7 +382,7 @@ namespace Kokoro.Graphics
             if (curProg == null) return;
             if (curFramebuffer == null) return;
 
-            
+
             for (int i = 0; i < feedbackBufs.Count; i++) GPUStateMachine.BindBuffer(BufferTarget.TransformFeedbackBuffer, feedbackBufs[i].Item1.id, i, (IntPtr)feedbackBufs[i].Item2, (IntPtr)feedbackBufs[i].Item3);
 
             if (feedbackBufs.Count > 0) GL.BeginTransformFeedback((TransformFeedbackPrimitiveType)feedbackPrimitive);

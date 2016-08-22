@@ -168,6 +168,9 @@
     <Compile Include="SceneGraph\PositionNode.cs" />
     <Compile Include="SceneGraph\RotationNode.cs" />
     <Compile Include="SceneGraph\ScaleNode.cs" />
+    <Compile Include="StateMachine\IScene.cs" />
+    <Compile Include="StateMachine\StateGroup.cs" />
+    <Compile Include="StateMachine\StateMachine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphics\Shaders\Atmosphere\fragment.glsl">
