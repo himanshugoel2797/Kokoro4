@@ -14,7 +14,7 @@ namespace Kokoro.Engine.UI
 
         public UICompositor()
         {
-            program = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL4.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL4.ShaderType.FragmentShader, "Graphics/Shaders/FrameBuffer/fragment.glsl"));
+            program = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/FrameBuffer/fragment.glsl"));
             fsq = Graphics.Prefabs.FullScreenQuadFactory.Create();
         }
 
@@ -25,7 +25,7 @@ namespace Kokoro.Engine.UI
 
             fsq.Bind();
             GraphicsDevice.SetShaderProgram(program);
-            GraphicsDevice.Draw(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, 0, 6, true);
+            GraphicsDevice.Draw(OpenTK.Graphics.OpenGL.PrimitiveType.Triangles, 0, 6, true);
 
             tex.SetResidency(TextureResidency.NonResident);
         }

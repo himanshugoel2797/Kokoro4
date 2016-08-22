@@ -21,13 +21,13 @@ namespace Kokoro.Engine.UI
 
             FramebufferTextureSource ui_col_tex = new FramebufferTextureSource(w, h, 1)
             {
-                InternalFormat = OpenTK.Graphics.OpenGL4.PixelInternalFormat.Rgba,
-                PixelType = OpenTK.Graphics.OpenGL4.PixelType.UnsignedByte
+                InternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgba,
+                PixelType = OpenTK.Graphics.OpenGL.PixelType.UnsignedByte
             };
 
             ui_col.SetData(ui_col_tex, 0);
             ui_fbuf = new Framebuffer(w, h);
-            ui_fbuf[OpenTK.Graphics.OpenGL4.FramebufferAttachment.ColorAttachment0] = ui_col;
+            ui_fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.ColorAttachment0] = ui_col;
 
             Compositor = new UICompositor();
 

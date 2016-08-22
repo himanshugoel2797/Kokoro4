@@ -15,8 +15,8 @@ namespace Kokoro.Engine.UI
 
         public UIRenderer()
         {
-            if(fill_prog == null)fill_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL4.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL4.ShaderType.FragmentShader, "Graphics/Shaders/FilledRectangle/fragment.glsl"));
-            if (tex_prog == null) tex_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL4.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL4.ShaderType.FragmentShader, "Graphics/Shaders/TextureRectangle/fragment.glsl"));
+            if(fill_prog == null)fill_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/FilledRectangle/fragment.glsl"));
+            if (tex_prog == null) tex_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/TextureRectangle/fragment.glsl"));
             if (fsq == null)fsq = Graphics.Prefabs.FullScreenQuadFactory.Create();
         }
 
@@ -30,7 +30,7 @@ namespace Kokoro.Engine.UI
             GraphicsDevice.AlphaEnabled = true;
             fsq.Bind();
             GraphicsDevice.SetShaderProgram(fill_prog);
-            GraphicsDevice.Draw(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, 0, 6, true);
+            GraphicsDevice.Draw(OpenTK.Graphics.OpenGL.PrimitiveType.Triangles, 0, 6, true);
             GraphicsDevice.AlphaEnabled = blendstate;
         }
         
@@ -45,7 +45,7 @@ namespace Kokoro.Engine.UI
             GraphicsDevice.AlphaEnabled = true;
             fsq.Bind();
             GraphicsDevice.SetShaderProgram(tex_prog);
-            GraphicsDevice.Draw(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, 0, 6, true);
+            GraphicsDevice.Draw(OpenTK.Graphics.OpenGL.PrimitiveType.Triangles, 0, 6, true);
             GraphicsDevice.AlphaEnabled = blendstate;
 
             tex.SetResidency(TextureResidency.NonResident);

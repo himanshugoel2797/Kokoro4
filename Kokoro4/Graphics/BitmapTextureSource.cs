@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL4;
+using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -42,9 +42,9 @@ namespace Kokoro.Graphics
             return 2;
         }
 
-        public OpenTK.Graphics.OpenGL4.PixelFormat GetFormat()
+        public OpenTK.Graphics.OpenGL.PixelFormat GetFormat()
         {
-            return OpenTK.Graphics.OpenGL4.PixelFormat.Bgra;
+            return OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
         }
 
         public int GetHeight()

@@ -1,6 +1,6 @@
 ﻿using Kokoro.Graphics.Input.LowLevel;
 using Kokoro.Math;
-using OpenTK.Graphics.OpenGL4;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -240,10 +240,14 @@ namespace Kokoro.Graphics
             game.Run(ups, fps);
         }
 
+        static string renderer_name = "";
         public static void SwapBuffers()
         {
 #if DEBUG
-            game.Title = gameName + $"FPS : {game.RenderFrequency}, UPS : {game.UpdateFrequency}";
+            if(renderer_name == "")
+                renderer_name = GL.GetString(StringName.Renderer);
+
+            game.Title = gameName + $" | {renderer_name} | FPS : {game.RenderFrequency:F2}, UPS : {game.UpdateFrequency:F2}";
 #endif
             game.SwapBuffers();
         }
@@ -282,6 +286,7 @@ namespace Kokoro.Graphics
             curFramebuffer = Framebuffer.Default;
             GL.Enable(EnableCap.DepthClamp);
             GL.Enable(EnableCap.TextureCubeMapSeamless);
+            GL.NV.DepthRange(-1, 1);
             Load?.Invoke();
         }
 

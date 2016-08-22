@@ -27,7 +27,7 @@ namespace TestApplication
 
             GraphicsDevice.Render += (double interval) =>
             {
-                GraphicsDevice.CullMode = OpenTK.Graphics.OpenGL4.CullFaceMode.Back;
+                GraphicsDevice.CullMode = OpenTK.Graphics.OpenGL.CullFaceMode.Back;
                 GraphicsDevice.CullEnabled = false;
 
                 if (ui_ctxt == null)
