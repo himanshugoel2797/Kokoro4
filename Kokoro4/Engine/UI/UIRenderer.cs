@@ -11,13 +11,13 @@ namespace Kokoro.Engine.UI
     public class UIRenderer
     {
         static ShaderProgram fill_prog, tex_prog;
-        static EngineObject fsq;
+        static Mesh fsq;
 
         public UIRenderer()
         {
             if(fill_prog == null)fill_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/FilledRectangle/fragment.glsl"));
             if (tex_prog == null) tex_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/TextureRectangle/fragment.glsl"));
-            if (fsq == null)fsq = Graphics.Prefabs.FullScreenQuadFactory.Create();
+            if (fsq == null)fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create();
         }
 
         public void Apply(Vector4 col, Vector2 Position, Vector2 Size)

@@ -92,16 +92,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\EngineComponent.cs" />
+    <Compile Include="Engine\EngineManager.cs" />
+    <Compile Include="Engine\Graphics\Material.cs" />
     <Compile Include="Engine\UI\UICompositor.cs" />
     <Compile Include="Engine\UI\UIContainer.cs" />
     <Compile Include="Engine\UI\UIContext.cs" />
     <Compile Include="Engine\UI\UIControl.cs" />
     <Compile Include="Engine\UI\UILabel.cs" />
     <Compile Include="Engine\UI\UIRenderer.cs" />
+    <Compile Include="Engine\Voxel\Chunk.cs" />
+    <Compile Include="Engine\Voxel\RLEData.cs" />
     <Compile Include="Graphics\BitmapTextureSource.cs" />
     <Compile Include="Graphics\BufferTexture.cs" />
-    <Compile Include="Graphics\Cameras\Camera.cs" />
-    <Compile Include="Graphics\Cameras\FirstPersonCamera.cs" />
+    <Compile Include="Engine\Cameras\Camera.cs" />
+    <Compile Include="Engine\Cameras\FirstPersonCamera.cs" />
     <Compile Include="Graphics\CubeMapTextureSource.cs" />
     <Compile Include="Graphics\DepthTextureSource.cs" />
     <Compile Include="Graphics\Fence.cs" />
@@ -110,13 +115,13 @@
     <Compile Include="Graphics\GBuffer.cs" />
     <Compile Include="Graphics\GPUBuffer.cs" />
     <Compile Include="Graphics\GPUStateMachine.cs" />
-    <Compile Include="Graphics\GraphicsContext.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\Input\Keyboard.cs" />
     <Compile Include="Graphics\Input\LowLevel\Input.cs" />
     <Compile Include="Graphics\Input\Mouse.cs" />
     <Compile Include="Graphics\ITextureSource.cs" />
     <Compile Include="Graphics\Prefabs\CubeFactory.cs" />
+    <Compile Include="Graphics\Prefabs\SphereFactory.cs" />
     <Compile Include="Graphics\Prefabs\FullScreenQuadFactory.cs" />
     <Compile Include="Graphics\ShaderProgram.cs" />
     <Compile Include="Graphics\ShaderSource.cs" />
@@ -163,14 +168,14 @@
     <Compile Include="Math\Vector4d.cs" />
     <Compile Include="Math\Vector4h.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Engine\EngineObject.cs" />
+    <Compile Include="Engine\Mesh.cs" />
     <Compile Include="SceneGraph\Node.cs" />
     <Compile Include="SceneGraph\PositionNode.cs" />
     <Compile Include="SceneGraph\RotationNode.cs" />
     <Compile Include="SceneGraph\ScaleNode.cs" />
     <Compile Include="StateMachine\IScene.cs" />
     <Compile Include="StateMachine\StateGroup.cs" />
-    <Compile Include="StateMachine\StateMachine.cs" />
+    <Compile Include="StateMachine\StateManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphics\Shaders\Atmosphere\fragment.glsl">
@@ -375,9 +380,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Engine\Graphics\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

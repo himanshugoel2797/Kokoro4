@@ -1,5 +1,5 @@
 ﻿using Kokoro.Graphics.Input;
-using OpenTK;
+using Kokoro.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 using Key = OpenTK.Input.Key;
 
-namespace Kokoro.Graphics.Cameras
+namespace Kokoro.Engine.Cameras
 {
     /// <summary>
     /// Represents a First Person Camera
@@ -41,7 +41,7 @@ namespace Kokoro.Graphics.Cameras
 
         private Matrix4 UpdateViewMatrix()
         {
-            Matrix3 cameraRotation = Matrix3.CreateRotationX(updownRot) * Matrix3.CreateRotationY(leftrightRot);
+            Matrix4 cameraRotation = Matrix4.CreateRotationX(updownRot) * Matrix4.CreateRotationY(leftrightRot);
 
             Vector3 cameraOriginalTarget = new Vector3(0, 0, -1);
             Vector3 cameraOriginalUpVector = new Vector3(0, 1, 0);
@@ -58,9 +58,9 @@ namespace Kokoro.Graphics.Cameras
         /// Update the camera instance
         /// </summary>
         /// <param name="interval">The time elapsed in ticks since the last update</param>
-        /// <param name="Context">The current GraphicsContext</param>
-        public override void Update(double interval, GraphicsContext Context)
+        public override void Update(double interval)
         {
+            if (!Enabled) return;
 
             if (Mouse.ButtonsDown.Left)
             {
@@ -113,7 +113,7 @@ namespace Kokoro.Graphics.Cameras
 #endif
             //View = UpdateViewMatrix();
             View = Matrix4.LookAt(Position, Position + Direction, cameraRotatedUpVector);
-            base.Update(interval, Context);
+            base.Update(interval);
         }
     }
 }

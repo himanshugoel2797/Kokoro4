@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Kokoro.StateMachine
 {
-    public class StateMachine
+    public class StateManager : IScene
     {
         public Dictionary<string, IScene> Scenes { get; private set; }
         public string CurrentSceneName { get; private set; }
         public IScene CurrentScene { get; private set; }
 
-        public StateMachine()
+        public StateManager()
         {
             Scenes = new Dictionary<string, IScene>();
         }
@@ -30,6 +30,11 @@ namespace Kokoro.StateMachine
             }
         }
 
+        public void Register(StateGroup grp)
+        {
+            grp.RegisterIScene(this);
+        }
+
         public void AddScene(string name, IScene scene)
         {
             Scenes.Add(name, scene);
@@ -40,12 +45,12 @@ namespace Kokoro.StateMachine
             Scenes.Remove(name);
         }
 
-        private void Update(double interval)
+        public void Update(double interval)
         {
             CurrentScene?.Update(interval);
         }
 
-        private void Render(double interval)
+        public void Render(double interval)
         {
             CurrentScene?.Render(interval);
         }

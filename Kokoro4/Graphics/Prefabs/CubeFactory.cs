@@ -9,7 +9,7 @@ namespace Kokoro.Graphics.Prefabs
 {
     class CubeFactory
     {
-        static EngineObject eObj;
+        static Mesh eObj;
 
         static CubeFactory()
         {
@@ -18,7 +18,7 @@ namespace Kokoro.Graphics.Prefabs
 
         private static void Init()
         {
-            eObj = new EngineObject();
+            eObj = new Mesh();
 
             uint[] indices = new uint[] {30,1,1,102,2,1,291,3,1
 ,50,1,2,170,2,2,292,3,2
@@ -1305,9 +1305,9 @@ namespace Kokoro.Graphics.Prefabs
             eObj.SetVertices(0, verts.ToArray(), false);
         }
 
-        public static EngineObject Create()
+        public static Mesh Create()
         {
-            return new EngineObject(eObj, true);    //Lock the buffers from changes
+            return new Mesh(eObj, true);    //Lock the buffers from changes
         }
     }
 }

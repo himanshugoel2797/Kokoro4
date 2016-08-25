@@ -1,13 +1,14 @@
-﻿using OpenTK;
+﻿using Kokoro.Engine;
+using Kokoro.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics.Cameras
+namespace Kokoro.Engine.Cameras
 {
-    public class Camera
+    public class Camera : EngineComponent
     {
         /// <summary>
         /// The Camera's View Matrix
@@ -49,8 +50,7 @@ namespace Kokoro.Graphics.Cameras
         /// Update the camera instance
         /// </summary>
         /// <param name="interval">The time elapsed in ticks since the last update</param>
-        /// <param name="Context">The current GraphicsContext</param>
-        public virtual void Update(double interval, GraphicsContext Context)
+        public virtual void Update(double interval)
         {
 
         }

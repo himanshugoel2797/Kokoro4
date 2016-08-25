@@ -7,30 +7,28 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Engine
 {
-    public class EngineObject : IDisposable
+    public class Mesh : IDisposable
     {
         public Math.BoundingBox Bounds { get; set; }
 
         internal VertexArray mesh;
         internal GPUBuffer verts, indices, uvs, norms;
-        internal List<Texture> textures;
 
         public int IndexCount { get; private set; }
 
         private bool lock_changes = false;
 
-        public EngineObject()
+        public Mesh()
         {
             mesh = new VertexArray();
             verts = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer);
             indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer);
             uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer);
             norms = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer);
-            textures = new List<Texture>();
             mesh.SetElementBufferObject(indices);
         }
 
-        public EngineObject(EngineObject src, bool lockChanges)
+        public Mesh(Mesh src, bool lockChanges)
         {
             mesh = src.mesh;
             verts = src.verts;
@@ -38,8 +36,7 @@ namespace Kokoro.Engine
             uvs = src.uvs;
             norms = src.norms;
             IndexCount = src.IndexCount;
-
-            textures = new List<Texture>();
+            
             lock_changes = lockChanges;
         }
 
@@ -69,15 +66,6 @@ namespace Kokoro.Engine
             if (lock_changes) return;
             norms.BufferData(offset, n, Dynamic ? OpenTK.Graphics.OpenGL.BufferUsageHint.DynamicDraw : OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
             mesh.SetBufferObject(2, norms, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
-        }
-
-        public void SetTexture(int slot, Texture tex)
-        {
-            while (textures.Count <= slot)
-            {
-                textures.Add(null);
-            }
-            textures[slot] = tex;
         }
 
         public void Bind()

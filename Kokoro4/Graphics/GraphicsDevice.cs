@@ -84,6 +84,7 @@ namespace Kokoro.Graphics
                 gameName = value;
             }
         }
+        
 
         public static StateGroup GameLoop { get; set; }
 
@@ -287,6 +288,11 @@ namespace Kokoro.Graphics
 
         private static void Game_UpdateFrame(object sender, FrameEventArgs e)
         {
+            //Update all the input sources
+            InputLL.IsFocused(Window.Focused);
+            Input.Mouse.Update();
+            Input.Keyboard.Update();
+
             Update?.Invoke(e.Time);
         }
 
@@ -387,7 +393,7 @@ namespace Kokoro.Graphics
 
             if (feedbackBufs.Count > 0) GL.BeginTransformFeedback((TransformFeedbackPrimitiveType)feedbackPrimitive);
 
-            curProg.Set("WindowSize", new Vector2(WindowSize.Width, WindowSize.Height));
+            curProg.Set(nameof(WindowSize), new Vector2(WindowSize.Width, WindowSize.Height));
 
             GL.UseProgram(curProg.id);
 

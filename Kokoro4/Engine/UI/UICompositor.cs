@@ -10,12 +10,12 @@ namespace Kokoro.Engine.UI
     class UICompositor
     {
         ShaderProgram program;
-        EngineObject fsq;
+        Mesh fsq;
 
         public UICompositor()
         {
             program = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/FrameBuffer/fragment.glsl"));
-            fsq = Graphics.Prefabs.FullScreenQuadFactory.Create();
+            fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create();
         }
 
         public void Apply(Texture tex)

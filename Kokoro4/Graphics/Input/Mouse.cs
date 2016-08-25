@@ -1,5 +1,5 @@
 ﻿using Kokoro.Graphics.Input.LowLevel;
-using OpenTK;
+using Kokoro.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;

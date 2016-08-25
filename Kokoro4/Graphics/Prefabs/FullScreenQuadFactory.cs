@@ -9,7 +9,7 @@ namespace Kokoro.Graphics.Prefabs
 {
     public class FullScreenQuadFactory
     {
-        static EngineObject eObj;
+        static Mesh eObj;
 
         static FullScreenQuadFactory()
         {
@@ -18,7 +18,7 @@ namespace Kokoro.Graphics.Prefabs
 
         private static void Init()
         {
-            eObj = new EngineObject();
+            eObj = new Mesh();
 
             eObj.SetIndices(0, new uint[] { 3, 2, 0, 0, 2, 1 }, false);
             eObj.SetUVs(0, new float[] {
@@ -36,9 +36,9 @@ namespace Kokoro.Graphics.Prefabs
             }, false);
         }
         
-        public static EngineObject Create()
+        public static Mesh Create()
         {
-            return new EngineObject(eObj, true);    //Lock the buffers from changes
+            return new Mesh(eObj, true);    //Lock the buffers from changes
         }
     }
 }
