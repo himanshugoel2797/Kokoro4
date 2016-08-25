@@ -49,9 +49,11 @@ namespace Kokoro.SceneGraph
         public Node Parent { get; set; }
         public List<Node> Children { get; set; }
 
+        public ulong LayerMask { get; set; }
+
         public string Name { get; set; }
 
-        public Node(Node parent, string name)
+        public Node(Node parent, string name, ulong layers)
         {
             _transform_lock = new object();
             dirty_lock = new object();
@@ -62,6 +64,7 @@ namespace Kokoro.SceneGraph
             Transform = Matrix4.Identity;
             NetTransform = Transform;
             Name = name;
+            LayerMask = layers;
             dirty = true;
         }
 

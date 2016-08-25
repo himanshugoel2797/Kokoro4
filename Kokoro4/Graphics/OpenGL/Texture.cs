@@ -1,11 +1,13 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿#if OPENGL
+using Kokoro.Engine.Graphics;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Engine.Graphics
 {
     public enum TextureResidency
     {
@@ -72,7 +74,7 @@ namespace Kokoro.Graphics
             bool inited = false;
             if (id == 0)
             {
-                GL.CreateTextures(src.GetTextureTarget(), 1, out id);
+                GL.CreateTextures((OpenTK.Graphics.OpenGL.TextureTarget)src.GetTextureTarget(), 1, out id);
                 inited = true;
             }
 
@@ -80,15 +82,15 @@ namespace Kokoro.Graphics
             {
                 case 1:
                     if (inited) GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
-                    GL.TextureSubImage1D(id, level, 0, src.GetWidth(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage1D(id, level, 0, src.GetWidth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
                     break;
                 case 2:
                     if (inited) GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
-                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
                     break;
                 case 3:
                     if (inited) GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
-                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), src.GetFormat(), src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
                     break;
             }
 
@@ -156,3 +158,4 @@ namespace Kokoro.Graphics
 
     }
 }
+#endif

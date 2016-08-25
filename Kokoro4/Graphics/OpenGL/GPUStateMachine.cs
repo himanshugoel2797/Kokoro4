@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Graphics.OpenGL
 {
     public static class GPUStateMachine
     {

@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Kokoro.Graphics
+#if OPENGL
+using Kokoro.Graphics.OpenGL;
+#elif VULKAN
+using Kokoro.Graphics.Vulkan;
+#else
+#error "Pick a graphics backend by defining either 'OPENGL' or 'VULKAN'"
+#endif
+
+namespace Kokoro.Engine.Graphics
 {
     public class BitmapTextureSource : ITextureSource, IDisposable
     {
@@ -42,9 +49,9 @@ namespace Kokoro.Graphics
             return 2;
         }
 
-        public OpenTK.Graphics.OpenGL.PixelFormat GetFormat()
+        public PixelFormat GetFormat()
         {
-            return OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
+            return PixelFormat.Bgra;
         }
 
         public int GetHeight()

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 using GDIGraphics = System.Drawing.Graphics;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Engine.Graphics
 {
     [Flags]
     public enum FontStyle

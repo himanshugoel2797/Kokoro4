@@ -1,4 +1,5 @@
-﻿using Kokoro.Graphics;
+﻿using Kokoro.Engine.Graphics;
+using Kokoro.Graphics;
 using Kokoro.Math;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,8 @@ namespace Kokoro.Engine.UI
 
         public UIRenderer()
         {
-            if(fill_prog == null)fill_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/FilledRectangle/fragment.glsl"));
-            if (tex_prog == null) tex_prog = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/TextureRectangle/fragment.glsl"));
+            if(fill_prog == null)fill_prog = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/Shaders/FilledRectangle/fragment.glsl"));
+            if (tex_prog == null) tex_prog = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/Shaders/TextureRectangle/fragment.glsl"));
             if (fsq == null)fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create();
         }
 
@@ -26,12 +27,12 @@ namespace Kokoro.Engine.UI
             fill_prog.Set("Position", Position);
             fill_prog.Set("Size", Size);
 
-            bool blendstate = GraphicsDevice.AlphaEnabled;
-            GraphicsDevice.AlphaEnabled = true;
+            bool blendstate = EngineManager.AlphaEnabled;
+            EngineManager.AlphaEnabled = true;
             fsq.Bind();
-            GraphicsDevice.SetShaderProgram(fill_prog);
+            EngineManager.SetShaderProgram(fill_prog);
             GraphicsDevice.Draw(OpenTK.Graphics.OpenGL.PrimitiveType.Triangles, 0, 6, true);
-            GraphicsDevice.AlphaEnabled = blendstate;
+            EngineManager.AlphaEnabled = blendstate;
         }
         
         public void Apply(Texture tex, Vector2 Position, Vector2 Size)
@@ -42,11 +43,11 @@ namespace Kokoro.Engine.UI
             tex_prog.Set("Size", Size);
 
             bool blendstate = GraphicsDevice.AlphaEnabled;
-            GraphicsDevice.AlphaEnabled = true;
+            EngineManager.AlphaEnabled = true;
             fsq.Bind();
             GraphicsDevice.SetShaderProgram(tex_prog);
             GraphicsDevice.Draw(OpenTK.Graphics.OpenGL.PrimitiveType.Triangles, 0, 6, true);
-            GraphicsDevice.AlphaEnabled = blendstate;
+            EngineManager.AlphaEnabled = blendstate;
 
             tex.SetResidency(TextureResidency.NonResident);
         }

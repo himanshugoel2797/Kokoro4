@@ -23,7 +23,7 @@ namespace Kokoro.SceneGraph
             }
         }
 
-        public PositionNode(Node parent, string name, Vector3 pos) : base(parent, name)
+        public PositionNode(Node parent, string name, ulong layerMask, Vector3 pos) : base(parent, name, layerMask)
         {
             Position = pos;
         }

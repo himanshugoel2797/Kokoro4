@@ -1,4 +1,5 @@
 ﻿using Kokoro.Engine;
+using Kokoro.Engine.Graphics;
 using Kokoro.Math;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,11 @@ namespace Kokoro.Engine.Cameras
         /// </summary>
         public Matrix4 Projection { get; internal set; }
 
-        Vector3 pos;
+        public List<RenderPass> PostProcessingEffects { get; set; }
+
+        public ulong LayerMask { get; set; }
+
+        private Vector3 pos;
         /// <summary>
         /// The 3D Position of the Camera
         /// </summary>
@@ -43,6 +48,7 @@ namespace Kokoro.Engine.Cameras
         {
             View = Matrix4.LookAt(new Vector3(-1, 0, 0), Vector3.Zero, Vector3.UnitY);
             Position = -Vector3.UnitX;
+            PostProcessingEffects = new List<RenderPass>();
             SetProjection(0.7853f, 16f / 9f, 0.1f, 1000f);  //FOV = 45
         }
 
@@ -53,6 +59,19 @@ namespace Kokoro.Engine.Cameras
         public virtual void Update(double interval)
         {
 
+        }
+
+        public virtual void Render(double interval, SceneGraph.Node scene)
+        {
+            //Create buckets of meshes for each shader, take the ones in the same buffer and render them in a single multidraw call, possibly running a compute shader first to upload relevant sparse texture data and perform culling
+
+            //Render all of the opaque meshes to the GBuffer
+
+
+            //Forward render all the transparent meshes
+
+
+            //In the end apply all the passes in the order they have been added
         }
 
         public void SetProjection(float fov, float aspectRatio, float nearClip, float farClip)

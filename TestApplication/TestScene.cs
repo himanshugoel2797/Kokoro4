@@ -9,12 +9,12 @@ namespace TestApplication
 {
     class TestScene : IScene
     {
-        public void Render(double interval)
+        public void Update(double interval)
         {
 
         }
 
-        public void Update(double interval)
+        public void Render(double interval)
         {
 
         }

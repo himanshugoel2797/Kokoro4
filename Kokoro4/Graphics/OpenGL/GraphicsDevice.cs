@@ -13,8 +13,9 @@ using GameWindow = OpenTK.GameWindow;
 using FrameEventArgs = OpenTK.FrameEventArgs;
 using VSyncMode = OpenTK.VSyncMode;
 using Kokoro.StateMachine;
+using Kokoro.Engine.Graphics;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Graphics.OpenGL
 {
     public enum FaceWinding
     {
@@ -82,6 +83,7 @@ namespace Kokoro.Graphics
             set
             {
                 gameName = value;
+                if (Window != null) Window.Title = gameName;
             }
         }
         
@@ -354,6 +356,11 @@ namespace Kokoro.Graphics
             SetViewport(0, 0, framebuf.Width, framebuf.Height);
         }
 
+        public static Framebuffer GetFramebuffer()
+        {
+            return curFramebuffer;
+        }
+
         public static void SetFeedbackBuffer(int slot, GPUBuffer buf)
         {
             SetFeedbackBuffer(slot, buf, 0, buf.size);
@@ -376,7 +383,7 @@ namespace Kokoro.Graphics
 
         public static void DispatchComputeJob(ShaderProgram prog, int x, int y, int z)
         {
-            GL.UseProgram(prog.id);
+            GL.UseProgram(prog.prog.id);
             GL.DispatchCompute(x, y, z);
         }
 
@@ -395,7 +402,7 @@ namespace Kokoro.Graphics
 
             curProg.Set(nameof(WindowSize), new Vector2(WindowSize.Width, WindowSize.Height));
 
-            GL.UseProgram(curProg.id);
+            GL.UseProgram(curProg.prog.id);
 
             if (indexed) GL.DrawElements(type, count, DrawElementsType.UnsignedInt, IntPtr.Zero);
             else GL.DrawArrays(type, first, count);
@@ -420,9 +427,9 @@ namespace Kokoro.Graphics
             System.Drawing.Imaging.BitmapData bmpData;
 
             bmpData = bmp.LockBits(new Rectangle(0, 0, t.Width, t.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            GPUStateMachine.BindTexture(0, t.texTarget, t.id);
-            GL.GetTexImage(t.texTarget, 0, PixelFormat.Bgra, PixelType.UnsignedInt8888Reversed, bmpData.Scan0);
-            GPUStateMachine.UnbindTexture(0, t.texTarget);
+            GPUStateMachine.BindTexture(0, (OpenTK.Graphics.OpenGL.TextureTarget)t.texTarget, t.id);
+            GL.GetTexImage((OpenTK.Graphics.OpenGL.TextureTarget)t.texTarget, 0, (OpenTK.Graphics.OpenGL.PixelFormat)Engine.Graphics.PixelFormat.Bgra, (OpenTK.Graphics.OpenGL.PixelType)Engine.Graphics.PixelType.UnsignedInt8888Reversed, bmpData.Scan0);
+            GPUStateMachine.UnbindTexture(0, (OpenTK.Graphics.OpenGL.TextureTarget)t.texTarget);
             bmp.UnlockBits(bmpData);
 
             bmp.RotateFlip(RotateFlipType.Rotate180FlipX);

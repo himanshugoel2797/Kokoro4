@@ -6,29 +6,23 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using System.IO;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Graphics.OpenGL
 {
-    public class ShaderSource : IDisposable
+    public class IntShaderSource : IDisposable
     {
-        #region Static Methods
-        public static ShaderSource Load(ShaderType sType, string file)
-        {
-            return new ShaderSource(sType, File.ReadAllText(file));
-        }
-        #endregion
 
         internal int id;
         internal ShaderType sType;
 
-        public ShaderSource(ShaderType sType, string src)
+        public IntShaderSource(Kokoro.Engine.Graphics.ShaderType sType, string src)
         {
             src = "#version 450 core\n#extension GL_ARB_bindless_texture : require\n" + src;
 
-            id = GL.CreateShader(sType);
+            id = GL.CreateShader((OpenTK.Graphics.OpenGL.ShaderType)sType);
             GL.ShaderSource(id, src);
             GL.CompileShader(id);
 
-            this.sType = sType;
+            this.sType = (OpenTK.Graphics.OpenGL.ShaderType)sType;
 
             int result = 0;
             GL.GetShader(id, ShaderParameter.CompileStatus, out result);
@@ -68,7 +62,7 @@ namespace Kokoro.Graphics
             }
         }
 
-        ~ShaderSource() {
+        ~IntShaderSource() {
           // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
           Dispose(false);
         }

@@ -5,21 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using Kokoro.Math;
+using Kokoro.Engine.Graphics;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Graphics.OpenGL
 {
-    public class ShaderProgram : IDisposable
+    public class IntShaderProgram : IDisposable
     {
         internal int id;
         private Dictionary<string, int> locs;
 
-        public ShaderProgram(params ShaderSource[] shaders)
+        public IntShaderProgram(params ShaderSource[] shaders)
         {
             id = GL.CreateProgram();
 
             for (int i = 0; i < shaders.Length; i++)
             {
-                GL.AttachShader(id, shaders[i].id);
+                GL.AttachShader(id, shaders[i].shader_src.id);
             }
 
             GL.LinkProgram(id);
@@ -40,7 +41,7 @@ namespace Kokoro.Graphics
 
             for (int i = 0; i < shaders.Length; i++)
             {
-                GL.DetachShader(id, shaders[i].id);
+                GL.DetachShader(id, shaders[i].shader_src.id);
             }
 
 
@@ -180,7 +181,7 @@ namespace Kokoro.Graphics
             }
         }
 
-        ~ShaderProgram()
+        ~IntShaderProgram()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(false);

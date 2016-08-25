@@ -9,6 +9,15 @@ using Kokoro.SceneGraph;
 using Kokoro.Math;
 using Kokoro.Graphics;
 using Kokoro.Engine.Cameras;
+using Kokoro.Engine.Graphics;
+
+#if OPENGL
+using Kokoro.Graphics.OpenGL;
+#elif VULKAN
+using Kokoro.Graphics.Vulkan;
+#else
+#error "Pick a graphics backend by defining either 'OPENGL' or 'VULKAN'"
+#endif
 
 namespace Kokoro.Engine
 {
@@ -23,6 +32,30 @@ namespace Kokoro.Engine
         public static string Name { get { return GraphicsDevice.Name; } set { GraphicsDevice.Name = value; } }
         public static string EngineName { get { return $"{typeof(EngineManager).Assembly.GetName().Name} {typeof(EngineManager).Assembly.GetName().Version}"; } }
 
+        public static Framebuffer Framebuffer
+        {
+            get { return GraphicsDevice.GetFramebuffer(); }
+            set { GraphicsDevice.SetFramebuffer(value); }
+        }
+
+        public static bool DepthTestEnabled
+        {
+            get { return GraphicsDevice.DepthTestEnabled; }
+            set { GraphicsDevice.DepthTestEnabled = value; }
+        }
+
+        public static bool DepthWriteEnabled
+        {
+            get { return GraphicsDevice.DepthWriteEnabled; }
+            set { GraphicsDevice.DepthWriteEnabled = value; }
+        }
+
+        public static Vector4 ClearColor
+        {
+            get { return GraphicsDevice.ClearColor; }
+            set { GraphicsDevice.ClearColor = value; }
+        }
+
         private static Dictionary<string, Camera> Cameras;
 
         static EngineManager()
@@ -30,17 +63,30 @@ namespace Kokoro.Engine
             Name = EngineName;
             Cameras = new Dictionary<string, Camera>();
 
+            //Initialize the state machine
             StateManager = new StateManager();
             GraphicsDevice.GameLoop.RegisterIScene(new _SceneMan());
         }
 
+        public static void Clear()
+        {
+            GraphicsDevice.Clear();
+        }
+
+        #region Execution Management
         public static void Run(double fps, double ups)
         {
             GraphicsDevice.Run(ups, fps);
         }
 
-        #region Scene manager
+        public static void Exit()
+        {
+            GraphicsDevice.Cleanup?.Invoke();
+            GraphicsDevice.Exit();
+        }
+        #endregion
 
+        #region Scene manager
         private class _SceneMan : IScene
         {
             public void Update(double interval)
@@ -55,9 +101,6 @@ namespace Kokoro.Engine
                 GraphicsDevice.SwapBuffers();
             }
         }
-
-
-
         #endregion
 
         #region Camera management

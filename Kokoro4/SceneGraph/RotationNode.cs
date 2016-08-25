@@ -23,7 +23,7 @@ namespace Kokoro.SceneGraph
             }
         }
 
-        public RotationNode(Node parent, string name, Quaternion rot) : base(parent, name)
+        public RotationNode(Node parent, string name, ulong layerMask, Quaternion rot) : base(parent, name, layerMask)
         {
             Rotation = rot;
         }

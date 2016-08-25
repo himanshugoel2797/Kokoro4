@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Graphics.OpenGL
 {
-    public class UniformBuffer
+    public class ShaderStorageBuffer
     {
         #region Bind point allocation
         private static int freebindPoint = 0;
@@ -17,17 +17,14 @@ namespace Kokoro.Graphics
         private static int getFreeBindPoint()
         {
             if (freebindPoint >= maxBindPoints)
-                throw new Exception("Too many UBOs!");
+                throw new Exception("Too many SSBOs!");
             return (freebindPoint++ % maxBindPoints);
         }
         #endregion
 
-
-        private const int UniformBufferSize = 16 * 1024; 
-
-        static UniformBuffer()
+        static ShaderStorageBuffer()
         {
-            maxBindPoints = GL.GetInteger(GetPName.MaxUniformBufferBindings);
+            maxBindPoints = GL.GetInteger((GetPName)All.MaxShaderStorageBufferBindings);
         }
 
 
@@ -35,12 +32,19 @@ namespace Kokoro.Graphics
         internal int bindPoint = 0;
         internal Fence readyFence;
 
-        public UniformBuffer()
+        bool dirty = false;
+
+        public ShaderStorageBuffer(GPUBuffer buf)
         {
-            buf = new GPUBuffer(BufferTarget.UniformBuffer, UniformBufferSize, false);
+            this.buf = buf;
             bindPoint = getFreeBindPoint();
             readyFence = new Fence();
             readyFence.PlaceFence();
+        }
+
+        public ShaderStorageBuffer(int size) : this(new GPUBuffer(BufferTarget.ShaderStorageBuffer, size, false))
+        {
+
         }
 
         public unsafe byte* Update()

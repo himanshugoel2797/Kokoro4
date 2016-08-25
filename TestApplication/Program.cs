@@ -21,7 +21,12 @@ namespace TestApplication
         static void Main()
         {
             EngineManager.Name = EngineManager.EngineName;
+
+            EngineManager.StateManager.AddScene(nameof(TestScene), new TestScene());
+            EngineManager.StateManager.SetActiveScene(nameof(TestScene));
+
             EngineManager.Run(60, 60);
+            EngineManager.Exit();
         }
     }
 }

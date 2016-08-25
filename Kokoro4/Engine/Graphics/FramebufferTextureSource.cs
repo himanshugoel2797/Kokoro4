@@ -3,20 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
 
-namespace Kokoro.Graphics
+
+#if OPENGL
+using Kokoro.Graphics.OpenGL;
+#elif VULKAN
+using Kokoro.Graphics.Vulkan;
+#else
+#error "Pick a graphics backend by defining either 'OPENGL' or 'VULKAN'"
+#endif
+
+namespace Kokoro.Engine.Graphics
 {
-    public class DepthTextureSource : ITextureSource
+    public class FramebufferTextureSource : ITextureSource
     {
-        public int Height { get; set; }
-        public int Width { get; set; }
+        private int width, height, levels;
+
+        public PixelType PixelType { get; set; }
         public PixelInternalFormat InternalFormat { get; set; }
 
-        public DepthTextureSource(int width, int height)
+        public FramebufferTextureSource(int width, int height, int levels)
         {
-            this.Width = width;
-            this.Height = height;
+            this.width = width;
+            this.height = height;
+            this.levels = levels;
         }
 
         public int GetDepth()
@@ -31,12 +41,12 @@ namespace Kokoro.Graphics
 
         public PixelFormat GetFormat()
         {
-            return PixelFormat.DepthComponent;
+            return PixelFormat.Bgra;
         }
 
         public int GetHeight()
         {
-            return Height;
+            return height;
         }
 
         public PixelInternalFormat GetInternalFormat()
@@ -46,7 +56,7 @@ namespace Kokoro.Graphics
 
         public int GetLevels()
         {
-            return 0;
+            return levels;
         }
 
         public IntPtr GetPixelData(int level)
@@ -61,12 +71,12 @@ namespace Kokoro.Graphics
 
         public int GetWidth()
         {
-            return Width;
+            return width;
         }
 
         PixelType ITextureSource.GetType()
         {
-            return PixelType.Float;
+            return PixelType;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Kokoro.Graphics;
+﻿using Kokoro.Engine.Graphics;
+using Kokoro.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,8 +22,8 @@ namespace Kokoro.Engine.UI
 
             FramebufferTextureSource ui_col_tex = new FramebufferTextureSource(w, h, 1)
             {
-                InternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgba,
-                PixelType = OpenTK.Graphics.OpenGL.PixelType.UnsignedByte
+                InternalFormat = PixelInternalFormat.Rgba,
+                PixelType = PixelType.UnsignedByte
             };
 
             ui_col.SetData(ui_col_tex, 0);
@@ -34,28 +35,28 @@ namespace Kokoro.Engine.UI
             Containers = new List<UIContainer>();
         }
 
+#warning Move this into a post processing pass
         public void Draw()
         {
-            bool depth_state = GraphicsDevice.DepthTestEnabled;
-            bool depth_write = GraphicsDevice.DepthWriteEnabled;
-            GraphicsDevice.DepthWriteEnabled = false;
-            GraphicsDevice.DepthTestEnabled = false;
-            GraphicsDevice.SetFramebuffer(ui_fbuf);
-            
-            GraphicsDevice.Clear();
+            bool depth_state = EngineManager.DepthTestEnabled;
+            bool depth_write = EngineManager.DepthWriteEnabled;
+            EngineManager.DepthWriteEnabled = false;
+            EngineManager.DepthTestEnabled = false;
+            EngineManager.Framebuffer = ui_fbuf;
+
+            EngineManager.Clear();
 
             for(int i = 0; i < Containers.Count; i++)
             {
                 Containers[i].Draw();
             }
-
-            GraphicsDevice.SetFramebuffer(Framebuffer.Default);
+            
             //Now blend the UI on top
 
             Compositor.Apply(ui_col);
 
-            GraphicsDevice.DepthTestEnabled = depth_state;
-            GraphicsDevice.DepthWriteEnabled = depth_write;
+            //GraphicsDevice.DepthTestEnabled = depth_state;
+            //GraphicsDevice.DepthWriteEnabled = depth_write;
         }
 
 

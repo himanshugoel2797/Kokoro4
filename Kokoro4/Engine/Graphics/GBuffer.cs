@@ -4,7 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics
+#if OPENGL
+using Kokoro.Graphics.OpenGL;
+#elif VULKAN
+using Kokoro.Graphics.Vulkan;
+#else
+#error "Pick a graphics backend by defining either 'OPENGL' or 'VULKAN'"
+#endif
+
+namespace Kokoro.Engine.Graphics
 {
     public class GBuffer
     {
@@ -17,24 +25,24 @@ namespace Kokoro.Graphics
 
             FramebufferTextureSource color = new FramebufferTextureSource(w, h, levels)
             {
-                PixelType = OpenTK.Graphics.OpenGL.PixelType.UnsignedByte,
-                InternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgba8
+                PixelType = PixelType.UnsignedByte,
+                InternalFormat = PixelInternalFormat.Rgba8
             };
 
             FramebufferTextureSource materials = new FramebufferTextureSource(w, h, levels)
             {
-                PixelType = OpenTK.Graphics.OpenGL.PixelType.Short,
-                InternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgba16ui
+                PixelType = PixelType.Short,
+                InternalFormat = PixelInternalFormat.Rgba16ui
             };
 
             FramebufferTextureSource normals = new FramebufferTextureSource(w, h, levels)
             {
-                PixelType = OpenTK.Graphics.OpenGL.PixelType.Float,
-                InternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgb16f
+                PixelType = PixelType.Float,
+                InternalFormat = PixelInternalFormat.Rgb16f
             };
 
             DepthTextureSource depth = new DepthTextureSource(w, h);
-            depth.InternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.DepthComponent32f;
+            depth.InternalFormat = PixelInternalFormat.DepthComponent32f;
 
 
             color_tex = new Texture();

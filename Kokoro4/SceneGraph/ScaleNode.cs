@@ -23,7 +23,7 @@ namespace Kokoro.SceneGraph
             }
         }
 
-        public ScaleNode(Node parent, string name, Vector3 scale) : base(parent, name)
+        public ScaleNode(Node parent, string name, ulong layerMask, Vector3 scale) : base(parent, name, layerMask)
         {
             Scale = scale;
         }

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Engine.Graphics
 {
-    public class Material : EngineRenderable
+    public class ShaderGroup
     {
-        public bool Transparent { get; set; }
-
     }
 }

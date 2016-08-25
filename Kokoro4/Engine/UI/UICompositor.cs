@@ -1,4 +1,5 @@
-﻿using Kokoro.Graphics;
+﻿using Kokoro.Engine.Graphics;
+using Kokoro.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Kokoro.Engine.UI
 
         public UICompositor()
         {
-            program = new ShaderProgram(ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(OpenTK.Graphics.OpenGL.ShaderType.FragmentShader, "Graphics/Shaders/FrameBuffer/fragment.glsl"));
+            program = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/Shaders/FrameBuffer/fragment.glsl"));
             fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create();
         }
 

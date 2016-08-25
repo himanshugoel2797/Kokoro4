@@ -1,11 +1,12 @@
-﻿using System;
+﻿#if OPENGL
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 
-namespace Kokoro.Graphics
+namespace Kokoro.Engine.Graphics
 {
     public class Framebuffer : IDisposable
     {
@@ -105,3 +106,4 @@ namespace Kokoro.Graphics
         #endregion
     }
 }
+#endif
