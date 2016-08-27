@@ -54,6 +54,11 @@ namespace Kokoro.Graphics.Vulkan
             return LogicalDevice.CreateShaderModule(info);
         }
 
+        internal static global::Vulkan.Framebuffer CreateFramebuffer(FramebufferCreateInfo info)
+        {
+            return LogicalDevice.CreateFramebuffer(info);
+        }
+
         public static void Run(double ups, double fps)
         {
             var extensions = new string[]

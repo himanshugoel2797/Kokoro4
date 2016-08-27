@@ -151,6 +151,7 @@
     <Compile Include="Graphics\OpenGL\TextureTarget.cs" />
     <Compile Include="Graphics\OpenGL\UniformBuffer.cs" />
     <Compile Include="Graphics\OpenGL\VertexArray.cs" />
+    <Compile Include="Graphics\Vulkan\CommandBuffer.cs" />
     <Compile Include="Graphics\Vulkan\Framebuffer.cs" />
     <Compile Include="Graphics\Vulkan\GameWindow.cs">
       <SubType>Form</SubType>
@@ -162,9 +163,13 @@
     <Compile Include="Graphics\Vulkan\GraphicsDevice.cs" />
     <Compile Include="Graphics\Vulkan\IntShaderProgram.cs" />
     <Compile Include="Graphics\Vulkan\IntShaderSource.cs" />
+    <Compile Include="Graphics\Vulkan\PixelFormat.cs" />
+    <Compile Include="Graphics\Vulkan\PixelInternalFormat.cs" />
+    <Compile Include="Graphics\Vulkan\PixelType.cs" />
     <Compile Include="Graphics\Vulkan\RenderState.cs" />
     <Compile Include="Graphics\Vulkan\ShaderType.cs" />
     <Compile Include="Graphics\Vulkan\Texture.cs" />
+    <Compile Include="Graphics\Vulkan\TextureTarget.cs" />
     <Compile Include="Math\BezierCurve.cs" />
     <Compile Include="Math\BezierCurveCubic.cs" />
     <Compile Include="Math\BezierCurveQuadric.cs" />

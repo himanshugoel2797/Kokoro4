@@ -29,10 +29,10 @@ namespace Kokoro.Engine
         public Mesh()
         {
             mesh = new VertexArray();
-            verts = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer);
-            indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer);
-            uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer);
-            norms = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer);
+            verts = new GPUBuffer();
+            indices = new GPUBuffer();
+            uvs = new GPUBuffer();
+            norms = new GPUBuffer();
             mesh.SetElementBufferObject(indices);
         }
 

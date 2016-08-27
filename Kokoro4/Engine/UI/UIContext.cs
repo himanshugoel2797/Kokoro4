@@ -27,8 +27,7 @@ namespace Kokoro.Engine.UI
             };
 
             ui_col.SetData(ui_col_tex, 0);
-            ui_fbuf = new Framebuffer(w, h);
-            ui_fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.ColorAttachment0] = ui_col;
+            ui_fbuf = new Framebuffer(w, h, new FramebufferAttachmentData() { Attachment = FramebufferAttachment.ColorAttachment0, Texture = ui_col });
 
             Compositor = new UICompositor();
 
@@ -46,11 +45,11 @@ namespace Kokoro.Engine.UI
 
             EngineManager.Clear();
 
-            for(int i = 0; i < Containers.Count; i++)
+            for (int i = 0; i < Containers.Count; i++)
             {
                 Containers[i].Draw();
             }
-            
+
             //Now blend the UI on top
 
             Compositor.Apply(ui_col);

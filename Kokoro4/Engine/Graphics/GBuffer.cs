@@ -54,11 +54,11 @@ namespace Kokoro.Engine.Graphics
             depth_tex = new Texture();
             depth_tex.SetData(depth, 0);
 
-            fbuf = new Framebuffer(w, h);
-
-            fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.ColorAttachment0] = color_tex;
-            fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.ColorAttachment1] = material_tex;
-            fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.DepthAttachment] = depth_tex;
+            fbuf = new Framebuffer(w, h, 
+                new FramebufferAttachmentData() { Attachment = FramebufferAttachment.ColorAttachment0, Texture = color_tex },
+                new FramebufferAttachmentData() { Attachment = FramebufferAttachment.ColorAttachment1, Texture = material_tex},
+                new FramebufferAttachmentData() { Attachment = FramebufferAttachment.DepthAttachment, Texture = depth_tex}
+           );
         }
 
         public static implicit operator Framebuffer(GBuffer buf)
