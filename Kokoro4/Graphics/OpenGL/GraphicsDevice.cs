@@ -1,4 +1,5 @@
-﻿using Kokoro.Graphics.Input.LowLevel;
+﻿#if OPENGL
+using Kokoro.Graphics.Input.LowLevel;
 using Kokoro.Math;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -440,3 +441,4 @@ namespace Kokoro.Graphics.OpenGL
 
     }
 }
+#endif

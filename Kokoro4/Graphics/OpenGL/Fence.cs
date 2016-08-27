@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿#if OPENGL
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,3 +89,4 @@ namespace Kokoro.Graphics.OpenGL
         #endregion
     }
 }
+#endif

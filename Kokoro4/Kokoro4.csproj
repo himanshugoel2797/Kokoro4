@@ -56,7 +56,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;OPENGL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;VULKAN</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -84,16 +84,24 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Vulkan">
+      <HintPath>..\Vulkan.dll</HintPath>
+    </Reference>
+    <Reference Include="Vulkan.Windows">
+      <HintPath>..\Vulkan.Windows.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\EngineComponent.cs" />
     <Compile Include="Engine\EngineManager.cs" />
+    <Compile Include="Engine\Graphics\DataBuffer.cs" />
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />
     <Compile Include="Engine\Graphics\GraphicsObject.cs" />
     <Compile Include="Engine\Graphics\Material.cs" />
@@ -143,6 +151,20 @@
     <Compile Include="Graphics\OpenGL\TextureTarget.cs" />
     <Compile Include="Graphics\OpenGL\UniformBuffer.cs" />
     <Compile Include="Graphics\OpenGL\VertexArray.cs" />
+    <Compile Include="Graphics\Vulkan\Framebuffer.cs" />
+    <Compile Include="Graphics\Vulkan\GameWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Graphics\Vulkan\GameWindow.Designer.cs">
+      <DependentUpon>GameWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Graphics\Vulkan\GPUBuffer.cs" />
+    <Compile Include="Graphics\Vulkan\GraphicsDevice.cs" />
+    <Compile Include="Graphics\Vulkan\IntShaderProgram.cs" />
+    <Compile Include="Graphics\Vulkan\IntShaderSource.cs" />
+    <Compile Include="Graphics\Vulkan\RenderState.cs" />
+    <Compile Include="Graphics\Vulkan\ShaderType.cs" />
+    <Compile Include="Graphics\Vulkan\Texture.cs" />
     <Compile Include="Math\BezierCurve.cs" />
     <Compile Include="Math\BezierCurveCubic.cs" />
     <Compile Include="Math\BezierCurveQuadric.cs" />
@@ -391,7 +413,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Vulkan\GameWindow.resx">
+      <DependentUpon>GameWindow.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

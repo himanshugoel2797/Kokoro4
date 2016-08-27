@@ -14,12 +14,12 @@ namespace Kokoro.Engine.Graphics
 
         static Framebuffer()
         {
-            Default = new Framebuffer(0, GraphicsDevice.WindowSize.Width, GraphicsDevice.WindowSize.Height);
+            Default = new Framebuffer(0, EngineManager.WindowSize.Width, EngineManager.WindowSize.Height);
         }
 
         internal static void RecreateDefaultFramebuffer()
         {
-            Default = new Framebuffer(0, GraphicsDevice.WindowSize.Width, GraphicsDevice.WindowSize.Height);
+            Default = new Framebuffer(0, EngineManager.WindowSize.Width, EngineManager.WindowSize.Height);
         }
 
         private Framebuffer(int id, int w, int h)
@@ -42,7 +42,7 @@ namespace Kokoro.Engine.Graphics
 
             GL.CreateFramebuffers(1, out id);
             bindings = new Dictionary<FramebufferAttachment, Texture>();
-            GraphicsDevice.Cleanup += Dispose;
+            EngineManager.Cleanup += Dispose;
         }
 
         public Texture this[FramebufferAttachment attachment]

@@ -1,35 +1,54 @@
-﻿#if OPENGL
-using OpenTK.Graphics.OpenGL;
+﻿#if VULKAN
+using Kokoro.Engine.Graphics;
+using Kokoro.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics.OpenGL
+namespace Kokoro.Graphics.Vulkan
 {
-    public class VertexArray : IDisposable
+    public class IntShaderProgram : IDisposable
     {
-        internal int id;
-
-        public VertexArray()
+        public IntShaderProgram(params ShaderSource[] shaders)
         {
-            GL.CreateVertexArrays(1, out id);
-            GraphicsDevice.Cleanup += Dispose;
+            //Put all the shaders into a PipelineShaderStageCreateInfo structure
         }
 
-        public void SetElementBufferObject(GPUBuffer buffer)
+        public void Set(string name, int val)
         {
-            GL.VertexArrayElementBuffer(id, buffer.id);
+
         }
 
-        public void SetBufferObject(int index, GPUBuffer buffer, int elementCount, VertexAttribPointerType type)
+        public void Set(string name, float val)
         {
-            GL.EnableVertexArrayAttrib(id, index);
 
-            GL.VertexArrayAttribFormat(id, index, elementCount, (VertexAttribType)type, false, 0);
-            GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, elementCount * 4);
-            GL.VertexArrayAttribBinding(id, index, index);
+        }
+
+        public void Set(string name, Vector2 val)
+        {
+
+        }
+
+        public void Set(string name, Vector2I val)
+        {
+
+        }
+
+        public void Set(string name, Vector3 val)
+        {
+
+        }
+
+        public void Set(string name, Vector4 val)
+        {
+
+        }
+
+        public void Set(string name, Matrix4 val)
+        {
+
         }
 
         #region IDisposable Support
@@ -44,8 +63,6 @@ namespace Kokoro.Graphics.OpenGL
                     // TODO: dispose managed state (managed objects).
                 }
 
-                GL.DeleteVertexArray(id);
-                id = 0;
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
 
@@ -53,11 +70,11 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
-        ~VertexArray()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(false);
-        }
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~IntShaderProgram() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
 
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
@@ -65,9 +82,10 @@ namespace Kokoro.Graphics.OpenGL
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
             // TODO: uncomment the following line if the finalizer is overridden above.
-            GC.SuppressFinalize(this);
+            // GC.SuppressFinalize(this);
         }
         #endregion
+
     }
 }
 #endif

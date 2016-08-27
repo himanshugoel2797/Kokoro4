@@ -10,6 +10,7 @@ using Kokoro.Math;
 using Kokoro.Graphics;
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
+using System.Drawing;
 
 #if OPENGL
 using Kokoro.Graphics.OpenGL;
@@ -24,6 +25,9 @@ namespace Kokoro.Engine
     public static class EngineManager
     {
         public static StateManager StateManager { get; private set; }
+        public static Action Cleanup { get { return GraphicsDevice.Cleanup; } set { GraphicsDevice.Cleanup = value; } }
+
+        public static Size WindowSize { get { return GraphicsDevice.WindowSize; } set { GraphicsDevice.WindowSize = value; } }
 
         public static Matrix4 View { get; set; }
         public static Matrix4 Projection { get; set; }

@@ -57,7 +57,7 @@ namespace Kokoro.Engine.Graphics
         public Texture()
         {
             id = 0;
-            GraphicsDevice.Cleanup += Dispose;
+            EngineManager.Cleanup += Dispose;
         }
 
         public void SetResidency(TextureResidency residency)

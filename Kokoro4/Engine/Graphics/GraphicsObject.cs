@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Engine.Graphics
 {
-    public class GraphicsObject
+    public class GraphicsObject : EngineRenderable
     {
         public Material Material { get; private set; }
+        public ShaderGroup Shaders { get; private set; }
+        public Mesh Mesh { get; private set; }
 
-        public GraphicsObject(Material mat)
+        public GraphicsObject(Mesh mesh, Material mat, ShaderGroup grp)
         {
             Material = mat;
+            Mesh = mesh;
+            Shaders = grp;
         }
     }
 }

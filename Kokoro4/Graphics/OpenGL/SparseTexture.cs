@@ -1,4 +1,5 @@
-﻿using Kokoro.Engine.Graphics;
+﻿#if OPENGL
+using Kokoro.Engine.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,3 +21,4 @@ namespace Kokoro.Graphics.OpenGL
         }
     }
 }
+#endif

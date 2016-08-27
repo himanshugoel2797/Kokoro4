@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if OPENGL
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -132,3 +133,4 @@ namespace Kokoro.Graphics.OpenGL
         #endregion
     }
 }
+#endif

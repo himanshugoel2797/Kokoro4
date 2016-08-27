@@ -12,6 +12,7 @@ namespace Kokoro.Engine.UI
     {
         ShaderProgram program;
         Mesh fsq;
+        GraphicsObject graphicsObj;
 
         public UICompositor()
         {
@@ -19,14 +20,15 @@ namespace Kokoro.Engine.UI
             fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create();
         }
 
+#warning Move this over to RenderPass
         public void Apply(Texture tex)
         {
             tex.SetResidency(TextureResidency.Resident);
             program.Set("AlbedoMap", tex.Handle);
 
             fsq.Bind();
-            GraphicsDevice.SetShaderProgram(program);
-            GraphicsDevice.Draw(OpenTK.Graphics.OpenGL.PrimitiveType.Triangles, 0, 6, true);
+            //GraphicsDevice.SetShaderProgram(program);
+            //GraphicsDevice.Draw(OpenTK.Graphics.OpenGL.PrimitiveType.Triangles, 0, 6, true);
 
             tex.SetResidency(TextureResidency.NonResident);
         }
