@@ -9,8 +9,10 @@ namespace Kokoro.Engine.Graphics
 {
     public enum TextureTarget
     {
-        Texture1D = ImageType.Image1D,
-        Texture2D = ImageType.Image2D,
-        Texture3D = ImageType.Image3D
+        Texture1D = ImageViewType.View1D,
+        Texture2D = ImageViewType.View2D,
+        Texture3D = ImageViewType.View3D,
+        TextureCubeMap = ImageViewType.Cube
+
     }
 }

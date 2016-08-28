@@ -17,6 +17,6 @@ namespace Kokoro.Engine.Graphics
 {
     public abstract class RenderPass : EngineComponent
     {
-        public abstract void Apply(TextureHandle[] prev);
+        public abstract void Apply(TextureView[] prev);
     }
 }

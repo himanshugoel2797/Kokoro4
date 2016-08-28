@@ -109,49 +109,25 @@
     <Compile Include="Engine\Graphics\ShaderGroup.cs" />
     <Compile Include="Engine\Graphics\ShaderProgram.cs" />
     <Compile Include="Engine\Graphics\ShaderSource.cs" />
-    <Compile Include="Engine\UI\UICompositor.cs" />
-    <Compile Include="Engine\UI\UIContainer.cs" />
-    <Compile Include="Engine\UI\UIContext.cs" />
-    <Compile Include="Engine\UI\UIControl.cs" />
-    <Compile Include="Engine\UI\UILabel.cs" />
-    <Compile Include="Engine\UI\UIRenderer.cs" />
-    <Compile Include="Engine\Voxel\Chunk.cs" />
-    <Compile Include="Engine\Voxel\RLEData.cs" />
     <Compile Include="Engine\Graphics\BitmapTextureSource.cs" />
-    <Compile Include="Graphics\OpenGL\BufferTexture.cs" />
     <Compile Include="Engine\Cameras\Camera.cs" />
     <Compile Include="Engine\Cameras\FirstPersonCamera.cs" />
     <Compile Include="Engine\Graphics\CubeMapTextureSource.cs" />
     <Compile Include="Engine\Graphics\DepthTextureSource.cs" />
-    <Compile Include="Graphics\OpenGL\Fence.cs" />
-    <Compile Include="Graphics\OpenGL\Framebuffer.cs" />
     <Compile Include="Engine\Graphics\FramebufferTextureSource.cs" />
     <Compile Include="Engine\Graphics\GBuffer.cs" />
-    <Compile Include="Graphics\OpenGL\GPUBuffer.cs" />
-    <Compile Include="Graphics\OpenGL\GPUStateMachine.cs" />
-    <Compile Include="Graphics\OpenGL\GraphicsDevice.cs" />
-    <Compile Include="Graphics\OpenGL\Input\Keyboard.cs" />
-    <Compile Include="Graphics\OpenGL\Input\LowLevel\Input.cs" />
-    <Compile Include="Graphics\OpenGL\Input\Mouse.cs" />
     <Compile Include="Engine\Graphics\ITextureSource.cs" />
     <Compile Include="Engine\Graphics\Prefabs\CubeFactory.cs" />
     <Compile Include="Engine\Graphics\Prefabs\SphereFactory.cs" />
     <Compile Include="Engine\Graphics\Prefabs\FullScreenQuadFactory.cs" />
-    <Compile Include="Graphics\OpenGL\PixelFormat.cs" />
-    <Compile Include="Graphics\OpenGL\PixelInternalFormat.cs" />
-    <Compile Include="Graphics\OpenGL\PixelType.cs" />
-    <Compile Include="Graphics\OpenGL\ShaderProgram.cs" />
-    <Compile Include="Graphics\OpenGL\ShaderSource.cs" />
     <Compile Include="Engine\Graphics\SimplexNoise.cs" />
-    <Compile Include="Graphics\OpenGL\ShaderType.cs" />
-    <Compile Include="Graphics\OpenGL\SparseTexture.cs" />
-    <Compile Include="Graphics\OpenGL\Texture.cs" />
-    <Compile Include="Graphics\OpenGL\ShaderStorageBuffer.cs" />
     <Compile Include="Engine\Graphics\TextDrawer.cs" />
-    <Compile Include="Graphics\OpenGL\TextureTarget.cs" />
-    <Compile Include="Graphics\OpenGL\UniformBuffer.cs" />
-    <Compile Include="Graphics\OpenGL\VertexArray.cs" />
+    <Compile Include="Graphics\Vulkan\AsyncUploadSystem.cs" />
+    <Compile Include="Graphics\Vulkan\BlendFunc.cs" />
     <Compile Include="Graphics\Vulkan\CommandBuffer.cs" />
+    <Compile Include="Graphics\Vulkan\DepthTestMode.cs" />
+    <Compile Include="Graphics\Vulkan\DeviceMemoryAllocator.cs" />
+    <Compile Include="Graphics\Vulkan\FillMode.cs" />
     <Compile Include="Graphics\Vulkan\Framebuffer.cs" />
     <Compile Include="Graphics\Vulkan\GameWindow.cs">
       <SubType>Form</SubType>
@@ -161,8 +137,13 @@
     </Compile>
     <Compile Include="Graphics\Vulkan\GPUBuffer.cs" />
     <Compile Include="Graphics\Vulkan\GraphicsDevice.cs" />
+    <Compile Include="Graphics\Vulkan\Input\Keyboard.cs" />
+    <Compile Include="Graphics\Vulkan\Input\LowLevel\Input.cs" />
+    <Compile Include="Graphics\Vulkan\Input\Mouse.cs" />
     <Compile Include="Graphics\Vulkan\IntShaderProgram.cs" />
     <Compile Include="Graphics\Vulkan\IntShaderSource.cs" />
+    <Compile Include="Graphics\Vulkan\PipelineState.cs" />
+    <Compile Include="Graphics\Vulkan\PipelineStateObject.cs" />
     <Compile Include="Graphics\Vulkan\PixelFormat.cs" />
     <Compile Include="Graphics\Vulkan\PixelInternalFormat.cs" />
     <Compile Include="Graphics\Vulkan\PixelType.cs" />
@@ -170,6 +151,8 @@
     <Compile Include="Graphics\Vulkan\ShaderType.cs" />
     <Compile Include="Graphics\Vulkan\Texture.cs" />
     <Compile Include="Graphics\Vulkan\TextureTarget.cs" />
+    <Compile Include="Graphics\Vulkan\TextureTilingMode.cs" />
+    <Compile Include="Graphics\Vulkan\TextureView.cs" />
     <Compile Include="Math\BezierCurve.cs" />
     <Compile Include="Math\BezierCurveCubic.cs" />
     <Compile Include="Math\BezierCurveQuadric.cs" />
@@ -214,209 +197,6 @@
     <Compile Include="StateMachine\IScene.cs" />
     <Compile Include="StateMachine\StateGroup.cs" />
     <Compile Include="StateMachine\StateManager.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Graphics\OpenGL\Shaders\Atmosphere\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Atmosphere\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\BlurHorizontal\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\BlurHorizontal\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\BlurVertical\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\BlurVertical\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Compositor\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Compositor\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Default\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Default\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\DirectionalLight\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\DirectionalLight\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Content Include="Graphics\OpenGL\Shaders\FilledRectangle\fragment.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graphics\OpenGL\Shaders\TextureRectangle\fragment.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="Graphics\OpenGL\Shaders\FrameBufferToG\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\FrameBufferToG\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Content Include="Graphics\OpenGL\Shaders\FrameBuffer\fragment.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graphics\OpenGL\Shaders\FrameBuffer\vertex.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="Graphics\OpenGL\Shaders\Fur\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Fur\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\GBuffer\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\GBuffer\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\HemisphereSampler\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\HemisphereSampler\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Lighting\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Lighting\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\LightShadowBloom\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\LightShadowBloom\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\LoD\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\LoD\tessControl.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\LoD\tessEval.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\LoD\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\PackGlossRoughNorm\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\PackGlossRoughNorm\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ParticleRenderer\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ParticleRenderer\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ParticleSystemInitializer\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ParticleSystemInitializer\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\PBRPreProcess\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\PBRPreProcess\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\PBR\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\PointLight\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\PointLight\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Radiosity PassA\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Radiosity PassA\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Radiosity PassB\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Radiosity PassB\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Ray Casting\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Ray Casting\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\RSM\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\RSM\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowedPackedTess\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowedPackedTess\tessControl.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowedPackedTess\tessEval.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowedPackedTess\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowedPacked\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowedPacked\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Shadowed\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Shadowed\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowMap\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\ShadowMap\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\SimpleParticleSystem\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\SimpleParticleSystem\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\SSGI\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\SSGI\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\SSR\fragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\SSR\vertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Graphics\Vulkan\GameWindow.resx">

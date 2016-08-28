@@ -21,10 +21,12 @@ namespace Kokoro.Engine.Graphics
         int GetWidth();
         int GetHeight();
         int GetDepth();
+        int GetLayersCount();
         int GetLevels();
+        TextureTilingMode GetTilingMode();
         PixelInternalFormat GetInternalFormat();
         PixelFormat GetFormat();
         PixelType GetType();
-        IntPtr GetPixelData(int level);
+        IntPtr GetPixelData(int level, int layer);
     }
 }

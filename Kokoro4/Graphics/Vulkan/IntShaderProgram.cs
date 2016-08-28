@@ -51,6 +51,11 @@ namespace Kokoro.Graphics.Vulkan
 
         }
 
+        public void Set(string name, TextureView view)
+        {
+
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

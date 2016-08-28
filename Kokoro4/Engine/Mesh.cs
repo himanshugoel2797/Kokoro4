@@ -19,7 +19,7 @@ namespace Kokoro.Engine
     {
         public Math.BoundingBox Bounds { get; set; }
 
-        internal VertexArray mesh;
+        //internal VertexArray mesh;
         internal GPUBuffer verts, indices, uvs, norms;
 
         public int IndexCount { get; private set; }
@@ -28,17 +28,17 @@ namespace Kokoro.Engine
 
         public Mesh()
         {
-            mesh = new VertexArray();
+            //mesh = new VertexArray();
             verts = new GPUBuffer();
             indices = new GPUBuffer();
             uvs = new GPUBuffer();
             norms = new GPUBuffer();
-            mesh.SetElementBufferObject(indices);
+            //mesh.SetElementBufferObject(indices);
         }
 
         public Mesh(Mesh src, bool lockChanges)
         {
-            mesh = src.mesh;
+            //mesh = src.mesh;
             verts = src.verts;
             indices = src.indices;
             uvs = src.uvs;
@@ -51,34 +51,34 @@ namespace Kokoro.Engine
         public void SetVertices(int offset, float[] vertices, bool Dynamic)
         {
             if (lock_changes) return;
-            verts.BufferData(offset, vertices, Dynamic ? OpenTK.Graphics.OpenGL.BufferUsageHint.DynamicDraw : OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
-            mesh.SetBufferObject(0, verts, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
+            verts.BufferData(offset, vertices, Dynamic);
+            //mesh.SetBufferObject(0, verts, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
         }
 
         public void SetIndices(int offset, uint[] i, bool Dynamic)
         {
             if (lock_changes) return;
             IndexCount = i.Length;
-            indices.BufferData(offset, i, Dynamic ? OpenTK.Graphics.OpenGL.BufferUsageHint.DynamicDraw : OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
+            indices.BufferData(offset, i, Dynamic);
         }
 
         public void SetUVs(int offset, float[] uv, bool Dynamic)
         {
             if (lock_changes) return;
-            uvs.BufferData(offset, uv, Dynamic ? OpenTK.Graphics.OpenGL.BufferUsageHint.DynamicDraw : OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
-            mesh.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
+            uvs.BufferData(offset, uv, Dynamic);
+            //mesh.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
         }
 
         public void SetNormals(int offset, float[] n, bool Dynamic)
         {
             if (lock_changes) return;
-            norms.BufferData(offset, n, Dynamic ? OpenTK.Graphics.OpenGL.BufferUsageHint.DynamicDraw : OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
-            mesh.SetBufferObject(2, norms, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
+            norms.BufferData(offset, n, Dynamic);
+            //mesh.SetBufferObject(2, norms, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
         }
 
         public void Bind()
         {
-            GraphicsDevice.SetVertexArray(mesh);
+            //GraphicsDevice.SetVertexArray(mesh);
         }
 
         #region IDisposable Support

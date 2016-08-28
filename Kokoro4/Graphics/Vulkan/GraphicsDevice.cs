@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kokoro.StateMachine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,10 @@ namespace Kokoro.Graphics.Vulkan
         public static uint MajorVersion { get; set; }
         public static uint MinorVersion { get; set; }
         public static uint PatchVersion { get; set; }
+
+        public static Action Cleanup { get; set; }
+        public static System.Drawing.Size WindowSize { get { return Window.Size; } set { Window.Size = value; } }
+        public static StateGroup GameLoop { get; set; }
 
         private static GameWindow Window { get; set; }
         private static Instance inst;
@@ -42,6 +47,12 @@ namespace Kokoro.Graphics.Vulkan
             ShaderResourceResidency = true,
         };
 
+
+        private static int gfx_queue_index = -1;
+        private static int compute_queue_index = -1;
+        private static int transfer_queue_index = -1;
+        private static int present_queue_index = -1;
+
 #if DEBUG
         private static Bool32 debugReportCallback(DebugReportFlagsExt flags, DebugReportObjectTypeExt objectType, ulong objectHandle, IntPtr location, int messageCode, IntPtr layerPrefix, IntPtr message, IntPtr userData)
         {
@@ -57,6 +68,32 @@ namespace Kokoro.Graphics.Vulkan
         internal static global::Vulkan.Framebuffer CreateFramebuffer(FramebufferCreateInfo info)
         {
             return LogicalDevice.CreateFramebuffer(info);
+        }
+
+        internal static global::Vulkan.Image CreateImage(ImageCreateInfo info)
+        {
+            return LogicalDevice.CreateImage(info);
+        }
+
+        internal static uint[] GetQueueFamilyIndices()
+        {
+            return new List<uint>(new uint[] { (uint)gfx_queue_index, (uint)compute_queue_index, (uint)transfer_queue_index, (uint)present_queue_index }).Distinct().ToArray();
+        }
+
+        internal static IntPtr MapMemory(Image img)
+        {
+            return LogicalDevice.MapMemory()
+        }
+
+        internal static DeviceMemory AllocateMemory(int size)
+        {
+            MemoryAllocateInfo info = new MemoryAllocateInfo()
+            {
+                AllocationSize = size,
+                MemoryTypeIndex = 
+
+            };
+            return LogicalDevice.AllocateMemory(info);
         }
 
         public static void Run(double ups, double fps)
@@ -117,10 +154,6 @@ namespace Kokoro.Graphics.Vulkan
             DrawSurface = inst.CreateWin32SurfaceKHR(surf_create_info);
 
             //Get the necessary Queues
-            int gfx_queue_index = -1;
-            int compute_queue_index = -1;
-            int transfer_queue_index = -1;
-            int present_queue_index = -1;
 
             Func<PhysicalDevice, bool> appropriateDevice = (device) =>
             {
@@ -254,6 +287,21 @@ namespace Kokoro.Graphics.Vulkan
             
         }
 
+        public static void SwapBuffers()
+        {
+
+        }
+
+        public static void Clear()
+        {
+
+        }
+
+        public static void Exit()
+        {
+            Cleanup?.Invoke();
+            System.Windows.Forms.Application.Exit();
+        }
 
     }
 }

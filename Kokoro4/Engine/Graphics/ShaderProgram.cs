@@ -24,19 +24,9 @@ namespace Kokoro.Engine.Graphics
             prog = new IntShaderProgram(src);
         }
 
-        public void Set(string name, TextureHandle handle)
+        public void Set(string name, TextureView handle)
         {
             prog.Set(name, handle);
-        }
-
-        public void Set(string name, UniformBuffer ubo)
-        {
-            prog.Set(name, ubo);
-        }
-
-        public void Set(string name, ShaderStorageBuffer ssbo)
-        {
-            prog.Set(name, ssbo);
         }
 
         public void Set(string name, Vector3 vec)
