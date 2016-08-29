@@ -80,21 +80,129 @@ namespace Kokoro.Graphics.Vulkan
             return new List<uint>(new uint[] { (uint)gfx_queue_index, (uint)compute_queue_index, (uint)transfer_queue_index, (uint)present_queue_index }).Distinct().ToArray();
         }
 
-        internal static IntPtr MapMemory(Image img)
+        #region Memory Mapping/Unmapping
+        private static Dictionary<IntPtr, DeviceMemory> Mappings = new Dictionary<IntPtr, DeviceMemory>();
+
+        internal static IntPtr MapMemory(DeviceMemory mem, DeviceSize offset, DeviceSize size)
         {
-            return LogicalDevice.MapMemory()
+            var tmp = LogicalDevice.MapMemory(mem, offset, size);
+            Mappings[tmp] = mem;
+            return tmp;
         }
 
-        internal static DeviceMemory AllocateMemory(int size)
+        internal static void UnmapMemory(IntPtr mem)
+        {
+            LogicalDevice.UnmapMemory(Mappings[mem]);
+        }
+        #endregion
+
+        #region Memory Allocation
+        private const int BlockAllocationSize = 1024*1024*4;
+
+        internal static uint FindMemoryType(uint filter, MemoryPropertyFlags flags)
+        {
+            PhysicalDeviceMemoryProperties props;
+            props = PhysDevice.GetMemoryProperties();
+
+            for (int i = 0; i < props.MemoryTypeCount; i++)
+            {
+                if ((filter & (1 << i)) != 0 && (props.MemoryTypes[i].PropertyFlags & flags) == flags)
+                {
+                    return (uint)i;
+                }
+            }
+
+            return 0;
+        }
+
+        internal static DeviceMemory AllocateDeviceMemory(int size, uint filter, MemoryPropertyFlags flags)
         {
             MemoryAllocateInfo info = new MemoryAllocateInfo()
             {
                 AllocationSize = size,
-                MemoryTypeIndex = 
-
+                MemoryTypeIndex = FindMemoryType(filter, flags)
             };
             return LogicalDevice.AllocateMemory(info);
         }
+
+        private struct MemorySubBlock
+        {
+            public DeviceMemory BlockHandle;
+            public int Size;
+            public int FreeSize;
+        }
+
+        private struct MemoryBlock
+        {
+            public List<MemorySubBlock> Blocks;
+            public uint Filter;
+            public MemoryPropertyFlags Flags;
+        }
+
+        private static Dictionary<Tuple<uint, MemoryPropertyFlags>, MemoryBlock> MemoryBlocks;
+
+        internal static DeviceMemory AllocateMemory(int size, uint filter, MemoryPropertyFlags flags, out DeviceSize offset)
+        {
+            //TODO read up on Vulkan's memory allocation requirements
+            offset = 0;
+            return AllocateDeviceMemory(size, filter, flags);
+
+            if(MemoryBlocks == null)
+            {
+                MemoryBlocks = new Dictionary<Tuple<uint, MemoryPropertyFlags>, MemoryBlock>();
+            }
+
+            Tuple<uint, MemoryPropertyFlags> key = new Tuple<uint, MemoryPropertyFlags>(filter, flags);
+
+            MemoryBlock block;
+
+            if (MemoryBlocks.ContainsKey(key))
+            {
+                block = MemoryBlocks[key];
+            }
+            else
+            {
+                MemoryBlocks[key] = new MemoryBlock();
+                block = MemoryBlocks[key];
+                block.Blocks = new List<MemorySubBlock>();
+                block.Filter = filter;
+                block.Flags = flags;
+            }
+
+            bool spaceFound = false;
+            int spaceIndex = -1;
+            for(int i = 0; i < block.Blocks.Count; i++)
+            {
+                MemorySubBlock curBlock = block.Blocks[i];
+
+                if(curBlock.FreeSize >= size)
+                {
+                    spaceFound = true;
+                    spaceIndex = i;
+                }
+            }
+
+            if (spaceFound)
+            {
+                var tmp = block.Blocks[spaceIndex];
+                offset = (uint)(tmp.Size - tmp.FreeSize);
+                tmp.FreeSize -= size;
+                return tmp.BlockHandle;
+            }
+            else
+            {
+                MemorySubBlock n_block = new MemorySubBlock();
+                n_block.BlockHandle = AllocateDeviceMemory(BlockAllocationSize, filter, flags);
+                n_block.FreeSize = BlockAllocationSize;
+                n_block.Size = BlockAllocationSize;
+
+                offset = (uint)(n_block.Size - n_block.FreeSize);
+                n_block.FreeSize -= size;
+                return n_block.BlockHandle;
+            }
+        }
+
+        #endregion
 
         public static void Run(double ups, double fps)
         {
@@ -284,7 +392,7 @@ namespace Kokoro.Graphics.Vulkan
             Swapchain = LogicalDevice.CreateSwapchainKHR(swapchain_create_info);
             SwapchainImages = LogicalDevice.GetSwapchainImagesKHR(Swapchain);
 
-            
+
         }
 
         public static void SwapBuffers()
