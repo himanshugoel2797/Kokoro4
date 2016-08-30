@@ -14,6 +14,7 @@ using FrameEventArgs = OpenTK.FrameEventArgs;
 using VSyncMode = OpenTK.VSyncMode;
 using Kokoro.StateMachine;
 using Kokoro.Engine.Graphics;
+using Cloo;
 
 namespace Kokoro.Graphics.OpenGL
 {
@@ -248,6 +249,9 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
+        private static ComputeContext _comp_ctxt;
+        private static ComputeCommandQueue _comp_queue;
+
         static GraphicsDevice()
         {
             game = new GameWindow(1280, 720);
@@ -262,6 +266,8 @@ namespace Kokoro.Graphics.OpenGL
             curVarray = null;
             curProg = null;
             feedbackBufs = new List<Tuple<GPUBuffer, int, int>>();
+
+
         }
 
 
@@ -298,6 +304,9 @@ namespace Kokoro.Graphics.OpenGL
             Update?.Invoke(e.Time);
         }
 
+        [System.Runtime.InteropServices.DllImport("opengl64.dll", EntryPoint = "wglGetCurrentDC")]
+        extern static IntPtr wglGetCurrentDC();//CAl
+
         private static void InitRender(object sender, FrameEventArgs e)
         {
             int major_v = GL.GetInteger(GetPName.MajorVersion);
@@ -306,6 +315,18 @@ namespace Kokoro.Graphics.OpenGL
             {
                 throw new Exception($"Unsupported OpenGL version ({major_v}.{minor_v}), minimum OpenGL 4.5 required.");
             }
+
+            ComputePlatform plat = ComputePlatform.GetByVendor(GL.GetString(StringName.Vendor));
+            ComputeContextPropertyList props = new ComputeContextPropertyList(new ComputeContextProperty[]
+            {
+                new ComputeContextProperty(ComputeContextPropertyName.Platform, plat.Handle.Value),
+                new ComputeContextProperty(ComputeContextPropertyName.CL_GL_CONTEXT_KHR, OpenTK.Graphics.GraphicsContext.CurrentContextHandle.Handle),
+                new ComputeContextProperty(ComputeContextPropertyName.CL_WGL_HDC_KHR, wglGetCurrentDC())
+            });
+
+            _comp_ctxt = new ComputeContext(ComputeDeviceTypes.Gpu, props, null, IntPtr.Zero);
+            _comp_queue = new ComputeCommandQueue(_comp_ctxt, _comp_ctxt.Devices[0], ComputeCommandQueueFlags.OutOfOrderExecution);
+            
 
             Game_RenderFrame(sender, e);
             game.RenderFrame -= InitRender;

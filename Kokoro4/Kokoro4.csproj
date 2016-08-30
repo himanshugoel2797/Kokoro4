@@ -74,6 +74,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cloo, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sourceforge.Cloo.0.9.1\lib\net35\Cloo.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\OpenTK.dll</HintPath>
@@ -98,6 +102,7 @@
     <Compile Include="Engine\Graphics\GraphicsObject.cs" />
     <Compile Include="Engine\Graphics\Material.cs" />
     <Compile Include="Engine\Graphics\RenderPass.cs" />
+    <Compile Include="Engine\Graphics\RenderState.cs" />
     <Compile Include="Engine\Graphics\ShaderGroup.cs" />
     <Compile Include="Engine\Graphics\ShaderProgram.cs" />
     <Compile Include="Engine\Graphics\ShaderSource.cs" />
@@ -110,11 +115,13 @@
     <Compile Include="Engine\Voxel\Chunk.cs" />
     <Compile Include="Engine\Voxel\RLEData.cs" />
     <Compile Include="Engine\Graphics\BitmapTextureSource.cs" />
+    <Compile Include="Graphics\OpenGL\BlendFunc.cs" />
     <Compile Include="Graphics\OpenGL\BufferTexture.cs" />
     <Compile Include="Engine\Cameras\Camera.cs" />
     <Compile Include="Engine\Cameras\FirstPersonCamera.cs" />
     <Compile Include="Engine\Graphics\CubeMapTextureSource.cs" />
     <Compile Include="Engine\Graphics\DepthTextureSource.cs" />
+    <Compile Include="Graphics\OpenGL\DepthFunc.cs" />
     <Compile Include="Graphics\OpenGL\Fence.cs" />
     <Compile Include="Graphics\OpenGL\Framebuffer.cs" />
     <Compile Include="Engine\Graphics\FramebufferTextureSource.cs" />
@@ -390,6 +397,7 @@
     <None Include="Graphics\OpenGL\Shaders\SSR\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
