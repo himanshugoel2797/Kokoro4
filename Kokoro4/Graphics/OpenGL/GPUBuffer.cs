@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using System.Runtime.InteropServices;
+using Cloo;
 
 namespace Kokoro.Graphics.OpenGL
 {
@@ -16,6 +17,16 @@ namespace Kokoro.Graphics.OpenGL
         public int dataLen;
 
         private IntPtr addr;
+
+        internal ComputeBuffer<uint> _comp_buf;
+        internal ComputeBuffer<uint> GetComputeBuffer(ComputeMemoryFlags flags)
+        {
+            if (_comp_buf == null || _comp_buf.Flags != flags)
+            {
+                _comp_buf = ComputeBuffer<uint>.CreateFromGLBuffer<uint>(GraphicsDevice._comp_ctxt, flags, id);
+            }
+            return _comp_buf;
+        }
 
         public GPUBuffer(BufferTarget target)
         {

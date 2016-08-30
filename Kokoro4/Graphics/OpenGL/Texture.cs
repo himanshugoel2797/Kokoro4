@@ -1,5 +1,7 @@
 ﻿#if OPENGL
+using Cloo;
 using Kokoro.Engine.Graphics;
+using Kokoro.Graphics.OpenGL;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -18,10 +20,36 @@ namespace Kokoro.Engine.Graphics
     public class TextureHandle
     {
         internal long hndl = 0;
+        internal Texture parent;
+        private ComputeImage computeTex;
 
-        internal TextureHandle(long hndl)
+        internal ComputeImage GetImageForCompute(ComputeMemoryFlags flags, int mipLevel)
+        {
+            if(computeTex == null || (computeTex.Flags != flags))
+            {
+                switch (parent.texTarget)
+                {
+                    case TextureTarget.TextureCubeMapNegativeX:
+                    case TextureTarget.TextureCubeMapNegativeY:
+                    case TextureTarget.TextureCubeMapNegativeZ:
+                    case TextureTarget.TextureCubeMapPositiveX:
+                    case TextureTarget.TextureCubeMapPositiveY:
+                    case TextureTarget.TextureCubeMapPositiveZ:
+                    case TextureTarget.Texture2D:
+                        computeTex = ComputeImage2D.CreateFromGLTexture2D(GraphicsDevice._comp_ctxt, flags, (int)parent.texTarget, mipLevel, parent.id);
+                            break;
+                    case TextureTarget.Texture3D:
+                        computeTex = ComputeImage3D.CreateFromGLTexture3D(GraphicsDevice._comp_ctxt, flags, (int)TextureTarget.Texture3D, mipLevel, parent.id);
+                            break;
+                }
+            }
+            return computeTex;
+        }
+
+        internal TextureHandle(long hndl, Texture parent)
         {
             this.hndl = hndl;
+            this.parent = parent;
         }
 
         public static implicit operator long(TextureHandle handle)
@@ -62,8 +90,8 @@ namespace Kokoro.Engine.Graphics
 
         public void SetResidency(TextureResidency residency)
         {
-            if(Handle == null)
-                Handle = new TextureHandle(GL.Arb.GetTextureHandle(id));
+            if (Handle == null)
+                Handle = new TextureHandle(GL.Arb.GetTextureHandle(id), this);
 
             if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(Handle);
             else GL.Arb.MakeTextureHandleNonResident(Handle);

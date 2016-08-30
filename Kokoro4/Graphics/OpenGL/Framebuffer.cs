@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
+using Kokoro.Graphics.OpenGL;
 
 namespace Kokoro.Engine.Graphics
 {

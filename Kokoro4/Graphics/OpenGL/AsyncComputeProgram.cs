@@ -16,6 +16,70 @@ namespace Kokoro.Engine.Graphics
             GraphicsDevice.Cleanup += Dispose;
         }
 
+        public void Set(int index, TextureHandle value, bool read, bool write, int miplevel)
+        {
+            ComputeMemoryFlags flags = ComputeMemoryFlags.None;
+            if (read && write) flags |= ComputeMemoryFlags.ReadWrite;
+            else if (read && !write) flags |= ComputeMemoryFlags.ReadOnly;
+            else if (!read && write) flags |= ComputeMemoryFlags.WriteOnly;
+
+            while(Objects.Count <= index)
+            {
+                Objects.Add(null);
+            }
+
+            kern.SetMemoryArgument(index, value.GetImageForCompute(flags, miplevel));
+            Objects[index] = (value.GetImageForCompute(flags, miplevel));
+        }
+
+        public void Set(int index, GPUBuffer value, bool read, bool write)
+        {
+            ComputeMemoryFlags flags = ComputeMemoryFlags.None;
+            if (read && write) flags |= ComputeMemoryFlags.ReadWrite;
+            else if (read && !write) flags |= ComputeMemoryFlags.ReadOnly;
+            else if (!read && write) flags |= ComputeMemoryFlags.WriteOnly;
+
+            while (Objects.Count <= index)
+            {
+                Objects.Add(null);
+            }
+
+            kern.SetMemoryArgument(index, value.GetComputeBuffer(flags));
+            Objects[index] = (value.GetComputeBuffer(flags));
+        }
+
+        public void Set(int index, UniformBuffer value, bool read, bool write)
+        {
+            ComputeMemoryFlags flags = ComputeMemoryFlags.None;
+            if (read && write) flags |= ComputeMemoryFlags.ReadWrite;
+            else if (read && !write) flags |= ComputeMemoryFlags.ReadOnly;
+            else if (!read && write) flags |= ComputeMemoryFlags.WriteOnly;
+
+            while (Objects.Count <= index)
+            {
+                Objects.Add(null);
+            }
+
+            kern.SetMemoryArgument(index, value.buf.GetComputeBuffer(flags));
+            Objects[index] = (value.buf.GetComputeBuffer(flags));
+        }
+
+        public void Set(int index, ShaderStorageBuffer value, bool read, bool write)
+        {
+            ComputeMemoryFlags flags = ComputeMemoryFlags.None;
+            if (read && write) flags |= ComputeMemoryFlags.ReadWrite;
+            else if (read && !write) flags |= ComputeMemoryFlags.ReadOnly;
+            else if (!read && write) flags |= ComputeMemoryFlags.WriteOnly;
+
+            while (Objects.Count <= index)
+            {
+                Objects.Add(null);
+            }
+
+            kern.SetMemoryArgument(index, value.buf.GetComputeBuffer(flags));
+            Objects[index] = (value.buf.GetComputeBuffer(flags));
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
