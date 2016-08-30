@@ -115,6 +115,8 @@
     <Compile Include="Engine\Voxel\Chunk.cs" />
     <Compile Include="Engine\Voxel\RLEData.cs" />
     <Compile Include="Engine\Graphics\BitmapTextureSource.cs" />
+    <Compile Include="Graphics\OpenGL\AsyncComputeProgram.cs" />
+    <Compile Include="Graphics\OpenGL\AsyncComputeSource.cs" />
     <Compile Include="Graphics\OpenGL\BlendFunc.cs" />
     <Compile Include="Graphics\OpenGL\BufferTexture.cs" />
     <Compile Include="Engine\Cameras\Camera.cs" />

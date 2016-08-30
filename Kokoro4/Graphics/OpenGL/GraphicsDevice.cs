@@ -249,8 +249,9 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
-        private static ComputeContext _comp_ctxt;
-        private static ComputeCommandQueue _comp_queue;
+        internal static ComputeContext _comp_ctxt;
+        internal static ComputeCommandQueue _comp_queue;
+        internal static ComputeEventList _comp_events;
 
         static GraphicsDevice()
         {
@@ -326,7 +327,14 @@ namespace Kokoro.Graphics.OpenGL
 
             _comp_ctxt = new ComputeContext(ComputeDeviceTypes.Gpu, props, null, IntPtr.Zero);
             _comp_queue = new ComputeCommandQueue(_comp_ctxt, _comp_ctxt.Devices[0], ComputeCommandQueueFlags.OutOfOrderExecution);
-            
+            _comp_events = new ComputeEventList();
+
+            Cleanup += () =>
+            {
+                _comp_events.Clear();
+                _comp_queue.Dispose();
+                _comp_ctxt.Dispose();
+            };
 
             Game_RenderFrame(sender, e);
             game.RenderFrame -= InitRender;
@@ -402,10 +410,19 @@ namespace Kokoro.Graphics.OpenGL
             else throw new Exception();
         }
 
-        public static void DispatchComputeJob(ShaderProgram prog, int x, int y, int z)
+        public static void DispatchSyncComputeJob(ShaderProgram prog, int x, int y, int z)
         {
             GL.UseProgram(prog.prog.id);
             GL.DispatchCompute(x, y, z);
+        }
+
+        public static void DispatchAsyncComputeJob(AsyncComputeProgram prog, int xoff, int yoff, int zoff, int x, int y, int z)
+        {
+            //Acquire the related opengl objects
+            _comp_queue.AcquireGLObjects(prog.Objects, _comp_events);
+            _comp_queue.Execute(prog.kern, new long[] { xoff, yoff, zoff }, new long[] { x, y, z }, new long[] { 4, 4, 4 }, _comp_events);
+            _comp_queue.ReleaseGLObjects(prog.Objects, _comp_events);
+            while (_comp_events.Count > 10)_comp_events.RemoveAt(0);
         }
 
         public static void Draw(PrimitiveType type, int first, int count, bool indexed)
