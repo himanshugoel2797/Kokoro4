@@ -14,6 +14,7 @@ namespace Kokoro.Engine.Graphics
         {
             kern = src.prog.CreateKernel(entryPoint);
             GraphicsDevice.Cleanup += Dispose;
+            Objects = new List<ComputeMemory>();
         }
 
         public void Set(int index, TextureHandle value, bool read, bool write, int miplevel)
@@ -27,6 +28,7 @@ namespace Kokoro.Engine.Graphics
             {
                 Objects.Add(null);
             }
+
 
             kern.SetMemoryArgument(index, value.GetImageForCompute(flags, miplevel));
             Objects[index] = (value.GetImageForCompute(flags, miplevel));

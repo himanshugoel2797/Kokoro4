@@ -32,30 +32,6 @@ namespace Kokoro.Engine
         public static string Name { get { return GraphicsDevice.Name; } set { GraphicsDevice.Name = value; } }
         public static string EngineName { get { return $"{typeof(EngineManager).Assembly.GetName().Name} {typeof(EngineManager).Assembly.GetName().Version}"; } }
 
-        public static Framebuffer Framebuffer
-        {
-            get { return GraphicsDevice.GetFramebuffer(); }
-            set { GraphicsDevice.SetFramebuffer(value); }
-        }
-
-        public static bool DepthTestEnabled
-        {
-            get { return GraphicsDevice.DepthTestEnabled; }
-            set { GraphicsDevice.DepthTestEnabled = value; }
-        }
-
-        public static bool DepthWriteEnabled
-        {
-            get { return GraphicsDevice.DepthWriteEnabled; }
-            set { GraphicsDevice.DepthWriteEnabled = value; }
-        }
-
-        public static Vector4 ClearColor
-        {
-            get { return GraphicsDevice.ClearColor; }
-            set { GraphicsDevice.ClearColor = value; }
-        }
-
         private static Dictionary<string, Camera> Cameras;
 
         static EngineManager()
@@ -71,6 +47,19 @@ namespace Kokoro.Engine
         public static void Clear()
         {
             GraphicsDevice.Clear();
+        }
+
+        public static void SetRenderState(RenderState state)
+        {
+            GraphicsDevice.CullMode = state.CullMode;
+            GraphicsDevice.ClearColor = state.ClearColor;
+            GraphicsDevice.DepthTest = state.DepthTest;
+            GraphicsDevice.DepthWriteEnabled = state.DepthWrite;
+            GraphicsDevice.ClearDepth = state.ClearDepth;
+            GraphicsDevice.AlphaSrc = state.Src;
+            GraphicsDevice.AlphaDst = state.Dst;
+            GraphicsDevice.Framebuffer = state.Framebuffer;
+            GraphicsDevice.ShaderProgram = state.ShaderProgram;
         }
 
         #region Execution Management

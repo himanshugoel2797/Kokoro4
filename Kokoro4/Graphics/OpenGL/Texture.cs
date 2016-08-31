@@ -51,6 +51,12 @@ namespace Kokoro.Engine.Graphics
             this.hndl = hndl;
             this.parent = parent;
         }
+        
+        public void SetResidency(TextureResidency residency)
+        {
+            if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(hndl);
+            else GL.Arb.MakeTextureHandleNonResident(hndl);
+        }
 
         public static implicit operator long(TextureHandle handle)
         {
@@ -66,14 +72,16 @@ namespace Kokoro.Engine.Graphics
         internal TextureTarget texTarget;
         internal PixelFormat format;
 
+            
+
         public int Width { get; internal set; }
         public int Height { get; internal set; }
         public int Depth { get; internal set; }
         public int LevelCount { get; internal set; }
 
-        public TextureHandle Handle { get; private set; }
-
         public static float MaxAnisotropy { get; internal set; }
+
+        private Dictionary<int, TextureHandle> handles;
 
         static Texture()
         {
@@ -85,16 +93,21 @@ namespace Kokoro.Engine.Graphics
         public Texture()
         {
             id = 0;
+            handles = new Dictionary<int, TextureHandle>();
             GraphicsDevice.Cleanup += Dispose;
         }
 
-        public void SetResidency(TextureResidency residency)
+        public TextureHandle GetHandle(TextureSampler sampler)
         {
-            if (Handle == null)
-                Handle = new TextureHandle(GL.Arb.GetTextureHandle(id), this);
+            if (!handles.ContainsKey(sampler.id))
+            {
+                if (sampler.id != 0)
+                    handles[sampler.id] = new TextureHandle(GL.Arb.GetTextureSamplerHandle(id, sampler.id), this);
+                else
+                    handles[0] = new TextureHandle(GL.Arb.GetTextureHandle(id), this);
+            }
 
-            if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(Handle);
-            else GL.Arb.MakeTextureHandleNonResident(Handle);
+            return handles[sampler.id];
         }
 
         public virtual void SetData(ITextureSource src, int level)

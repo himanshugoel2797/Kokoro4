@@ -170,8 +170,8 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
-        static CullFaceMode cullMode = CullFaceMode.Back;
-        public static CullFaceMode CullMode
+        static Engine.Graphics.CullFaceMode cullMode = Engine.Graphics.CullFaceMode.Back;
+        public static Engine.Graphics.CullFaceMode CullMode
         {
             get
             {
@@ -180,7 +180,7 @@ namespace Kokoro.Graphics.OpenGL
             set
             {
                 cullMode = value;
-                GL.CullFace(cullMode);
+                GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
             }
         }
 
@@ -201,24 +201,70 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
-        static bool depthTestEnabled = false;
-        public static bool DepthTestEnabled
+        static DepthFunc dFunc = DepthFunc.None;
+        public static DepthFunc DepthTest
         {
             get
             {
-                return depthTestEnabled;
+                return dFunc;
             }
             set
             {
-                depthTestEnabled = value;
-                if (depthTestEnabled)
+                if (dFunc != value)
                 {
-                    GL.Enable(EnableCap.DepthTest);
-                    GL.DepthFunc(DepthFunction.Lequal);
+                    dFunc = value;
+                    GL.DepthFunc((DepthFunction)value);
                 }
-                else
+            }
+        }
+
+        static float clearDepth = 0;
+        public static float ClearDepth
+        {
+            get
+            {
+                return clearDepth;
+            }
+            set
+            {
+                if(clearDepth != value)
                 {
-                    GL.Disable(EnableCap.DepthTest);
+                    clearDepth = value;
+                    GL.ClearDepth(value);
+                }
+            }
+        }
+
+        static BlendFactor alphaSrc = BlendFactor.One;
+        public static BlendFactor AlphaSrc
+        {
+            get
+            {
+                return alphaSrc;
+            }
+            set
+            {
+                if(alphaSrc != value)
+                {
+                    alphaSrc = value;
+                    GL.BlendFunc((BlendingFactorSrc)alphaSrc, (BlendingFactorDest)alphaDst);
+                }
+            }
+        }
+
+        static BlendFactor alphaDst = BlendFactor.One;
+        public static BlendFactor AlphaDst
+        {
+            get
+            {
+                return alphaDst;
+            }
+            set
+            {
+                if (alphaDst != value)
+                {
+                    alphaDst = value;
+                    GL.BlendFunc((BlendingFactorSrc)alphaSrc, (BlendingFactorDest)alphaDst);
                 }
             }
         }
@@ -275,6 +321,12 @@ namespace Kokoro.Graphics.OpenGL
         public static void Run(double ups, double fps)
         {
             game.Title = gameName;
+#if DEBUG
+            if (renderer_name == "")
+                renderer_name = GL.GetString(StringName.Renderer);
+
+            game.Title = gameName + $" | {renderer_name}";
+#endif
             game.Run(ups, fps);
         }
 
@@ -305,7 +357,7 @@ namespace Kokoro.Graphics.OpenGL
             Update?.Invoke(e.Time);
         }
 
-        [System.Runtime.InteropServices.DllImport("opengl64.dll", EntryPoint = "wglGetCurrentDC")]
+        [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")]
         extern static IntPtr wglGetCurrentDC();//CAl
 
         private static void InitRender(object sender, FrameEventArgs e)
@@ -317,7 +369,21 @@ namespace Kokoro.Graphics.OpenGL
                 throw new Exception($"Unsupported OpenGL version ({major_v}.{minor_v}), minimum OpenGL 4.5 required.");
             }
 
-            ComputePlatform plat = ComputePlatform.GetByVendor(GL.GetString(StringName.Vendor));
+            ComputePlatform plat = null;
+
+            string vendorName = GL.GetString(StringName.Vendor);
+            if (vendorName == "ATI Technologies Inc.") vendorName = "Advanced Micro Devices, Inc.";
+
+            for (int i = 0; i < ComputePlatform.Platforms.Count; i++)
+            {
+                if(ComputePlatform.Platforms[i].Vendor == vendorName)
+                {
+                    plat = ComputePlatform.Platforms[i];
+                    break;
+                }
+            }
+
+            
             ComputeContextPropertyList props = new ComputeContextPropertyList(new ComputeContextProperty[]
             {
                 new ComputeContextProperty(ComputeContextPropertyName.Platform, plat.Handle.Value),
@@ -366,10 +432,13 @@ namespace Kokoro.Graphics.OpenGL
         {
             GL.Viewport(x, y, width, height);
         }
-
-        public static void SetShaderProgram(ShaderProgram prog)
+        
+        public static ShaderProgram ShaderProgram
         {
-            curProg = prog;
+            set
+            {
+                curProg = value;
+            }
         }
 
         public static void SetVertexArray(VertexArray varray)
@@ -378,17 +447,21 @@ namespace Kokoro.Graphics.OpenGL
             GL.BindVertexArray(varray.id);
         }
 
-        public static void SetFramebuffer(Framebuffer framebuf)
+        public static Framebuffer Framebuffer
         {
-            curFramebuffer = framebuf;
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, curFramebuffer.id);
-            SetViewport(0, 0, framebuf.Width, framebuf.Height);
+            get
+            {
+                return curFramebuffer;
+            }
+
+            set
+            {
+                curFramebuffer = value;
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, curFramebuffer.id);
+                SetViewport(0, 0, value.Width, value.Height);
+            }
         }
 
-        public static Framebuffer GetFramebuffer()
-        {
-            return curFramebuffer;
-        }
 
         public static void SetFeedbackBuffer(int slot, GPUBuffer buf)
         {
