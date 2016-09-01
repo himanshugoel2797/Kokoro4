@@ -235,7 +235,7 @@
     <None Include="Graphics\OpenGL\Shaders\DirectionalLight\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="..\x64\Debug\Kokoro4.Native.dll">
+    <Content Include="..\$(Configuration)\$(Platform)\Kokoro4.Native.dll">
       <Link>Kokoro4.Native.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
