@@ -235,6 +235,10 @@
     <None Include="Graphics\OpenGL\Shaders\DirectionalLight\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="..\x64\Debug\Kokoro4.Native.dll">
+      <Link>Kokoro4.Native.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\OpenGL\Shaders\FilledRectangle\fragment.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -401,12 +405,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Kokoro4.Native\Kokoro4.Native.vcxproj">
-      <Project>{9dca59cc-8c09-473c-8162-ca47a0b788cc}</Project>
-      <Name>Kokoro4.Native</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

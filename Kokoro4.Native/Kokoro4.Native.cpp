@@ -27,5 +27,6 @@ __declspec(dllexport) int LoadMesh(const char *file, void** targetLocs)
 
 __declspec(dllexport) int LoadDDS1Texture(const char *file, void *buffer)
 {
-	//Load DDS1 textures straight into the buffers 
+	//Load DDS1 textures straight into the buffers
+	return 0;
 }

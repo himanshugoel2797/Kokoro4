@@ -39,7 +39,7 @@ namespace Kokoro.Engine
 
         public Mesh(float[] vertices, float[] uv, float[] norm, ushort[] indice)
         {
-
+            //These allocations can't be managed by the scene manager, best to keep them limited
         }
 
         public Mesh(Mesh src, bool lockChanges)
