@@ -71,6 +71,11 @@ namespace Kokoro.Graphics.OpenGL
             return addr;
         }
 
+        public void FlushBuffer(IntPtr offset, int size)
+        {
+            GL.FlushMappedNamedBufferRange(id, offset, size);
+        }
+
         public static void FlushAll()
         {
             GL.MemoryBarrier(MemoryBarrierFlags.ClientMappedBufferBarrierBit);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Kokoro.Engine.Graphics;
 
 #if OPENGL
 using Kokoro.Graphics.OpenGL;

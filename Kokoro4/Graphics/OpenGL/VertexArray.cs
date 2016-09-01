@@ -25,7 +25,6 @@ namespace Kokoro.Graphics.OpenGL
         public void SetBufferObject(int index, GPUBuffer buffer, int elementCount, VertexAttribPointerType type)
         {
             GL.EnableVertexArrayAttrib(id, index);
-
             GL.VertexArrayAttribFormat(id, index, elementCount, (VertexAttribType)type, false, 0);
             GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, elementCount * 4);
             GL.VertexArrayAttribBinding(id, index, index);

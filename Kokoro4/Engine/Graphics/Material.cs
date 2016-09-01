@@ -9,6 +9,7 @@ namespace Kokoro.Engine.Graphics
     public class Material : EngineRenderable
     {
         public bool Transparent { get; set; }
-
+        public ShaderGroup Shaders { get; set; }
+        public Dictionary<string, TextureHandle> Textures { get; set; }
     }
 }
