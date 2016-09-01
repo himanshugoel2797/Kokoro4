@@ -23,7 +23,7 @@ namespace Kokoro.Graphics.Prefabs
             List<float> verts = new List<float>();
             List<float> uvs = new List<float>();
             List<float> normals = new List<float>();
-            List<uint> indices = new List<uint>();
+            List<ushort> indices = new List<ushort>();
 
             float step = 3600;
             float radius = 1;
@@ -71,7 +71,7 @@ namespace Kokoro.Graphics.Prefabs
                     normals.Add(normal.Y);
                     normals.Add(normal.Z);
 
-                    indices.Add(n);
+                    indices.Add((ushort)n);
                     n++;
 
 
@@ -94,7 +94,7 @@ namespace Kokoro.Graphics.Prefabs
                     uvs.Add(uvX);
                     uvs.Add(uvY);
 
-                    indices.Add(n);
+                    indices.Add((ushort)n);
                     n++;
 
 
@@ -117,7 +117,7 @@ namespace Kokoro.Graphics.Prefabs
                     uvs.Add(uvX);
                     uvs.Add(uvY);
 
-                    indices.Add(n);
+                    indices.Add((ushort)n);
                     n++;
 
                     x = (float)(radius * System.Math.Cos((aX + angleStep) * toRad) * System.Math.Sin((aY + angleStep) * toRad));
@@ -139,21 +139,16 @@ namespace Kokoro.Graphics.Prefabs
                     uvs.Add(uvX);
                     uvs.Add(uvY);
 
-                    indices.Add(n);
-                    indices.Add((uint)(n - 1));
-                    indices.Add((uint)(n - 2));
+                    indices.Add((ushort)n);
+                    indices.Add((ushort)(n - 1));
+                    indices.Add((ushort)(n - 2));
                     n++;
 
                 }
             }
 
 
-            eObj = new Mesh();
-
-            eObj.SetIndices(0, indices.ToArray(), false);
-            eObj.SetUVs(0, uvs.ToArray(), false);
-
-            eObj.SetVertices(0, verts.ToArray(), false);
+            eObj = new Mesh(verts.ToArray(), uvs.ToArray(), normals.ToArray(), indices.ToArray());
         }
         
         public static Mesh Create()

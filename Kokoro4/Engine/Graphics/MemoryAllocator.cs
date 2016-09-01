@@ -29,6 +29,7 @@ namespace Kokoro.Engine.Graphics
         static GPUBuffer uvs;
         static GPUBuffer normals;
         static GPUBuffer indices;
+        internal static VertexArray varray;
 
         static Dictionary<int, bool[]> usedBlocks;
         static Dictionary<int, int> baseOffsets;
@@ -66,6 +67,13 @@ namespace Kokoro.Engine.Graphics
             baseOffsets[256] = baseOffsets[1024] + usedBlocks[1024].Length * 1024;
             baseOffsets[64] = baseOffsets[256] + usedBlocks[256].Length * 256;
             baseOffsets[16] = baseOffsets[64] + usedBlocks[64].Length * 64;
+
+            varray = new VertexArray();
+            varray.SetBufferObject(0, vertices, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
+            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
+            varray.SetBufferObject(2, normals, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
+            varray.SetElementBufferObject(indices);
+            GraphicsDevice.SetVertexArray(varray);
 
             //NOTE: Meshes are automatically expelled from memory as needed, the engine knows about which meshes should be visible based on the player's position in the scene, thus it can handle evicting meshes as necessary
             //Have multiple block sizes, 65536, 16384, 4096, 1024, 256, 64, 16
@@ -131,6 +139,8 @@ namespace Kokoro.Engine.Graphics
                     vertices.FlushBuffer(vertices.GetPtr() + (offset * 3 * sizeof(float)), size);
                     break;
             }
+
+            //Place a fence here to allow freeing to be deferred to when the resource is no longer in use
         }
 
         public static void FreeMemory(int offset)

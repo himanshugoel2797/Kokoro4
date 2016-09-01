@@ -18,8 +18,7 @@ namespace Kokoro.Graphics.Prefabs
 
         private static void Init()
         {
-            eObj = new Mesh();
-
+            
             uint[] indices = new uint[] {30,1,1,102,2,1,291,3,1
 ,50,1,2,170,2,2,292,3,2
 ,35,1,3,107,2,3,293,3,3
@@ -1277,7 +1276,7 @@ namespace Kokoro.Graphics.Prefabs
             List<float> norms = new List<float>();
             List<float> uvs_l = new List<float>();
             List<float> verts = new List<float>();
-            List<uint> inds = new List<uint>();
+            List<ushort> inds = new List<ushort>();
 
             for (int i = 0; i < indices.Length; i += 3)
             {
@@ -1285,7 +1284,7 @@ namespace Kokoro.Graphics.Prefabs
                 uint u_ind = indices[i + 1] - 1;
                 uint n_ind = indices[i + 2] - 1;
 
-                inds.Add((uint)i / 3);
+                inds.Add((ushort)(i / 3));
 
                 uvs_l.Add((float)uvs[u_ind * 2]);
                 uvs_l.Add((float)uvs[u_ind * 2 + 1]);
@@ -1299,10 +1298,7 @@ namespace Kokoro.Graphics.Prefabs
                 verts.Add((float)vers[v_ind * 3 + 2]);
             }
 
-            eObj.SetIndices(0, inds.ToArray(), false);
-            eObj.SetUVs(0, uvs_l.ToArray(), false);
-            eObj.SetNormals(0, norms.ToArray(), false);
-            eObj.SetVertices(0, verts.ToArray(), false);
+            eObj = new Mesh(verts.ToArray(), uvs_l.ToArray(), norms.ToArray(), inds.ToArray());
         }
 
         public static Mesh Create()
