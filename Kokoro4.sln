@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro4", "Kokoro4\Kokoro4.csproj", "{CFAD0F2C-BE42-4482-B032-1D72B9C00B98}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9DCA59CC-8C09-473C-8162-CA47A0B788CC} = {9DCA59CC-8C09-473C-8162-CA47A0B788CC}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "TestApplication\TestApplication.csproj", "{D608A797-3F04-46DB-856A-4E08CB13D9C6}"
 EndProject

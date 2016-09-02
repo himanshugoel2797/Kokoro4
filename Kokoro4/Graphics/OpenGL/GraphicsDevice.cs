@@ -357,6 +357,7 @@ namespace Kokoro.Graphics.OpenGL
             Update?.Invoke(e.Time);
         }
 
+        [System.Security.SuppressUnmanagedCodeSecurity]
         [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")]
         extern static IntPtr wglGetCurrentDC();//CAl
 

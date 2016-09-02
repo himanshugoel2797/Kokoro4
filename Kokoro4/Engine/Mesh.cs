@@ -18,6 +18,7 @@ namespace Kokoro.Engine
 {
     public class Mesh : IDisposable
     {
+        [System.Security.SuppressUnmanagedCodeSecurity]
         [System.Runtime.InteropServices.DllImport("Kokoro4.Native.dll", EntryPoint = "LoadMesh")]
         extern static int LoadMesh(string file, IntPtr[] ptrs);//CAl
 
@@ -40,6 +41,18 @@ namespace Kokoro.Engine
         public Mesh(float[] vertices, float[] uv, float[] norm, ushort[] indice)
         {
             //These allocations can't be managed by the scene manager, best to keep them limited
+            IndexCount = indice.Length;
+
+            int alloc_size = global::System.Math.Max(vertices.Length, indice.Length);
+            IntPtr[] ptrs = MemoryAllocator.AllocateMemory(alloc_size, out offset);
+
+            short[] temp = new short[indice.Length];
+            System.Buffer.BlockCopy(indice, 0, temp, 0, temp.Length * 2);
+
+            System.Runtime.InteropServices.Marshal.Copy(temp, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.Index], indice.Length);
+            System.Runtime.InteropServices.Marshal.Copy(uv, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.UV], uv.Length);
+            System.Runtime.InteropServices.Marshal.Copy(norm, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.Normal], norm.Length);
+            System.Runtime.InteropServices.Marshal.Copy(vertices, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.Vertex], vertices.Length);
         }
 
         public Mesh(Mesh src, bool lockChanges)

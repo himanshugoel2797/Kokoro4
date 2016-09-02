@@ -25,7 +25,7 @@ namespace Kokoro.Engine.Graphics
 
         internal ComputeImage GetImageForCompute(ComputeMemoryFlags flags, int mipLevel)
         {
-            if(computeTex == null || (computeTex.Flags != flags))
+            if (computeTex == null || (computeTex.Flags != flags))
             {
                 switch (parent.texTarget)
                 {
@@ -37,10 +37,10 @@ namespace Kokoro.Engine.Graphics
                     case TextureTarget.TextureCubeMapPositiveZ:
                     case TextureTarget.Texture2D:
                         computeTex = ComputeImage2D.CreateFromGLTexture2D(GraphicsDevice._comp_ctxt, flags, (int)parent.texTarget, mipLevel, parent.id);
-                            break;
+                        break;
                     case TextureTarget.Texture3D:
                         computeTex = ComputeImage3D.CreateFromGLTexture3D(GraphicsDevice._comp_ctxt, flags, (int)TextureTarget.Texture3D, mipLevel, parent.id);
-                            break;
+                        break;
                 }
             }
             return computeTex;
@@ -51,7 +51,7 @@ namespace Kokoro.Engine.Graphics
             this.hndl = hndl;
             this.parent = parent;
         }
-        
+
         public void SetResidency(TextureResidency residency)
         {
             if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(hndl);
@@ -72,7 +72,7 @@ namespace Kokoro.Engine.Graphics
         internal TextureTarget texTarget;
         internal PixelFormat format;
 
-            
+
 
         public int Width { get; internal set; }
         public int Height { get; internal set; }
@@ -147,18 +147,21 @@ namespace Kokoro.Engine.Graphics
 
         public void SetTileMode(bool tileX, bool tileY)
         {
+            if (handles.ContainsKey(0)) handles.Remove(0); //Force regeneration of the handle next time it's accessed
             GL.TextureParameter(id, TextureParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
             GL.TextureParameter(id, TextureParameterName.TextureWrapT, tileY ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
         }
 
         public void SetEnableLinearFilter(bool linear)
         {
+            if (handles.ContainsKey(0)) handles.Remove(0); //Force regeneration of the handle next time it's accessed
             GL.TextureParameter(id, TextureParameterName.TextureMagFilter, linear ? (int)TextureMagFilter.Linear : (int)TextureMagFilter.Nearest);
             GL.TextureParameter(id, TextureParameterName.TextureMinFilter, linear ? (int)TextureMinFilter.Linear : (int)TextureMinFilter.Nearest);
         }
 
         public void SetAnisotropicFilter(float taps)
         {
+            if (handles.ContainsKey(0)) handles.Remove(0); //Force regeneration of the handle next time it's accessed
             GL.TextureParameter(id, (TextureParameterName)All.TextureMaxAnisotropyExt, taps);
         }
 
