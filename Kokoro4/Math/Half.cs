@@ -122,11 +122,18 @@ namespace Kokoro.Math
             }
         }
 
+        public Half(double f, bool throwOnError) : this((float)f, throwOnError)
+        {
+
+        }
+
         /// <summary>
         /// The new Half instance will convert the parameter into 16-bit half-precision floating-point.
         /// </summary>
         /// <param name="d">64-bit double-precision floating-point number.</param>
         public Half(float d) : this() { unsafe { bits = SingleToHalf(*(int*)&d); } }
+
+        public Half(double d) : this((float)d) { }
         #endregion Constructors
 
         #region Single -> Half

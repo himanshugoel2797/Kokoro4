@@ -12,6 +12,11 @@ namespace Kokoro4.ContentProcessor.Mesh
     public static class MeshProcessor
     {
 
+        public static string GetHelp()
+        {
+            return "";
+        }
+
         private static uint CompressNormal(float x, float y, float z)
         {
             uint x_i = (uint)(Math.Abs(x) * 1023);

@@ -8,6 +8,12 @@ namespace Kokoro4.ContentProcessor.Texture
 {
     public static class TextureProcessor
     {
+
+        public static string GetHelp()
+        {
+            return "";
+        }
+
         public static void Preprocess(string[] args)
         {
             for (int i = 0; i < args.Length; i++)

@@ -8,6 +8,11 @@ namespace Kokoro4.ContentProcessor.Material
 {
     public static class MaterialProcessor
     {
+        public static string GetHelp()
+        {
+            return "";
+        }
+
         public static void Preprocess(string[] args)
         {
             Dictionary<string, string> OptionMap = new Dictionary<string, string>();
