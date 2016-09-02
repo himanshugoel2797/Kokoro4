@@ -17,7 +17,7 @@ namespace Kokoro.Engine.Graphics
     internal static class MemoryAllocator
     {
         //Net Vertex Count:
-        //16,500,000 vertices
+        //49,000,000 vertices
         //3 components for vertices, 2 for UVs, 2 for normals, 1 for Indices
         // (750 * 40960 + 1000*16384 + 363*4096 + 300*1024 + 304*256 + 302*64 + 300*16))
         //NOTE: Indices are 16 bit unsigned integers, this means that a mesh may not have more than 65536 vertices, allowing 251 meshes to be loaded into memory at any given moment
@@ -69,9 +69,9 @@ namespace Kokoro.Engine.Graphics
             baseOffsets[16] = baseOffsets[64] + usedBlocks[64].Length * 64;
 
             varray = new VertexArray();
-            varray.SetBufferObject(0, vertices, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
-            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.HalfFloat);
-            varray.SetBufferObject(2, normals, 4, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedInt2101010Rev);
+            varray.SetBufferObject(0, vertices, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float, false);
+            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedShort, true);
+            varray.SetBufferObject(2, normals, 4, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedInt2101010Rev, true);
             varray.SetElementBufferObject(indices);
             GraphicsDevice.SetVertexArray(varray);
 

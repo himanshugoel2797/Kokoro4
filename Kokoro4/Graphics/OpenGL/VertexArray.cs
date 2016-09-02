@@ -23,7 +23,7 @@ namespace Kokoro.Graphics.OpenGL
             GL.VertexArrayElementBuffer(id, buffer.id);
         }
 
-        public void SetBufferObject(int index, GPUBuffer buffer, int elementCount, VertexAttribPointerType type)
+        public void SetBufferObject(int index, GPUBuffer buffer, int elementCount, VertexAttribPointerType type, bool normalize)
         {
             int eSize = sizeof(uint);
             switch (type)
@@ -54,7 +54,7 @@ namespace Kokoro.Graphics.OpenGL
             }
 
             GL.EnableVertexArrayAttrib(id, index);
-            GL.VertexArrayAttribFormat(id, index, elementCount, (VertexAttribType)type, false, 0);
+            GL.VertexArrayAttribFormat(id, index, elementCount, (VertexAttribType)type, normalize, 0);
             GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, elementCount * eSize);
             GL.VertexArrayAttribBinding(id, index, index);
         }

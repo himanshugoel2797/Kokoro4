@@ -107,9 +107,8 @@ namespace Kokoro.Math
         /// </summary>
         /// <param name="f">32-bit single-precision floating-point number.</param>
         /// <param name="throwOnError">Enable checks that will throw if the conversion result is not meaningful.</param>
-        public Half(double f, bool throwOnError)
+        public Half(float f, bool throwOnError) : this(f)
         {
-            bits = (ushort)f;
             if (throwOnError)
             {
                 // handle cases that cause overflow rather than silently ignoring it
@@ -127,7 +126,7 @@ namespace Kokoro.Math
         /// The new Half instance will convert the parameter into 16-bit half-precision floating-point.
         /// </summary>
         /// <param name="d">64-bit double-precision floating-point number.</param>
-        public Half(Double d) : this(d, true) { }
+        public Half(float d) : this() { unsafe { bits = SingleToHalf(*(int*)&d); } }
         #endregion Constructors
 
         #region Single -> Half
@@ -298,20 +297,6 @@ namespace Kokoro.Math
         public static explicit operator Half(float f)
         {
             return new Half(f);
-        }
-
-        /// <summary>
-        /// Converts a System.Double to a Kokoro.Math.Half.
-        /// </summary>
-        /// <param name="d">The value to convert.
-        /// A <see cref="System.Double"/>
-        /// </param>
-        /// <returns>The result of the conversion.
-        /// A <see cref="Half"/>
-        /// </returns>
-        public static explicit operator Half(double d)
-        {
-            return new Half(d);
         }
 
         /// <summary>
