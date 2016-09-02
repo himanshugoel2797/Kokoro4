@@ -131,6 +131,7 @@
     <Compile Include="Graphics\OpenGL\GPUBuffer.cs" />
     <Compile Include="Graphics\OpenGL\GPUStateMachine.cs" />
     <Compile Include="Graphics\OpenGL\GraphicsDevice.cs" />
+    <Compile Include="Graphics\OpenGL\MultiDrawParameters.cs" />
     <Compile Include="Graphics\OpenGL\Input\Keyboard.cs" />
     <Compile Include="Graphics\OpenGL\Input\LowLevel\Input.cs" />
     <Compile Include="Graphics\OpenGL\Input\Mouse.cs" />

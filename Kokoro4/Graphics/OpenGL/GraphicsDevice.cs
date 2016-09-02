@@ -30,8 +30,6 @@ namespace Kokoro.Graphics.OpenGL
         static ShaderProgram curProg;
         static Framebuffer curFramebuffer;
         static GameWindow game;
-        static List<Tuple<GPUBuffer, int, int>> feedbackBufs;
-        static PrimitiveType feedbackPrimitive;
 
         static FaceWinding winding;
         public static FaceWinding Winding
@@ -295,9 +293,41 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
+        public static ShaderProgram ShaderProgram
+        {
+            get
+            {
+                return curProg;
+            }
+            set
+            {
+                GL.UseProgram(curProg.prog.id);
+                curProg = value;
+            }
+        }
+
+        public static Framebuffer Framebuffer
+        {
+            get
+            {
+                return curFramebuffer;
+            }
+
+            set
+            {
+                curFramebuffer = value;
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, curFramebuffer.id);
+                SetViewport(0, 0, value.Width, value.Height);
+            }
+        }
+
         internal static ComputeContext _comp_ctxt;
         internal static ComputeCommandQueue _comp_queue;
         internal static ComputeEventList _comp_events;
+
+        [System.Security.SuppressUnmanagedCodeSecurity]
+        [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")]
+        extern static IntPtr wglGetCurrentDC();
 
         static GraphicsDevice()
         {
@@ -312,11 +342,7 @@ namespace Kokoro.Graphics.OpenGL
 
             curVarray = null;
             curProg = null;
-            feedbackBufs = new List<Tuple<GPUBuffer, int, int>>();
-
-
         }
-
 
         public static void Run(double ups, double fps)
         {
@@ -356,10 +382,6 @@ namespace Kokoro.Graphics.OpenGL
 
             Update?.Invoke(e.Time);
         }
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")]
-        extern static IntPtr wglGetCurrentDC();//CAl
 
         private static void InitRender(object sender, FrameEventArgs e)
         {
@@ -434,59 +456,37 @@ namespace Kokoro.Graphics.OpenGL
             GL.Viewport(x, y, width, height);
         }
         
-        public static ShaderProgram ShaderProgram
-        {
-            set
-            {
-                curProg = value;
-            }
-        }
-
         public static void SetVertexArray(VertexArray varray)
         {
             curVarray = varray;
             GL.BindVertexArray(varray.id);
         }
 
-        public static Framebuffer Framebuffer
+        #region Indirect call buffers
+        public static void SetMultiDrawParameterBuffer(GPUBuffer buf)
         {
-            get
-            {
-                return curFramebuffer;
-            }
-
-            set
-            {
-                curFramebuffer = value;
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, curFramebuffer.id);
-                SetViewport(0, 0, value.Width, value.Height);
-            }
+            GL.BindBuffer(BufferTarget.DrawIndirectBuffer, buf.id);
         }
 
-
-        public static void SetFeedbackBuffer(int slot, GPUBuffer buf)
+        public static void SetMultiDrawParameterBuffer(ShaderStorageBuffer buf)
         {
-            SetFeedbackBuffer(slot, buf, 0, buf.size);
+            SetMultiDrawParameterBuffer(buf.buf);
         }
 
-        public static void SetFeedbackBuffer(int slot, GPUBuffer buf, int offset, int size)
+        public static void SetParameterBuffer(GPUBuffer buf)
         {
-            while (feedbackBufs.Count <= slot)
-                feedbackBufs.Add(null);
-
-            feedbackBufs[slot] = new Tuple<GPUBuffer, int, int>(buf, offset, size);
+            GL.BindBuffer((BufferTarget)ArbIndirectParameters.ParameterBufferArb, buf.id);
         }
 
-
-        public static void SetFeedbackPrimitive(PrimitiveType type)
+        public static void SetParameterBuffer(ShaderStorageBuffer buf)
         {
-            if (feedbackPrimitive == PrimitiveType.Points || feedbackPrimitive == PrimitiveType.Lines || feedbackPrimitive == PrimitiveType.Triangles) feedbackPrimitive = type;
-            else throw new Exception();
+            SetParameterBuffer(buf.buf);
         }
+        #endregion
 
+        #region Compute Jobs
         public static void DispatchSyncComputeJob(ShaderProgram prog, int x, int y, int z)
         {
-            GL.UseProgram(prog.prog.id);
             GL.DispatchCompute(x, y, z);
         }
 
@@ -498,33 +498,52 @@ namespace Kokoro.Graphics.OpenGL
             _comp_queue.ReleaseGLObjects(prog.Objects, _comp_events);
             while (_comp_events.Count > 10)_comp_events.RemoveAt(0);
         }
+        #endregion
 
+        #region Draw calls
         public static void Draw(PrimitiveType type, int first, int count, bool indexed)
         {
             if (count == 0) return;
-
-            if (curVarray == null) return;
-            if (curProg == null) return;
-            if (curFramebuffer == null) return;
-
-
-            for (int i = 0; i < feedbackBufs.Count; i++) GPUStateMachine.BindBuffer(BufferTarget.TransformFeedbackBuffer, feedbackBufs[i].Item1.id, i, (IntPtr)feedbackBufs[i].Item2, (IntPtr)feedbackBufs[i].Item3);
-
-            if (feedbackBufs.Count > 0) GL.BeginTransformFeedback((TransformFeedbackPrimitiveType)feedbackPrimitive);
-
+            
             curProg.Set(nameof(WindowSize), new Vector2(WindowSize.Width, WindowSize.Height));
-
-            GL.UseProgram(curProg.prog.id);
-
-            if (indexed) GL.DrawElements(type, count, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            
+            if (indexed) GL.DrawElements(type, count, DrawElementsType.UnsignedShort, IntPtr.Zero);
             else GL.DrawArrays(type, first, count);
-
-            if (feedbackBufs.Count > 0) GL.EndTransformFeedback();
-
-            for (int i = 0; i < feedbackBufs.Count; i++) GPUStateMachine.UnbindBuffer(BufferTarget.TransformFeedbackBuffer, i);
-
-            feedbackBufs.Clear();
         }
+
+        public static void MultiDraw(PrimitiveType type, bool indexed, params MultiDrawParameters[] dParams)
+        {
+            if (dParams.Length == 0) return;
+
+            int[] first = new int[dParams.Length];
+            int[] count = new int[dParams.Length];
+            int[] baseVertex = new int[dParams.Length];
+            int drawCount = dParams.Length;
+
+            if (indexed)
+                GL.MultiDrawElementsBaseVertex(type, count, DrawElementsType.UnsignedShort, IntPtr.Zero, drawCount, baseVertex);
+            else
+                GL.MultiDrawArrays(type, first, count, drawCount);
+        }
+
+        public static void MultiDrawIndirect(PrimitiveType type, int count, bool indexed)
+        {
+            if (count == 0) return;
+
+            if (indexed)
+                GL.MultiDrawElementsIndirect(type, DrawElementsType.UnsignedShort, IntPtr.Zero, count, 0);
+            else
+                GL.MultiDrawArraysIndirect(type, IntPtr.Zero, count, 0);
+        }
+
+        public static void MultiDrawIndirectCount(PrimitiveType type, bool indexed)
+        {
+            if (indexed)
+                GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, IntPtr.Zero, IntPtr.Zero, 4096, 0);
+            else
+                GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, IntPtr.Zero, IntPtr.Zero, 4096, 0);
+        }
+        #endregion
 
         public static void Clear()
         {

@@ -11,9 +11,11 @@ namespace Kokoro.Engine.Graphics
         public static int SSAOSampleCount { get; set; } = 0;
         public static int PBRSampleCount { get; set; } = 0;
 
-        public static void Render(List<GameObject> meshes, RenderState state)
+        public static void Render(List<Mesh> meshes, RenderState state)
         {
             //Apply the render state
+            EngineManager.SetRenderState(state);
+
             //Submit the render calls
         }
 
