@@ -31,14 +31,14 @@ namespace Kokoro.Engine.Graphics
 
             FramebufferTextureSource materials = new FramebufferTextureSource(w, h, levels)
             {
-                PixelType = PixelType.Short,
-                InternalFormat = PixelInternalFormat.Rgba16ui
+                PixelType = PixelType.Float,
+                InternalFormat = PixelInternalFormat.R11fG11fB10f
             };
 
             FramebufferTextureSource normals = new FramebufferTextureSource(w, h, levels)
             {
                 PixelType = PixelType.Float,
-                InternalFormat = PixelInternalFormat.Rgb16f
+                InternalFormat = PixelInternalFormat.R11fG11fB10f
             };
 
             DepthTextureSource depth = new DepthTextureSource(w, h);

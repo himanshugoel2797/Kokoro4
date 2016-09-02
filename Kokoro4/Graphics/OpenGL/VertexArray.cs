@@ -25,9 +25,37 @@ namespace Kokoro.Graphics.OpenGL
 
         public void SetBufferObject(int index, GPUBuffer buffer, int elementCount, VertexAttribPointerType type)
         {
+            int eSize = sizeof(uint);
+            switch (type)
+            {
+                case VertexAttribPointerType.UnsignedByte:
+                case VertexAttribPointerType.Byte:
+                    eSize = sizeof(byte);
+                    break;
+                case VertexAttribPointerType.Double:
+                    eSize = sizeof(double);
+                    break;
+                case VertexAttribPointerType.Float:
+                    eSize = sizeof(float);
+                    break;
+                case VertexAttribPointerType.HalfFloat:
+                    eSize = sizeof(float) / 2;
+                    break;
+                case VertexAttribPointerType.UnsignedInt:
+                case VertexAttribPointerType.UnsignedInt2101010Rev:
+                case VertexAttribPointerType.Int2101010Rev:
+                case VertexAttribPointerType.Int:
+                    eSize = sizeof(int);
+                    break;
+                case VertexAttribPointerType.UnsignedShort:
+                case VertexAttribPointerType.Short:
+                    eSize = sizeof(short);
+                    break;
+            }
+
             GL.EnableVertexArrayAttrib(id, index);
             GL.VertexArrayAttribFormat(id, index, elementCount, (VertexAttribType)type, false, 0);
-            GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, elementCount * 4);
+            GL.VertexArrayVertexBuffer(id, index, buffer.id, IntPtr.Zero, elementCount * eSize);
             GL.VertexArrayAttribBinding(id, index, index);
         }
 

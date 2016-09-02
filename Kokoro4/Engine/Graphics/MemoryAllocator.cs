@@ -19,10 +19,10 @@ namespace Kokoro.Engine.Graphics
         //Net Vertex Count:
         //16,500,000 vertices
         //3 components for vertices, 2 for UVs, 2 for normals, 1 for Indices
-        // (400 * 40960 + 1000*16384 + 230*4096 + 200*1024 + 270*256 + 200*64 + 200*16)
+        // (750 * 40960 + 1000*16384 + 363*4096 + 300*1024 + 304*256 + 302*64 + 300*16))
         //NOTE: Indices are 16 bit unsigned integers, this means that a mesh may not have more than 65536 vertices, allowing 251 meshes to be loaded into memory at any given moment
 
-        const int vertex_cnt = 34000000;
+        const int vertex_cnt = 49000000;
         const int index_cnt = (int)(vertex_cnt);
 
         static GPUBuffer vertices;
@@ -45,19 +45,19 @@ namespace Kokoro.Engine.Graphics
         static MemoryAllocator()
         {
             vertices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 3 * sizeof(float), false);
-            uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(float), false);
-            normals = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(float), false);
+            uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(ushort), false);
+            normals = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * sizeof(uint), false);
             indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer, index_cnt * sizeof(ushort), false);
 
             usedBlocks = new Dictionary<int, bool[]>();
 
-            usedBlocks[40960] = new bool[400];
+            usedBlocks[40960] = new bool[750];
             usedBlocks[16384] = new bool[1000];
-            usedBlocks[4096] = new bool[230];
-            usedBlocks[1024] = new bool[200];
-            usedBlocks[256] = new bool[270];
-            usedBlocks[64] = new bool[200];
-            usedBlocks[16] = new bool[200];
+            usedBlocks[4096] = new bool[363];
+            usedBlocks[1024] = new bool[300];
+            usedBlocks[256] = new bool[304];
+            usedBlocks[64] = new bool[302];
+            usedBlocks[16] = new bool[300];
 
             baseOffsets = new Dictionary<int, int>();
             baseOffsets[40960] = 0;
@@ -70,8 +70,8 @@ namespace Kokoro.Engine.Graphics
 
             varray = new VertexArray();
             varray.SetBufferObject(0, vertices, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
-            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
-            varray.SetBufferObject(2, normals, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float);
+            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.HalfFloat);
+            varray.SetBufferObject(2, normals, 4, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedInt2101010Rev);
             varray.SetElementBufferObject(indices);
             GraphicsDevice.SetVertexArray(varray);
 
@@ -117,7 +117,7 @@ namespace Kokoro.Engine.Graphics
             result[(int)IntPtrIndex.Index] = indices.GetPtr() + (offset * sizeof(ushort));
             result[(int)IntPtrIndex.Vertex] = vertices.GetPtr() + (offset * 3 * sizeof(float));
             result[(int)IntPtrIndex.UV] = uvs.GetPtr() + (offset * 2 * sizeof(float));
-            result[(int)IntPtrIndex.Normal] = normals.GetPtr() + (offset * 2 * sizeof(float));
+            result[(int)IntPtrIndex.Normal] = normals.GetPtr() + (offset * sizeof(uint));
 
             return result;
         }
@@ -130,7 +130,7 @@ namespace Kokoro.Engine.Graphics
                     indices.FlushBuffer(indices.GetPtr() + (offset * sizeof(ushort)), size);
                     break;
                 case IntPtrIndex.Normal:
-                    normals.FlushBuffer(normals.GetPtr() + (offset * 2 * sizeof(float)), size);
+                    normals.FlushBuffer(normals.GetPtr() + (offset * sizeof(uint)), size);
                     break;
                 case IntPtrIndex.UV:
                     uvs.FlushBuffer(uvs.GetPtr() + (offset * 2 * sizeof(float)), size);
