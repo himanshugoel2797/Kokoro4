@@ -501,17 +501,17 @@ namespace Kokoro.Graphics.OpenGL
         #endregion
 
         #region Draw calls
-        public static void Draw(PrimitiveType type, int first, int count, bool indexed)
+        public static void Draw(Engine.Graphics.PrimitiveType type, int first, int count, bool indexed)
         {
             if (count == 0) return;
             
             curProg.Set(nameof(WindowSize), new Vector2(WindowSize.Width, WindowSize.Height));
             
-            if (indexed) GL.DrawElements(type, count, DrawElementsType.UnsignedShort, IntPtr.Zero);
-            else GL.DrawArrays(type, first, count);
+            if (indexed) GL.DrawElements((OpenTK.Graphics.OpenGL.PrimitiveType)type, count, DrawElementsType.UnsignedShort, IntPtr.Zero);
+            else GL.DrawArrays((OpenTK.Graphics.OpenGL.PrimitiveType)type, first, count);
         }
 
-        public static void MultiDraw(PrimitiveType type, bool indexed, params MultiDrawParameters[] dParams)
+        public static void MultiDraw(Engine.Graphics.PrimitiveType type, bool indexed, params MultiDrawParameters[] dParams)
         {
             if (dParams.Length == 0) return;
 
@@ -521,22 +521,22 @@ namespace Kokoro.Graphics.OpenGL
             int drawCount = dParams.Length;
 
             if (indexed)
-                GL.MultiDrawElementsBaseVertex(type, count, DrawElementsType.UnsignedShort, IntPtr.Zero, drawCount, baseVertex);
+                GL.MultiDrawElementsBaseVertex((OpenTK.Graphics.OpenGL.PrimitiveType)type, count, DrawElementsType.UnsignedShort, IntPtr.Zero, drawCount, baseVertex);
             else
-                GL.MultiDrawArrays(type, first, count, drawCount);
+                GL.MultiDrawArrays((OpenTK.Graphics.OpenGL.PrimitiveType)type, first, count, drawCount);
         }
 
-        public static void MultiDrawIndirect(PrimitiveType type, int count, bool indexed)
+        public static void MultiDrawIndirect(Engine.Graphics.PrimitiveType type, int count, bool indexed)
         {
             if (count == 0) return;
 
             if (indexed)
-                GL.MultiDrawElementsIndirect(type, DrawElementsType.UnsignedShort, IntPtr.Zero, count, 0);
+                GL.MultiDrawElementsIndirect((OpenTK.Graphics.OpenGL.PrimitiveType)type, DrawElementsType.UnsignedShort, IntPtr.Zero, count, 0);
             else
-                GL.MultiDrawArraysIndirect(type, IntPtr.Zero, count, 0);
+                GL.MultiDrawArraysIndirect((OpenTK.Graphics.OpenGL.PrimitiveType)type, IntPtr.Zero, count, 0);
         }
 
-        public static void MultiDrawIndirectCount(PrimitiveType type, bool indexed)
+        public static void MultiDrawIndirectCount(Engine.Graphics.PrimitiveType type, bool indexed)
         {
             if (indexed)
                 GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, IntPtr.Zero, IntPtr.Zero, 4096, 0);

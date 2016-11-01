@@ -6,23 +6,29 @@ using System.Threading.Tasks;
 
 namespace Kokoro.StateMachine
 {
-    public class StateManager : IScene
+    public class StateManager : IState
     {
-        public Dictionary<string, IScene> Scenes { get; private set; }
-        public string CurrentSceneName { get; private set; }
-        public IScene CurrentScene { get; private set; }
+        public Dictionary<string, IState> States { get; private set; }
+        public string CurrentStateName { get; private set; }
+        public IState CurrentState { get; private set; }
 
         public StateManager()
         {
-            Scenes = new Dictionary<string, IScene>();
+            States = new Dictionary<string, IState>();
         }
 
-        public void SetActiveScene(string name)
+        public void SetActiveState(string name)
         {
-            if (Scenes.ContainsKey(name))
+            if (States.ContainsKey(name))
             {
-                CurrentSceneName = name;
-                CurrentScene = Scenes[name];
+                CurrentStateName = name;
+
+                var prevState = CurrentState;
+                var nextState = States[name];
+
+                Exit(nextState);        //Call exit on the previous State
+                CurrentState = nextState;   //Change the current State
+                Enter(prevState);       //Call enter on the new State
             }
             else
             {
@@ -32,27 +38,37 @@ namespace Kokoro.StateMachine
 
         public void Register(StateGroup grp)
         {
-            grp.RegisterIScene(this);
+            grp.RegisterIState(this);
         }
 
-        public void AddScene(string name, IScene scene)
+        public void AddState(string name, IState State)
         {
-            Scenes.Add(name, scene);
+            States.Add(name, State);
         }
 
-        public void RemoveScene(string name)
+        public void RemoveState(string name)
         {
-            Scenes.Remove(name);
+            States.Remove(name);
         }
 
         public void Update(double interval)
         {
-            CurrentScene?.Update(interval);
+            CurrentState?.Update(interval);
         }
 
         public void Render(double interval)
         {
-            CurrentScene?.Render(interval);
+            CurrentState?.Render(interval);
+        }
+
+        public void Enter(IState prev)
+        {
+            CurrentState?.Enter(prev);
+        }
+
+        public void Exit(IState next)
+        {
+            CurrentState?.Exit(next);
         }
     }
 }

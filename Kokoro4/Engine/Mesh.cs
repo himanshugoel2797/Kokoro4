@@ -25,6 +25,7 @@ namespace Kokoro.Engine
         public Math.BoundingBox Bounds { get; set; }
 
         public int IndexCount { get; private set; }
+        public int StartOffset { get { return offset; } }
 
         private int offset = 0;
         private bool lock_changes = false;

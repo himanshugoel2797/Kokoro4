@@ -21,3 +21,5 @@ public:
 } MeshHeader;
 
 extern "C" __declspec(dllexport) int LoadMesh(const char *file, void** targetLocs);
+
+extern "C" __declspec(dllexport) int LoadBakedDraws(const char *file, void *target);

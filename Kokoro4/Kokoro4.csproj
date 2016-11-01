@@ -142,6 +142,7 @@
     <Compile Include="Graphics\OpenGL\PixelFormat.cs" />
     <Compile Include="Graphics\OpenGL\PixelInternalFormat.cs" />
     <Compile Include="Graphics\OpenGL\PixelType.cs" />
+    <Compile Include="Graphics\OpenGL\PrimitiveType.cs" />
     <Compile Include="Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Graphics\OpenGL\ShaderSource.cs" />
     <Compile Include="Engine\Graphics\SimplexNoise.cs" />
@@ -195,7 +196,7 @@
     <Compile Include="SceneGraph\PositionNode.cs" />
     <Compile Include="SceneGraph\RotationNode.cs" />
     <Compile Include="SceneGraph\ScaleNode.cs" />
-    <Compile Include="StateMachine\IScene.cs" />
+    <Compile Include="StateMachine\IState.cs" />
     <Compile Include="StateMachine\StateGroup.cs" />
     <Compile Include="StateMachine\StateManager.cs" />
   </ItemGroup>

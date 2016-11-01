@@ -61,6 +61,10 @@ namespace Kokoro4.ContentProcessor.Texture
                 }
             }
 
+            //Cubemaps stored as BC6H
+            //Normal maps stored as BC5
+            //Color stored as BC7
+            //Depth stored as BC6H
 
         }
     }

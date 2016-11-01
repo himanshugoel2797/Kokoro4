@@ -41,7 +41,7 @@ namespace Kokoro.Engine
 
             //Initialize the state machine
             StateManager = new StateManager();
-            GraphicsDevice.GameLoop.RegisterIScene(new _SceneMan());
+            GraphicsDevice.GameLoop.RegisterIState(new _SceneMan());
         }
 
         public static void Clear()
@@ -76,7 +76,7 @@ namespace Kokoro.Engine
         #endregion
 
         #region Scene manager
-        private class _SceneMan : IScene
+        private class _SceneMan : IState
         {
             public void Update(double interval)
             {
@@ -88,6 +88,16 @@ namespace Kokoro.Engine
                 GraphicsDevice.Clear();
                 StateManager.Render(interval);
                 GraphicsDevice.SwapBuffers();
+            }
+
+            public void Enter(IState prev)
+            {
+                StateManager.Enter(prev);
+            }
+
+            public void Exit(IState next)
+            {
+                StateManager.Exit(next);
             }
         }
         #endregion

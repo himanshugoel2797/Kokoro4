@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TestApplication
 {
-    class TestScene : IScene
+    class TestScene : IState
     {
         public void Update(double interval)
         {
@@ -15,6 +15,16 @@ namespace TestApplication
         }
 
         public void Render(double interval)
+        {
+
+        }
+
+        public void Enter(IState prev)
+        {
+
+        }
+
+        public void Exit(IState next)
         {
 
         }

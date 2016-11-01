@@ -25,8 +25,18 @@ __declspec(dllexport) int LoadMesh(const char *file, void** targetLocs)
 	else return -1;
 }
 
-__declspec(dllexport) int LoadDDS1Texture(const char *file, void *buffer)
+__declspec(dllexport) int LoadBakedDraws(const char *file, void *target)
 {
-	//Load DDS1 textures straight into the buffers
+	FILE *f = fopen(file, "rb");
+	if (f) {
+
+		fseek(f, 0, SEEK_END);
+		long len = ftell(f);
+
+		fread(target, 1, len, f);
+		fclose(f);
+
+		return 1;
+	}
 	return 0;
 }

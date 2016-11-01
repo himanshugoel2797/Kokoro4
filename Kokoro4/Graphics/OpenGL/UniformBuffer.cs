@@ -55,5 +55,7 @@ namespace Kokoro.Graphics.OpenGL
             readyFence.PlaceFence();
         }
 
+
+
     }
 }

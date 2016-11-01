@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Kokoro.Engine.Graphics;
 
 namespace TestApplication
 {
@@ -21,8 +22,8 @@ namespace TestApplication
         {
             EngineManager.Name = EngineManager.EngineName;
 
-            EngineManager.StateManager.AddScene(nameof(TestScene), new TestScene());
-            EngineManager.StateManager.SetActiveScene(nameof(TestScene));
+            EngineManager.StateManager.AddState(nameof(TestScene), new TestScene());
+            EngineManager.StateManager.SetActiveState(nameof(TestScene));
 
             EngineManager.Run(60, 60);
             EngineManager.Exit();

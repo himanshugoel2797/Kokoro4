@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Kokoro.StateMachine
 {
-    public interface IScene
+    public interface IState
     {
+        void Enter(IState prev);
+        void Exit(IState next);
+
         void Update(double interval);
         void Render(double interval);
     }
