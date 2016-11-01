@@ -11,5 +11,7 @@ namespace Kokoro.Engine
     {
         public Mesh MeshData { get; private set; }
         public Material MaterialData { get; private set; }
+
+        public IEnumerable<GameObject> Children { get; set; }
     }
 }

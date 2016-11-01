@@ -8,5 +8,6 @@ namespace Kokoro.Engine.Graphics
 {
     public class ShaderGroup
     {
+        private Dictionary<int, ShaderProgram> program;
     }
 }
