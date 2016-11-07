@@ -9,16 +9,9 @@ namespace Kokoro.Graphics.Prefabs
 {
     class CubeFactory
     {
-        static Mesh eObj;
-
-        static CubeFactory()
+        private static Mesh Create(MeshGroup group)
         {
-            Init();
-        }
 
-        private static void Init()
-        {
-            
             uint[] indices = new uint[] {30,1,1,102,2,1,291,3,1
 ,50,1,2,170,2,2,292,3,2
 ,35,1,3,107,2,3,293,3,3
@@ -1298,12 +1291,7 @@ namespace Kokoro.Graphics.Prefabs
                 verts.Add((float)vers[v_ind * 3 + 2]);
             }
 
-            eObj = new Mesh(verts.ToArray(), uvs_l.ToArray(), norms.ToArray(), inds.ToArray());
-        }
-
-        public static Mesh Create()
-        {
-            return new Mesh(eObj, true);    //Lock the buffers from changes
+            return new Mesh(group, verts.ToArray(), uvs_l.ToArray(), norms.ToArray(), inds.ToArray());
         }
     }
 }

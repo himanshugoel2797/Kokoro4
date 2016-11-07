@@ -102,13 +102,13 @@
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />
     <Compile Include="Engine\Graphics\GraphicsObject.cs" />
     <Compile Include="Engine\Graphics\Material.cs" />
-    <Compile Include="Engine\Graphics\MemoryAllocator.cs" />
     <Compile Include="Engine\Graphics\Renderer.cs" />
     <Compile Include="Engine\Graphics\RenderPass.cs" />
     <Compile Include="Engine\Graphics\RenderState.cs" />
     <Compile Include="Engine\Graphics\ShaderGroup.cs" />
     <Compile Include="Engine\Graphics\ShaderProgram.cs" />
     <Compile Include="Engine\Graphics\ShaderSource.cs" />
+    <Compile Include="Engine\MeshGroup.cs" />
     <Compile Include="Engine\UI\UIControl.cs" />
     <Compile Include="Engine\UI\UIRoot.cs" />
     <Compile Include="Engine\Voxel\Chunk.cs" />

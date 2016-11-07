@@ -10,16 +10,8 @@ namespace Kokoro.Graphics.Prefabs
 {
     public class SphereFactory
     {
-        static Mesh eObj;
-
-        static SphereFactory()
+        private static Mesh Create(MeshGroup group)
         {
-            Init();
-        }
-
-        private static void Init()
-        {
-
             List<float> verts = new List<float>();
             List<float> uvs = new List<float>();
             List<float> normals = new List<float>();
@@ -146,14 +138,8 @@ namespace Kokoro.Graphics.Prefabs
 
                 }
             }
-
-
-            eObj = new Mesh(verts.ToArray(), uvs.ToArray(), normals.ToArray(), indices.ToArray());
-        }
-        
-        public static Mesh Create()
-        {
-            return new Mesh(eObj, true);    //Lock the buffers from changes
+            
+            return new Mesh(group, verts.ToArray(), uvs.ToArray(), normals.ToArray(), indices.ToArray());
         }
     }
 }

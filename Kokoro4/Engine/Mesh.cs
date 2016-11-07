@@ -16,6 +16,9 @@ using Kokoro.Graphics.Vulkan;
 
 namespace Kokoro.Engine
 {
+    /// <summary>
+    /// Represents a collection of vertices, indices, normals and UVs
+    /// </summary>
     public class Mesh : IDisposable
     {
         [System.Security.SuppressUnmanagedCodeSecurity]
@@ -27,33 +30,45 @@ namespace Kokoro.Engine
         public int IndexCount { get; private set; }
         public int StartOffset { get { return offset; } }
 
+        public MeshGroup Parent { get; private set; }
+
         private int offset = 0;
         private bool lock_changes = false;
 
-        public Mesh(int vertex_count, int index_count, string file)
+        public Mesh(MeshGroup parent, int vertex_count, int index_count, string file)
         {
             IndexCount = index_count;
+            Parent = parent;
 
             int alloc_size = global::System.Math.Max(vertex_count, index_count);
-            if (LoadMesh(file, MemoryAllocator.AllocateMemory(alloc_size, out offset)) != 0)
+            if (LoadMesh(file, Parent.AllocateMemory(alloc_size, out offset)) != 0)
                 throw new Exception("Failed to load mesh");
         }
 
-        public Mesh(float[] vertices, float[] uv, float[] norm, ushort[] indice)
+        public Mesh(MeshGroup parent, float[] vertices, float[] uv, float[] norm, ushort[] indice)
         {
+            //TODO: A mesh shouldn't expect the raw data, it should expect the offset, length and a mesh group object
+            //A group object is 
+            //A mesh group object provides the backing storage for the data
+            //This arrangement allows for cleaner batching of meshes when possible
+            //Add a new class that can take individual mesh objects and bucket them based on the rendering properties
+            //These buckets can then be individually submitted for drawing
+
+
             //These allocations can't be managed by the scene manager, best to keep them limited
             IndexCount = indice.Length;
+            Parent = parent;
 
             int alloc_size = global::System.Math.Max(vertices.Length, indice.Length);
-            IntPtr[] ptrs = MemoryAllocator.AllocateMemory(alloc_size, out offset);
+            IntPtr[] ptrs = Parent.AllocateMemory(alloc_size, out offset);
 
             short[] temp = new short[indice.Length];
             System.Buffer.BlockCopy(indice, 0, temp, 0, temp.Length * 2);
 
-            System.Runtime.InteropServices.Marshal.Copy(temp, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.Index], indice.Length);
-            System.Runtime.InteropServices.Marshal.Copy(uv, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.UV], uv.Length);
-            System.Runtime.InteropServices.Marshal.Copy(norm, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.Normal], norm.Length);
-            System.Runtime.InteropServices.Marshal.Copy(vertices, 0, ptrs[(int)MemoryAllocator.IntPtrIndex.Vertex], vertices.Length);
+            System.Runtime.InteropServices.Marshal.Copy(temp, 0, ptrs[(int)MeshGroup.IntPtrIndex.Index], indice.Length);
+            System.Runtime.InteropServices.Marshal.Copy(uv, 0, ptrs[(int)MeshGroup.IntPtrIndex.UV], uv.Length);
+            System.Runtime.InteropServices.Marshal.Copy(norm, 0, ptrs[(int)MeshGroup.IntPtrIndex.Normal], norm.Length);
+            System.Runtime.InteropServices.Marshal.Copy(vertices, 0, ptrs[(int)MeshGroup.IntPtrIndex.Vertex], vertices.Length);
         }
 
         public Mesh(Mesh src, bool lockChanges)
