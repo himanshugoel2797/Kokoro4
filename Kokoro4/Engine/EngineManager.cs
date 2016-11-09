@@ -24,9 +24,10 @@ namespace Kokoro.Engine
     public static class EngineManager
     {
         public static StateManager StateManager { get; private set; }
+        public static MeshGroup CurrentMeshGroup { get; private set; }
 
-        public static Matrix4 View { get; set; }
-        public static Matrix4 Projection { get; set; }
+        public static Matrix4 View { get { if (VisibleCamera == null) return Matrix4.Identity; return VisibleCamera.View; } }
+        public static Matrix4 Projection { get { if (VisibleCamera == null) return Matrix4.Identity; return VisibleCamera.Projection; } }
         public static Camera VisibleCamera { get; private set; }
 
         public static string Name { get { return GraphicsDevice.Name; } set { GraphicsDevice.Name = value; } }
@@ -59,7 +60,16 @@ namespace Kokoro.Engine
             GraphicsDevice.AlphaSrc = state.Src;
             GraphicsDevice.AlphaDst = state.Dst;
             GraphicsDevice.Framebuffer = state.Framebuffer;
-            GraphicsDevice.ShaderProgram = state.ShaderProgram;
+            GraphicsDevice.SetDepthRange(state.NearPlane, state.FarPlane);
+
+            if (state.ShaderProgram != null)
+                GraphicsDevice.ShaderProgram = state.ShaderProgram;
+        }
+
+        public static void SetCurrentMeshGroup(MeshGroup grp)
+        {
+            CurrentMeshGroup = grp;
+            GraphicsDevice.SetVertexArray(grp.varray);
         }
 
         #region Execution Management

@@ -216,7 +216,7 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
-        static float clearDepth = 0;
+        static float clearDepth = float.NaN;
         public static float ClearDepth
         {
             get
@@ -301,8 +301,8 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                GL.UseProgram(curProg.prog.id);
                 curProg = value;
+                GL.UseProgram(curProg.prog.id);
             }
         }
 
@@ -332,7 +332,7 @@ namespace Kokoro.Graphics.OpenGL
         static GraphicsDevice()
         {
             game = new GameWindow(1280, 720);
-            game.VSync = VSyncMode.Off;
+
             game.Resize += Window_Resize;
             game.Load += Game_Load;
             game.RenderFrame += InitRender;
@@ -385,6 +385,11 @@ namespace Kokoro.Graphics.OpenGL
 
         private static void InitRender(object sender, FrameEventArgs e)
         {
+
+            game.VSync = VSyncMode.Off;
+            game.TargetRenderFrequency = 0;
+            game.TargetUpdateFrequency = 0;
+
             int major_v = GL.GetInteger(GetPName.MajorVersion);
             int minor_v = GL.GetInteger(GetPName.MinorVersion);
             if (major_v < 4 | (major_v == 4 && minor_v < 5))
@@ -440,7 +445,7 @@ namespace Kokoro.Graphics.OpenGL
             curFramebuffer = Framebuffer.Default;
             GL.Enable(EnableCap.DepthClamp);
             GL.Enable(EnableCap.TextureCubeMapSeamless);
-            GL.NV.DepthRange(-1, 1);
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             Load?.Invoke();
         }
 
@@ -526,22 +531,38 @@ namespace Kokoro.Graphics.OpenGL
                 GL.MultiDrawArrays((OpenTK.Graphics.OpenGL.PrimitiveType)type, first, count, drawCount);
         }
 
-        public static void MultiDrawIndirect(Engine.Graphics.PrimitiveType type, int count, bool indexed)
+        public static void MultiDrawIndirect(Engine.Graphics.PrimitiveType type, uint byteOffset, int count, bool indexed)
         {
             if (count == 0) return;
 
             if (indexed)
-                GL.MultiDrawElementsIndirect((OpenTK.Graphics.OpenGL.PrimitiveType)type, DrawElementsType.UnsignedShort, IntPtr.Zero, count, 0);
+                GL.MultiDrawElementsIndirect((OpenTK.Graphics.OpenGL.PrimitiveType)type, DrawElementsType.UnsignedShort, (IntPtr)byteOffset, count, 0);
             else
-                GL.MultiDrawArraysIndirect((OpenTK.Graphics.OpenGL.PrimitiveType)type, IntPtr.Zero, count, 0);
+                GL.MultiDrawArraysIndirect((OpenTK.Graphics.OpenGL.PrimitiveType)type, (IntPtr)byteOffset, count, 0);
         }
 
-        public static void MultiDrawIndirectCount(Engine.Graphics.PrimitiveType type, bool indexed)
+        public static void MultiDrawIndirectCount(Engine.Graphics.PrimitiveType type, uint byteOffset, uint countOffset, bool indexed)
         {
             if (indexed)
-                GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, IntPtr.Zero, IntPtr.Zero, 4096, 0);
+                GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, (IntPtr)byteOffset, (IntPtr)countOffset, 4096, 0);
             else
-                GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, IntPtr.Zero, IntPtr.Zero, 4096, 0);
+                GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, (IntPtr)byteOffset, (IntPtr)countOffset, 4096, 0);
+        }
+        #endregion
+
+        #region Depth Range
+        private static double _far = 0, _near = 0;
+        public static void SetDepthRange(double near, double far)
+        {
+            _far = far;
+            _near = near;
+            GL.DepthRange(near, far);
+        }
+
+        public static void GetDepthRange(out double near, out double far)
+        {
+            near = _near;
+            far = _far;
         }
         #endregion
 

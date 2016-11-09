@@ -59,6 +59,11 @@ namespace Kokoro.Graphics.OpenGL
             readyFence.PlaceFence();
         }
 
+        public bool IsReady()
+        {
+            return readyFence.Raised(1);
+        }
+
         public static explicit operator GPUBuffer(ShaderStorageBuffer b)
         {
             return b.buf;

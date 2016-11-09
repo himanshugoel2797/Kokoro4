@@ -40,7 +40,7 @@ namespace Kokoro4.ContentProcessor.Mesh
                     case "-f":
                     case "-file":
                         //File name
-                        if (i + 1 <= args.Length) throw new Exception();
+                        if (i + 1 >= args.Length) throw new Exception();
                         inputFile = args[++i];
                         break;
                     case "-st":
@@ -52,13 +52,13 @@ namespace Kokoro4.ContentProcessor.Mesh
                     case "-sc":
                     case "-scale":
                         //Scale the mesh by this value to convert it to world scale
-                        if (i + 1 <= args.Length) throw new Exception();
+                        if (i + 1 >= args.Length) throw new Exception();
                         scale = float.Parse(args[++i]);
                         break;
                     case "-o":
                     case "-out":
                         //Output file
-                        if (i + 1 <= args.Length) throw new Exception();
+                        if (i + 1 >= args.Length) throw new Exception();
                         outputFile = args[++i];
                         break;
                 }
@@ -99,10 +99,19 @@ namespace Kokoro4.ContentProcessor.Mesh
                 normals.Add(mesh.Normals[i].Z);
             }
 
-            uint[] indices_d = mesh.GetUnsignedIndices();
-            for (int i = 0; i < indices_d.Length; i++)
+            int[] indices_d = mesh.GetIndices();
+            if (indices_d == null)
             {
-                indices.Add((ushort)indices_d[i]);
+                for(int i = 0; i < mesh.VertexCount; i++)
+                {
+                    indices.Add((ushort)i);
+                }
+            }
+            else {
+                for (int i = 0; i < indices_d.Length; i++)
+                {
+                    indices.Add((ushort)indices_d[i]);
+                }
             }
 
 
@@ -147,35 +156,39 @@ namespace Kokoro4.ContentProcessor.Mesh
                 uint normalOffset = (uint)(uvOffset + c_uvs.Count * sizeof(ushort));
                 uint normalLen = (uint)(c_normals.Count * sizeof(uint));
 
-                StreamWriter w = new StreamWriter(outputFile);
-                w.Write(('M' << 24 | 'E' << 16 | 'S' << 8 | 'H'));
-                w.Write(indexOffset);
-                w.Write(vertexOffset);
-                w.Write(uvOffset);
-                w.Write(normalOffset);
-                w.Write(normalLen);
-
-                for (int i = 0; i < c_indices.Count; i++)
+                using (FileStream oFile = File.Open(outputFile, FileMode.Create))
                 {
-                    w.Write(c_indices[i]);
-                }
+                    BinaryWriter w = new BinaryWriter(oFile);
+                    w.Write(('M' | 'E' << 8 | 'S' << 16 | 'H' << 24));
+                    w.Write(indexOffset);
+                    w.Write(vertexOffset);
+                    w.Write(uvOffset);
+                    w.Write(normalOffset);
+                    w.Write(normalLen);
 
-                for (int i = 0; i < c_vertices.Count; i++)
-                {
-                    w.Write(c_vertices[i]);
-                }
+                    for (int i = 0; i < c_indices.Count; i++)
+                    {
+                        w.Write(c_indices[i]);
+                    }
 
-                for (int i = 0; i < c_uvs.Count; i++)
-                {
-                    w.Write(c_uvs[i]);
-                }
+                    for (int i = 0; i < c_vertices.Count; i++)
+                    {
+                        w.Write(c_vertices[i]);
+                    }
 
-                for (int i = 0; i < c_normals.Count; i++)
-                {
-                    w.Write(c_normals[i]);
-                }
+                    for (int i = 0; i < c_uvs.Count; i++)
+                    {
+                        w.Write(c_uvs[i]);
+                    }
 
-                w.Close();
+                    for (int i = 0; i < c_normals.Count; i++)
+                    {
+                        w.Write(c_normals[i]);
+                    }
+
+                    w.Flush();
+                    w.Close();
+                }
             }
         }
     }

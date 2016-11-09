@@ -10,7 +10,7 @@ namespace Kokoro.Graphics.Prefabs
 {
     public class SphereFactory
     {
-        private static Mesh Create(MeshGroup group)
+        public static Mesh Create(MeshGroup group)
         {
             List<float> verts = new List<float>();
             List<float> uvs = new List<float>();

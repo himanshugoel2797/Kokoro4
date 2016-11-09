@@ -44,12 +44,13 @@ namespace Kokoro.Engine.Cameras
         /// <summary>
         /// Create a new Camera object
         /// </summary>
-        public Camera()
+        public Camera(string name)
         {
             View = Matrix4.LookAt(new Vector3(-1, 0, 0), Vector3.Zero, Vector3.UnitY);
             Position = -Vector3.UnitX;
             PostProcessingEffects = new List<RenderPass>();
             SetProjection(0.7853f, 16f / 9f, 0.1f, 1000f);  //FOV = 45
+            this.Name = name;
         }
 
         /// <summary>

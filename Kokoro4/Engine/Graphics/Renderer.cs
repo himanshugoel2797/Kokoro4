@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Engine.Graphics
 {
-    public static class Renderer
+    static class Renderer
     {
         public static int SSAOSampleCount { get; set; } = 0;
         public static int PBRSampleCount { get; set; } = 0;
@@ -25,20 +25,20 @@ namespace Kokoro.Engine.Graphics
 
         }
 
-        public static void Render(ShaderStorageBuffer draws, int count, RenderState state)
+        public static void Render(ShaderStorageBuffer draws, uint offset, int count, RenderState state)
         {
             EngineManager.SetRenderState(state);
             GraphicsDevice.SetMultiDrawParameterBuffer(draws);
-            GraphicsDevice.MultiDrawIndirect(PrimitiveType.Triangles, count, true);
+            GraphicsDevice.MultiDrawIndirect(PrimitiveType.Triangles, offset, count, true);
         }
 
-        public static void Render(ShaderStorageBuffer draws, ShaderStorageBuffer count, RenderState state)
+        public static void Render(ShaderStorageBuffer draws, uint drawOffset, ShaderStorageBuffer count, uint countOffset, RenderState state)
         {
             EngineManager.SetRenderState(state);
             GraphicsDevice.SetMultiDrawParameterBuffer(draws);
             GraphicsDevice.SetParameterBuffer(count);
 
-            GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, true);
+            GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, drawOffset, countOffset, true);
         }
 
     }

@@ -56,7 +56,8 @@ namespace Kokoro.Engine
             if (this.offset + cnt >= vertex_cnt | this.offset + cnt >= index_cnt)
                 throw new OutOfMemoryException();
 
-            offset = this.offset += cnt;
+            offset = this.offset;
+            this.offset += cnt;
 
             IntPtr[] result = new IntPtr[4];
             result[(int)IntPtrIndex.Index] = indices.GetPtr() + (offset * sizeof(ushort));
@@ -72,16 +73,16 @@ namespace Kokoro.Engine
             switch (idx)
             {
                 case IntPtrIndex.Index:
-                    indices.FlushBuffer(indices.GetPtr() + (offset * sizeof(ushort)), size);
+                    indices.FlushBuffer(indices.GetPtr() + (offset * sizeof(ushort)), size * sizeof(ushort));
                     break;
                 case IntPtrIndex.Normal:
-                    normals.FlushBuffer(normals.GetPtr() + (offset * sizeof(uint)), size);
+                    normals.FlushBuffer(normals.GetPtr() + (offset * sizeof(uint)), size * sizeof(uint));
                     break;
                 case IntPtrIndex.UV:
-                    uvs.FlushBuffer(uvs.GetPtr() + (offset * 2 * sizeof(float)), size);
+                    uvs.FlushBuffer(uvs.GetPtr() + (offset * 2 * sizeof(float)), size * sizeof(float) * 2);
                     break;
                 case IntPtrIndex.Vertex:
-                    vertices.FlushBuffer(vertices.GetPtr() + (offset * 3 * sizeof(float)), size);
+                    vertices.FlushBuffer(vertices.GetPtr() + (offset * 3 * sizeof(float)), size * sizeof(float) * 3);
                     break;
             }
 

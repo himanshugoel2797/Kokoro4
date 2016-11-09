@@ -102,6 +102,7 @@
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />
     <Compile Include="Engine\Graphics\GraphicsObject.cs" />
     <Compile Include="Engine\Graphics\Material.cs" />
+    <Compile Include="Engine\Graphics\RenderQueue.cs" />
     <Compile Include="Engine\Graphics\Renderer.cs" />
     <Compile Include="Engine\Graphics\RenderPass.cs" />
     <Compile Include="Engine\Graphics\RenderState.cs" />

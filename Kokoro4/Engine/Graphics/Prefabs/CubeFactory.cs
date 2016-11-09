@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Graphics.Prefabs
 {
-    class CubeFactory
+    public class CubeFactory
     {
-        private static Mesh Create(MeshGroup group)
+        public static Mesh Create(MeshGroup group)
         {
 
             uint[] indices = new uint[] {30,1,1,102,2,1,291,3,1

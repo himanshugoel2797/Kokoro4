@@ -41,7 +41,14 @@ namespace Kokoro.Engine
             Parent = parent;
 
             int alloc_size = global::System.Math.Max(vertex_count, index_count);
-            if (LoadMesh(file, Parent.AllocateMemory(alloc_size, out offset)) != 0)
+            IndexCount = LoadMesh(file, Parent.AllocateMemory(alloc_size, out offset));
+
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.Index, offset, alloc_size);
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.Normal, offset, alloc_size);
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.UV, offset, alloc_size);
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.Vertex, offset, alloc_size);
+
+            if (IndexCount == 0)
                 throw new Exception("Failed to load mesh");
         }
 

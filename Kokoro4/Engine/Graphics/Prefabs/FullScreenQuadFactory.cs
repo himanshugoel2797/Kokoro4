@@ -9,8 +9,7 @@ namespace Kokoro.Graphics.Prefabs
 {
     public class FullScreenQuadFactory
     {
-
-        private static Mesh Create(MeshGroup group)
+        public static Mesh Create(MeshGroup group)
         {
             return new Mesh(
                 group,

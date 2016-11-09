@@ -31,7 +31,7 @@ namespace Kokoro.Engine.Cameras
         /// </summary>
         /// <param name="Position">The Position of the Camera</param>
         /// <param name="Direction">The Direction the Camera initially faces</param>
-        public FirstPersonCamera(Vector3 Position, Vector3 Direction)
+        public FirstPersonCamera(Vector3 Position, Vector3 Direction, string name) : base(name)
         {
             this.Position = Position;
             this.Direction = Direction;

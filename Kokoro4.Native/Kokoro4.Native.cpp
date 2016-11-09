@@ -10,7 +10,10 @@ __declspec(dllexport) int LoadMesh(const char *file, void** targetLocs)
 	FILE *f = fopen(file, "rb");
 	if (f) {
 		MeshHeader hdr;
-		fread(&hdr, sizeof(char), sizeof(hdr), f);
+		fread(&hdr, sizeof(char), sizeof(MeshHeader), f);
+
+		if (hdr.magic_num != MESH_MAGIC_NUM)
+			return 0;
 
 		//Read data straight into the buffers
 		fseek(f, hdr.indexOffset, SEEK_SET);
@@ -20,9 +23,9 @@ __declspec(dllexport) int LoadMesh(const char *file, void** targetLocs)
 		fread(targetLocs[(int)TargetIndices::Normal], sizeof(char), hdr.normalLen, f);
 		fclose(f);
 
-		return 0;
+		return (hdr.vertexOffset - hdr.indexOffset)/2;
 	}
-	else return -1;
+	else return 0;
 }
 
 __declspec(dllexport) int LoadBakedDraws(const char *file, void *target)

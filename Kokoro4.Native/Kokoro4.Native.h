@@ -8,7 +8,7 @@ enum class TargetIndices {
 	Normal = 3
 };
 
-#define MESH_MAGIC_NUM ('M' << 24 | 'E' << 16 | 'S' << 8 | 'H')
+#define MESH_MAGIC_NUM ('M' | 'E' << 8 | 'S' << 16 | 'H' << 24)
 
 typedef struct MeshHeader {
 public:
