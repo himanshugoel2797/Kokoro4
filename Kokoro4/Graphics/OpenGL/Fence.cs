@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics.OpenGL
+namespace Kokoro.Engine.Graphics
 {
     public class Fence : IDisposable
     {

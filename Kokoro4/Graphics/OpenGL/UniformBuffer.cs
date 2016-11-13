@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics.OpenGL
+namespace Kokoro.Engine.Graphics
 {
     public class UniformBuffer
     {

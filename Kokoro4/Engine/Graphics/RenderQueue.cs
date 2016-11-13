@@ -133,10 +133,11 @@ namespace Kokoro.Engine.Graphics
                     {
                         var mesh = bkt.meshes[j];
 
-                        data_ui[(j * 4) + 1] = (uint)mesh.IndexCount;   //count
-                        data_ui[(j * 4) + 2] = 1;   //instanceCount
-                        data_ui[(j * 4) + 3] = (uint)mesh.StartOffset;   //first
-                        data_ui[(j * 4) + 4] = 0;   //baseInstance
+                        data_ui[(j * 5) + 1] = (uint)mesh.IndexCount;   //count
+                        data_ui[(j * 5) + 2] = 1;   //instanceCount
+                        data_ui[(j * 5) + 3] = (uint)mesh.StartOffset;   //first
+                        data_ui[(j * 5) + 4] = (uint)mesh.StartOffset;   //baseVertex
+                        data_ui[(j * 5) + 5] = 0;   //baseInstance
                     }
 
                     //Move the data pointer forward

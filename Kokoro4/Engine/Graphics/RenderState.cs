@@ -5,12 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if OPENGL
+using Kokoro.Graphics.OpenGL;
+#else
+
+#endif
+
 namespace Kokoro.Engine.Graphics
 {
     public class RenderState
     {
         public Framebuffer Framebuffer { get; private set; }
         public ShaderProgram ShaderProgram { get; private set; }
+        public ShaderStorageBuffer[] ShaderStorageBufferBindings { get; private set; }
+        public UniformBuffer[] UniformBufferBindings { get; private set; }
+
         public bool DepthWrite { get; private set; }
         public DepthFunc DepthTest { get; private set; }
         public BlendFactor Src { get; private set; }
@@ -21,7 +30,19 @@ namespace Kokoro.Engine.Graphics
         public float NearPlane { get; private set; }
         public CullFaceMode CullMode { get; private set; }
 
-        public RenderState(Framebuffer fbuf, ShaderProgram prog, bool dWrite, DepthFunc dTest, float far, float near, BlendFactor src, BlendFactor dst, Vector4 ClearColor, float ClearDepth, CullFaceMode cullMode)
+        public RenderState(Framebuffer fbuf, 
+                           ShaderProgram prog, 
+                           ShaderStorageBuffer[] ssboBindings, 
+                           UniformBuffer[] uboBindings, 
+                           bool dWrite, 
+                           DepthFunc dTest, 
+                           float far, 
+                           float near, 
+                           BlendFactor src, 
+                           BlendFactor dst, 
+                           Vector4 ClearColor, 
+                           float ClearDepth, 
+                           CullFaceMode cullMode)
         {
             Framebuffer = fbuf;
             ShaderProgram = prog;
@@ -34,6 +55,8 @@ namespace Kokoro.Engine.Graphics
             this.ClearColor = ClearColor;
             this.ClearDepth = ClearDepth;
             CullMode = cullMode;
+            ShaderStorageBufferBindings = ssboBindings;
+            UniformBufferBindings = uboBindings;
         }
     }
 }

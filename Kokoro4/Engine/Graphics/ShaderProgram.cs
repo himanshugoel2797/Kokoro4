@@ -34,9 +34,24 @@ namespace Kokoro.Engine.Graphics
             prog.Set(name, ubo);
         }
 
-        public void Set(string name, ShaderStorageBuffer ssbo)
+        public int GetUniformBlockLocation(string name)
         {
-            prog.Set(name, ssbo);
+            return prog.GetUniformBlockLocation(name);
+        }
+
+        public int GetShaderStorageBufferLocation(string name)
+        {
+            return prog.GetShaderStorageBufferLocation(name);
+        }
+
+        public void SetShaderStorageBufferMapping(string name, int binding)
+        {
+            prog.SetShaderStorageBufferMapping(name, binding);
+        }
+
+        public void SetUniformBufferMapping(string name, int binding)
+        {
+            prog.SetUniformBufferMapping(name, binding);
         }
 
         public void Set(string name, Vector3 vec)

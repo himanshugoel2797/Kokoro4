@@ -7,30 +7,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics.OpenGL
+namespace Kokoro.Engine.Graphics
 {
     public class ShaderStorageBuffer
     {
-        #region Bind point allocation
-        private static int freebindPoint = 0;
-        private static int maxBindPoints = 0;
-
-        private static int getFreeBindPoint()
-        {
-            if (freebindPoint >= maxBindPoints)
-                throw new Exception("Too many SSBOs!");
-            return (freebindPoint++ % maxBindPoints);
-        }
-        #endregion
-
-        static ShaderStorageBuffer()
-        {
-            maxBindPoints = GL.GetInteger((GetPName)All.MaxShaderStorageBufferBindings);
-        }
-
-
         internal GPUBuffer buf;
-        internal int bindPoint = 0;
         internal Fence readyFence;
 
         bool dirty = false;
@@ -38,7 +19,6 @@ namespace Kokoro.Graphics.OpenGL
         public ShaderStorageBuffer(GPUBuffer buf)
         {
             this.buf = buf;
-            bindPoint = getFreeBindPoint();
             readyFence = new Fence();
             readyFence.PlaceFence();
         }

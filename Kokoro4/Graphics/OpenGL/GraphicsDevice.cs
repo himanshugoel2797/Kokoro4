@@ -45,6 +45,9 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
+        public const int MaxIndirectDrawsUBO = 256;
+        public const int MaxIndirectDrawsSSBO = 1024; 
+
         public static Size WindowSize
         {
             get
@@ -467,6 +470,19 @@ namespace Kokoro.Graphics.OpenGL
             GL.BindVertexArray(varray.id);
         }
 
+        #region Shader Buffers
+        public static void SetShaderStorageBufferBinding(ShaderStorageBuffer buf, int index)
+        {
+            GPUStateMachine.BindBuffer(BufferTarget.ShaderStorageBuffer, buf.buf.id, index, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        public static void SetUniformBufferBinding(UniformBuffer buf, int index)
+        {
+            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.buf.id, index, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        #endregion
+
         #region Indirect call buffers
         public static void SetMultiDrawParameterBuffer(GPUBuffer buf)
         {
@@ -546,7 +562,7 @@ namespace Kokoro.Graphics.OpenGL
             if (indexed)
                 GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, (IntPtr)byteOffset, (IntPtr)countOffset, 4096, 0);
             else
-                GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, (IntPtr)byteOffset, (IntPtr)countOffset, 4096, 0);
+                GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, (IntPtr)byteOffset, (IntPtr)countOffset, 4096, 5 * sizeof(int) /*Each entry is formatted as index data, so work accordingly*/);
         }
         #endregion
 

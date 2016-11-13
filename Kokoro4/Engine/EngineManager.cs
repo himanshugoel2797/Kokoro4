@@ -62,6 +62,22 @@ namespace Kokoro.Engine
             GraphicsDevice.Framebuffer = state.Framebuffer;
             GraphicsDevice.SetDepthRange(state.NearPlane, state.FarPlane);
 
+            if(state.ShaderStorageBufferBindings != null)
+            {
+                for(int i = 0; i < state.ShaderStorageBufferBindings.Length; i++)
+                {
+                    GraphicsDevice.SetShaderStorageBufferBinding(state.ShaderStorageBufferBindings[i], i);
+                }
+            }
+
+            if (state.UniformBufferBindings != null)
+            {
+                for (int i = 0; i < state.UniformBufferBindings.Length; i++)
+                {
+                    GraphicsDevice.SetUniformBufferBinding(state.UniformBufferBindings[i], i);
+                }
+            }
+
             if (state.ShaderProgram != null)
                 GraphicsDevice.ShaderProgram = state.ShaderProgram;
         }

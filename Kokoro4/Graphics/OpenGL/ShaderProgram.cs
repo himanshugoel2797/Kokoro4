@@ -76,11 +76,26 @@ namespace Kokoro.Graphics.OpenGL
             GL.UniformBlockBinding(id, loc, ubo.bindPoint);
         }
 
-        public void Set(string name, ShaderStorageBuffer ssbo)
+        public int GetUniformBlockLocation(string name)
         {
-            GPUStateMachine.BindBuffer(BufferTarget.ShaderStorageBuffer, ssbo.buf.id, ssbo.bindPoint, IntPtr.Zero, IntPtr.Zero);
+            int loc = GL.GetProgramResourceIndex(id, ProgramInterface.UniformBlock, name);
+            return loc;
+        }
+
+        public int GetShaderStorageBufferLocation(string name)
+        {
             int loc = GL.GetProgramResourceIndex(id, ProgramInterface.ShaderStorageBlock, name);
-            GL.ShaderStorageBlockBinding(id, loc, ssbo.bindPoint);
+            return loc;
+        }
+
+        public void SetShaderStorageBufferMapping(string name, int binding)
+        {
+            GL.ShaderStorageBlockBinding(id, GetShaderStorageBufferLocation(name), binding);
+        }
+
+        public void SetUniformBufferMapping(string name, int binding)
+        {
+            GL.UniformBlockBinding(id, GetUniformBlockLocation(name), binding);
         }
 
         public void Set(string name, Vector3 vec)
