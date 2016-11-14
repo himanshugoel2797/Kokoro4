@@ -11,7 +11,7 @@ namespace Kokoro.Engine.Graphics
 {
     public class Framebuffer : IDisposable
     {
-        public static Framebuffer Default;
+        public static Framebuffer Default { get; private set; }
 
         static Framebuffer()
         {
@@ -20,7 +20,8 @@ namespace Kokoro.Engine.Graphics
 
         internal static void RecreateDefaultFramebuffer()
         {
-            Default = new Framebuffer(0, GraphicsDevice.WindowSize.Width, GraphicsDevice.WindowSize.Height);
+            Default.Width = GraphicsDevice.WindowSize.Width;
+            Default.Height = GraphicsDevice.WindowSize.Height;
         }
 
         private Framebuffer(int id, int w, int h)

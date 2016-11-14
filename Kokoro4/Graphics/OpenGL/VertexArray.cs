@@ -42,10 +42,13 @@ namespace Kokoro.Graphics.OpenGL
                     eSize = sizeof(float) / 2;
                     break;
                 case VertexAttribPointerType.UnsignedInt:
-                case VertexAttribPointerType.UnsignedInt2101010Rev:
-                case VertexAttribPointerType.Int2101010Rev:
                 case VertexAttribPointerType.Int:
                     eSize = sizeof(int);
+                    break;
+
+                case VertexAttribPointerType.UnsignedInt2101010Rev:
+                case VertexAttribPointerType.Int2101010Rev:
+                    eSize = 1;
                     break;
                 case VertexAttribPointerType.UnsignedShort:
                 case VertexAttribPointerType.Short:

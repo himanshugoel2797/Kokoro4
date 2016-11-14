@@ -14,10 +14,10 @@ namespace Kokoro.Graphics.Prefabs
         {
             List<float> verts = new List<float>();
             List<float> uvs = new List<float>();
-            List<float> normals = new List<float>();
+            List<uint> normals = new List<uint>();
             List<ushort> indices = new List<ushort>();
 
-            float step = 3600;
+            float step = 36;
             float radius = 1;
 
             float angleStep = 360f / (float)step;
@@ -59,9 +59,7 @@ namespace Kokoro.Graphics.Prefabs
 
                     var normal = new Vector3(x, y, z);
                     normal.Normalize();
-                    normals.Add(normal.X);
-                    normals.Add(normal.Y);
-                    normals.Add(normal.Z);
+                    normals.Add(Mesh.CompressNormal(normal.X, normal.Y, normal.Z));
 
                     indices.Add((ushort)n);
                     n++;
@@ -77,9 +75,7 @@ namespace Kokoro.Graphics.Prefabs
 
                     normal = new Vector3(x, y, z);
                     normal.Normalize();
-                    normals.Add(normal.X);
-                    normals.Add(normal.Y);
-                    normals.Add(normal.Z);
+                    normals.Add(Mesh.CompressNormal(normal.X, normal.Y, normal.Z));
 
                     uvX = aX / 360;
                     uvY = (2 * (aY + angleStep)) / 360;
@@ -100,9 +96,7 @@ namespace Kokoro.Graphics.Prefabs
 
                     normal = new Vector3(x, y, z);
                     normal.Normalize();
-                    normals.Add(normal.X);
-                    normals.Add(normal.Y);
-                    normals.Add(normal.Z);
+                    normals.Add(Mesh.CompressNormal(normal.X, normal.Y, normal.Z));
 
                     uvX = (aX + angleStep) / 360;
                     uvY = (2 * aY) / 360;
@@ -122,9 +116,7 @@ namespace Kokoro.Graphics.Prefabs
 
                     normal = new Vector3(x, y, z);
                     normal.Normalize();
-                    normals.Add(normal.X);
-                    normals.Add(normal.Y);
-                    normals.Add(normal.Z);
+                    normals.Add(Mesh.CompressNormal(normal.X, normal.Y, normal.Z));
 
                     uvX = (aX + angleStep) / 360;
                     uvY = (2 * (aY + angleStep)) / 360;

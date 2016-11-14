@@ -39,8 +39,8 @@ namespace Kokoro.Engine
 
             varray = new VertexArray();
             varray.SetBufferObject(0, vertices, 3, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float, false);
-            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedShort, true);
-            varray.SetBufferObject(2, normals, 4, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedInt2101010Rev, true);
+            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedShort, false);
+            varray.SetBufferObject(2, normals, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Short, false);
             varray.SetElementBufferObject(indices);
 
             offset = 0;

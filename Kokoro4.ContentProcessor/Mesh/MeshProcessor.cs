@@ -17,14 +17,45 @@ namespace Kokoro4.ContentProcessor.Mesh
             return "";
         }
 
-        private static uint CompressNormal(float x, float y, float z)
-        {
-            uint x_i = (uint)(Math.Abs(x) * 1023);
-            uint y_i = (uint)(Math.Abs(y) * 1023);
-            uint z_i = (uint)(Math.Abs(z) * 1023);
 
-            return (uint)((x_i & 1023) | ((y_i & 1023) << 10) | ((z_i & 1023) << 20) | ((z_i >= 0 ? 0 : 1) << 21));
+
+        public static uint CompressNormal(float x, float y, float z)
+        {
+            //Convert cartesian to spherical
+            double theta = System.Math.Atan2(y, x) * 180.0d / System.Math.PI;
+            double phi = System.Math.Acos(z) * 180.0d / System.Math.PI;
+            
+            unchecked
+            {
+                const int scale = 100;
+
+                uint theta_us = (ushort)(theta * scale);
+                uint phi_us = (ushort)(phi * scale);
+
+                return theta_us | (phi_us << 16);
+            }
         }
+
+        /*
+        public static uint CompressNormal(float x, float y, float z)
+        {
+            uint x_i = (uint)(System.Math.Abs(x) * ((1 << 14) - 1));
+            uint y_i = (uint)(System.Math.Abs(y) * 1023);
+            uint z_i = (uint)(System.Math.Abs(z) * ((1 << 14) - 1));
+
+            uint result = 0;
+
+            result |= (x_i & 1023);
+            result |= (uint)((y >= 0 ? 0 : 2) << 10);
+            result |= (z_i >> 10) << 12;
+            result |= (x_i >> 10) << 16;
+            result |= (z_i & 1023) << 20;
+            result |= (uint)(((z >= 0 ? 0 : 2) | (x >= 0 ? 0 : 1)) /*Allows application of the sign in a shader using (1 - z)*/// << 30);
+
+
+         //   return result;
+         //   return (uint)((x_i & 1023) | ((y >= 0 ? 0 : 2) << 10) | ((z_i & 1023) << 20) | (((z >= 0 ? 0 : 2) | (x >= 0 ? 0 : 1)) /*Allows application of the sign in a shader using (1 - z)*/ << 30));
+       // }
 
         public static void Preprocess(string[] args)
         {

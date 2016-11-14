@@ -21,6 +21,23 @@ namespace Kokoro.Engine
     /// </summary>
     public class Mesh : IDisposable
     {
+        public static uint CompressNormal(float x, float y, float z)
+        {
+            //Convert cartesian to spherical
+            double theta = System.Math.Atan2(y, x) * 180.0d/System.Math.PI;
+            double phi = System.Math.Acos(z) * 180.0d/System.Math.PI;
+
+            unchecked
+            {
+                const int scale = 100;
+
+                uint theta_us = (ushort)(theta * scale);
+                uint phi_us = (ushort)(phi * scale);
+
+                return theta_us | (phi_us << 16);
+            }
+        }
+
         [System.Security.SuppressUnmanagedCodeSecurity]
         [System.Runtime.InteropServices.DllImport("Kokoro4.Native.dll", EntryPoint = "LoadMesh")]
         extern static int LoadMesh(string file, IntPtr[] ptrs);//CAl
@@ -52,7 +69,7 @@ namespace Kokoro.Engine
                 throw new Exception("Failed to load mesh");
         }
 
-        public Mesh(MeshGroup parent, float[] vertices, float[] uv, float[] norm, ushort[] indice)
+        public Mesh(MeshGroup parent, float[] vertices, float[] uv, uint[] norm, ushort[] indice)
         {
             //TODO: A mesh shouldn't expect the raw data, it should expect the offset, length and a mesh group object
             //A group object is 
@@ -74,7 +91,7 @@ namespace Kokoro.Engine
 
             System.Runtime.InteropServices.Marshal.Copy(temp, 0, ptrs[(int)MeshGroup.IntPtrIndex.Index], indice.Length);
             System.Runtime.InteropServices.Marshal.Copy(uv, 0, ptrs[(int)MeshGroup.IntPtrIndex.UV], uv.Length);
-            System.Runtime.InteropServices.Marshal.Copy(norm, 0, ptrs[(int)MeshGroup.IntPtrIndex.Normal], norm.Length);
+            System.Runtime.InteropServices.Marshal.Copy((int[])(object)norm, 0, ptrs[(int)MeshGroup.IntPtrIndex.Normal], norm.Length);
             System.Runtime.InteropServices.Marshal.Copy(vertices, 0, ptrs[(int)MeshGroup.IntPtrIndex.Vertex], vertices.Length);
         }
 

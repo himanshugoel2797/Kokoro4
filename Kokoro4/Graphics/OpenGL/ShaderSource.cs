@@ -16,7 +16,7 @@ namespace Kokoro.Graphics.OpenGL
 
         public IntShaderSource(Kokoro.Engine.Graphics.ShaderType sType, string src)
         {
-            src = $"#version 450 core\n#extension GL_ARB_bindless_texture : require\n #extension GL_ARB_shader_draw_parameters : require\n #define MAX_DRAWS_UBO {GraphicsDevice.MaxIndirectDrawsUBO}\n #define MAX_DRAWS_SSBO {GraphicsDevice.MaxIndirectDrawsSSBO}\n" + src;
+            src = $"#version 450 core\n#extension GL_ARB_bindless_texture : require\n #extension GL_ARB_shader_draw_parameters : require\n #define MAX_DRAWS_UBO {GraphicsDevice.MaxIndirectDrawsUBO}\n #define MAX_DRAWS_SSBO {GraphicsDevice.MaxIndirectDrawsSSBO}\n #define PI {System.Math.PI}\n" + src;
 
             id = GL.CreateShader((OpenTK.Graphics.OpenGL.ShaderType)sType);
             GL.ShaderSource(id, src);

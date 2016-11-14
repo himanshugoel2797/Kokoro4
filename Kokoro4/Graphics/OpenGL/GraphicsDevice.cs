@@ -448,13 +448,15 @@ namespace Kokoro.Graphics.OpenGL
             curFramebuffer = Framebuffer.Default;
             GL.Enable(EnableCap.DepthClamp);
             GL.Enable(EnableCap.TextureCubeMapSeamless);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.CullFace);
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             Load?.Invoke();
         }
 
         private static void Window_Resize(object sender, EventArgs e)
         {
-            GPUStateMachine.SetViewport(0, 0, game.Width, game.Height);
+            GPUStateMachine.SetViewport(0, 0, game.ClientSize.Width, game.ClientSize.Height);
             InputLL.SetWinXY(game.Location.X, game.Location.Y, game.ClientSize.Width, game.ClientSize.Height);
             Framebuffer.RecreateDefaultFramebuffer();
         }

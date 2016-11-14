@@ -226,12 +226,12 @@
     <None Include="Graphics\OpenGL\Shaders\Compositor\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Graphics\OpenGL\Shaders\Default\fragment.glsl">
+    <Content Include="Graphics\OpenGL\Shaders\Default\fragment.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Graphics\OpenGL\Shaders\Default\vertex.glsl">
+    </Content>
+    <Content Include="Graphics\OpenGL\Shaders\Default\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="Graphics\OpenGL\Shaders\DirectionalLight\fragment.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

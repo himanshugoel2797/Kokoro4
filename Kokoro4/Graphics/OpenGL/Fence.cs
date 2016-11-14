@@ -12,6 +12,11 @@ namespace Kokoro.Engine.Graphics
         IntPtr id = IntPtr.Zero;
         bool raised = false;
 
+        public Fence()
+        {
+            Kokoro.Graphics.OpenGL.GraphicsDevice.Cleanup += Dispose;
+        }
+
         public void PlaceFence()
         {
             if (id != IntPtr.Zero) GL.DeleteSync(id);

@@ -1266,7 +1266,7 @@ namespace Kokoro.Graphics.Prefabs
 ,0.0f,0.0f,-1.0f
             };
 
-            List<float> norms = new List<float>();
+            List<uint> norms = new List<uint>();
             List<float> uvs_l = new List<float>();
             List<float> verts = new List<float>();
             List<ushort> inds = new List<ushort>();
@@ -1282,9 +1282,7 @@ namespace Kokoro.Graphics.Prefabs
                 uvs_l.Add((float)uvs[u_ind * 2]);
                 uvs_l.Add((float)uvs[u_ind * 2 + 1]);
 
-                norms.Add(norm_p[n_ind * 3]);
-                norms.Add(norm_p[n_ind * 3 + 1]);
-                norms.Add(norm_p[n_ind * 3 + 2]);
+                norms.Add(Mesh.CompressNormal(norm_p[n_ind * 3], norm_p[n_ind * 3 + 1], norm_p[n_ind * 3 + 2]));
 
                 verts.Add((float)vers[v_ind * 3]);
                 verts.Add((float)vers[v_ind * 3 + 1]);

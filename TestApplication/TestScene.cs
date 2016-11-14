@@ -44,7 +44,7 @@ namespace TestApplication
             {
                 grp = new MeshGroup(3 * 11000, 3 * 11000);
                 mesh = new Mesh(grp, 25000, 25000, "car_0A.k4_stmesh");
-                cube = Kokoro.Graphics.Prefabs.CubeFactory.Create(grp);
+                cube = Kokoro.Graphics.Prefabs.SphereFactory.Create(grp);
                 camera = new FirstPersonCamera(Vector3.Zero, Vector3.UnitX, "FPV");
                 camera.Enabled = true;
 
@@ -58,7 +58,7 @@ namespace TestApplication
                 unsafe
                 {
                     byte* data = transform_params.Update();
-                    var matrices = new Matrix4[] { Matrix4.CreateTranslation(0, 100, 100), Matrix4.Identity };
+                    var matrices = new Matrix4[] { Matrix4.CreateTranslation(10, 0, 0), Matrix4.CreateTranslation(1, 0, 0) * Matrix4.Scale(6) };
 
                     fixed(Matrix4* mats = matrices)
                     {
@@ -70,9 +70,10 @@ namespace TestApplication
                             d[i] = s[i];
                         }
                     }
+                    transform_params.UpdateDone();
                 }
 
-                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), null, new UniformBuffer[] { transform_params }, true, DepthFunc.Greater, 0, 1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.One, 0, CullFaceMode.Back);
+                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), null, new UniformBuffer[] { transform_params }, true, DepthFunc.Greater, 0, 1, BlendFactor.One, BlendFactor.One, new Vector4(0, 0.5f, 1.0f, 0.0f), 0, CullFaceMode.Back);
                 EngineManager.SetRenderState(state);
                 
                 state.ShaderProgram.SetUniformBufferMapping("transforms", 0);
