@@ -53,14 +53,18 @@ namespace Kokoro.Engine.Graphics
             {
                 bindings[attachment] = value;
 
-                GL.NamedFramebufferTexture(id, attachment, value.id, 0);
+                GL.NamedFramebufferTexture(id, (OpenTK.Graphics.OpenGL.FramebufferAttachment)attachment, value.id, 0);
 
-                GL.NamedFramebufferDrawBuffers(id, bindings.Keys.Count,
-                    bindings.Keys.OrderByDescending((a) => (int)a).Reverse().Cast<DrawBuffersEnum>().ToArray());
-
-                if(GL.CheckNamedFramebufferStatus(id, FramebufferTarget.Framebuffer) != (All)FramebufferErrorCode.FramebufferComplete)
+                if (attachment != FramebufferAttachment.DepthAttachment)
                 {
-                    throw new Exception("Incomplete Framebuffer!");
+                    GL.NamedFramebufferDrawBuffers(id, bindings.Keys.Count,
+                        bindings.Keys.Except(new FramebufferAttachment[] { FramebufferAttachment.DepthAttachment })
+                        .OrderByDescending((a) => (int)a).Reverse().Cast<DrawBuffersEnum>().ToArray());
+                }
+
+                if (GL.CheckNamedFramebufferStatus(id, FramebufferTarget.Framebuffer) != (All)FramebufferErrorCode.FramebufferComplete)
+                {
+                    throw new Exception(GL.CheckNamedFramebufferStatus(id, FramebufferTarget.Framebuffer).ToString());
                 }
             }
             get
@@ -84,7 +88,7 @@ namespace Kokoro.Engine.Graphics
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
-                if(id != 0)GL.DeleteFramebuffer(id);
+                if (id != 0) GL.DeleteFramebuffer(id);
                 id = 0;
 
                 disposedValue = true;

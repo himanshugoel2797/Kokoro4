@@ -73,16 +73,16 @@ namespace Kokoro.Engine
             switch (idx)
             {
                 case IntPtrIndex.Index:
-                    indices.FlushBuffer(indices.GetPtr() + (offset * sizeof(ushort)), size * sizeof(ushort));
+                    indices.FlushBuffer((offset * sizeof(ushort)), size * sizeof(ushort));
                     break;
                 case IntPtrIndex.Normal:
-                    normals.FlushBuffer(normals.GetPtr() + (offset * sizeof(uint)), size * sizeof(uint));
+                    normals.FlushBuffer((offset * sizeof(uint)), size * sizeof(uint));
                     break;
                 case IntPtrIndex.UV:
-                    uvs.FlushBuffer(uvs.GetPtr() + (offset * 2 * sizeof(float)), size * sizeof(float) * 2);
+                    uvs.FlushBuffer((offset * 2 * sizeof(ushort)), size * sizeof(ushort) * 2);
                     break;
                 case IntPtrIndex.Vertex:
-                    vertices.FlushBuffer(vertices.GetPtr() + (offset * 3 * sizeof(float)), size * sizeof(float) * 3);
+                    vertices.FlushBuffer((offset * 3 * sizeof(float)), size * sizeof(float) * 3);
                     break;
             }
 

@@ -53,7 +53,7 @@ namespace Kokoro.Engine.Graphics
 
         public int GetLevels()
         {
-            return 0;
+            return 1;
         }
 
         public IntPtr GetPixelData(int level)

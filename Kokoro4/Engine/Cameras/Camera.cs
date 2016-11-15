@@ -49,7 +49,7 @@ namespace Kokoro.Engine.Cameras
             View = Matrix4.LookAt(new Vector3(-1, 0, 0), Vector3.Zero, Vector3.UnitY);
             Position = -Vector3.UnitX;
             PostProcessingEffects = new List<RenderPass>();
-            SetProjection(0.7853f, 16f / 9f, 0.1f, 1000f);  //FOV = 45
+            SetProjection((float)(90.0f/180.0f * System.Math.PI), 16f / 9f, 0.1f);  //FOV = 90
             this.Name = name;
         }
 
@@ -75,9 +75,9 @@ namespace Kokoro.Engine.Cameras
             //In the end apply all the passes in the order they have been added
         }
 
-        public void SetProjection(float fov, float aspectRatio, float nearClip, float farClip)
+        public void SetProjection(float fov, float aspectRatio, float nearClip)
         {
-            Projection = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearClip, farClip);
+            Projection = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearClip);
         }
     }
 }

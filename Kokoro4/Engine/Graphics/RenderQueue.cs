@@ -38,6 +38,8 @@ namespace Kokoro.Engine.Graphics
 
         private const int EntrySize = 0;
 
+        public bool ClearFramebufferBeforeSubmit { get; set; } = false;
+
         public RenderQueue()
         {
             buckets = new Dictionary<Tuple<MeshGroup, RenderState>, Bucket>();
@@ -157,6 +159,13 @@ namespace Kokoro.Engine.Graphics
 
             //Submit the multidraw calls
             for (int i = 0; i < RenderStates.Count; i++)
+            {
+                if (ClearFramebufferBeforeSubmit)
+                {
+                    EngineManager.SetRenderState(RenderStates[i]);
+                    GraphicsDevice.Clear();
+                }
+
                 for (int j = 0; j < MeshGroups[RenderStates[i]].Count; j++)
                 {
                     var bkt = buckets[new Tuple<MeshGroup, RenderState>(MeshGroups[RenderStates[i]][j], RenderStates[i])];
@@ -169,6 +178,7 @@ namespace Kokoro.Engine.Graphics
 
                     GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, bkt.offset + sizeof(uint), bkt.offset, true);
                 }
+            }
         }
 
     }

@@ -100,6 +100,7 @@
     <Compile Include="Engine\EngineManager.cs" />
     <Compile Include="Engine\GameObject.cs" />
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />
+    <Compile Include="Engine\Graphics\FramebufferAttachment.cs" />
     <Compile Include="Engine\Graphics\GraphicsObject.cs" />
     <Compile Include="Engine\Graphics\Material.cs" />
     <Compile Include="Engine\Graphics\RenderQueue.cs" />

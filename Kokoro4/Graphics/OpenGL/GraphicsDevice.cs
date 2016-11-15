@@ -180,8 +180,14 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                cullMode = value;
-                GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
+                if (cullMode != value)
+                {
+                    cullMode = value;
+                    if (cullMode == Engine.Graphics.CullFaceMode.None) CullEnabled = false;
+                    else CullEnabled = true;
+
+                    GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
+                }
             }
         }
 
@@ -194,11 +200,14 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                cullEnabled = value;
-                if (cullEnabled)
-                    GL.Enable(EnableCap.CullFace);
-                else
-                    GL.Disable(EnableCap.CullFace);
+                if (cullEnabled != value)
+                {
+                    if (cullEnabled)
+                        GL.Enable(EnableCap.CullFace);
+                    else
+                        GL.Disable(EnableCap.CullFace);
+                    cullEnabled = value;
+                }
             }
         }
 
@@ -449,7 +458,6 @@ namespace Kokoro.Graphics.OpenGL
             GL.Enable(EnableCap.DepthClamp);
             GL.Enable(EnableCap.TextureCubeMapSeamless);
             GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.CullFace);
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             Load?.Invoke();
         }
@@ -574,7 +582,7 @@ namespace Kokoro.Graphics.OpenGL
         {
             _far = far;
             _near = near;
-            GL.DepthRange(near, far);
+            //GL.DepthRange(near, far);
         }
 
         public static void GetDepthRange(out double near, out double far)

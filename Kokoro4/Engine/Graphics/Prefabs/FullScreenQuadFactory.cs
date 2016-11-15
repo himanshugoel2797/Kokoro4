@@ -24,8 +24,8 @@ namespace Kokoro.Graphics.Prefabs
                 1,1,
                 1,0,
                 0,0
-            }, 
-            null, 
+            },
+            new uint[]{ 0, 0, 0, 0 }, 
             new ushort[] { 3, 2, 0, 0, 2, 1 });
         }
     }

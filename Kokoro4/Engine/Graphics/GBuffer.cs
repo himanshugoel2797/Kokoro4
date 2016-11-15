@@ -17,7 +17,7 @@ namespace Kokoro.Engine.Graphics
     public class GBuffer
     {
         private Framebuffer fbuf;
-        private Texture color_tex, material_tex, depth_tex;
+        private Texture color_tex, normal_tex, material_tex, depth_tex;
 
         public GBuffer(int w, int h)
         {
@@ -48,6 +48,9 @@ namespace Kokoro.Engine.Graphics
             color_tex = new Texture();
             color_tex.SetData(color, 0);
 
+            normal_tex = new Texture();
+            normal_tex.SetData(normals, 0);
+
             material_tex = new Texture();
             material_tex.SetData(materials, 0);
 
@@ -56,9 +59,10 @@ namespace Kokoro.Engine.Graphics
 
             fbuf = new Framebuffer(w, h);
 
-            fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.ColorAttachment0] = color_tex;
-            fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.ColorAttachment1] = material_tex;
-            fbuf[OpenTK.Graphics.OpenGL.FramebufferAttachment.DepthAttachment] = depth_tex;
+            fbuf[FramebufferAttachment.DepthAttachment] = depth_tex;
+            fbuf[FramebufferAttachment.ColorAttachment0] = color_tex;
+            fbuf[FramebufferAttachment.ColorAttachment1] = material_tex;
+            fbuf[FramebufferAttachment.ColorAttachment2] = normal_tex;
         }
 
         public static implicit operator Framebuffer(GBuffer buf)
