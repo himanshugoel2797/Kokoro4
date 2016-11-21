@@ -186,7 +186,7 @@ namespace Kokoro.Graphics.OpenGL
                     if (cullMode == Engine.Graphics.CullFaceMode.None) CullEnabled = false;
                     else CullEnabled = true;
 
-                    GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
+                    if(cullMode != Engine.Graphics.CullFaceMode.None)GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
                 }
             }
         }
@@ -455,7 +455,7 @@ namespace Kokoro.Graphics.OpenGL
         private static void Game_Load(object sender, EventArgs e)
         {
             curFramebuffer = Framebuffer.Default;
-            GL.Enable(EnableCap.DepthClamp);
+            //GL.Enable(EnableCap.DepthClamp);
             GL.Enable(EnableCap.TextureCubeMapSeamless);
             GL.Enable(EnableCap.DepthTest);
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);

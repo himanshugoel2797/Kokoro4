@@ -73,6 +73,35 @@ namespace Kokoro.Math
 
         #endregion
 
+        #region Log2
+        public static ulong Log2(ulong v)
+        {
+            ulong[] b = new ulong[] { 0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000, 0xFFFFFFFF00000000 };
+            ulong[] S = new ulong[] { 1, 2, 4, 8, 16, 32 };
+            int i;
+
+            ulong r = 0; // result of log2(v) will go here
+            for (i = 5; i >= 0; i--) // unroll for speed...
+            {
+                if ((v & b[i]) != 0)
+                {
+                    v = v >> (int)S[i];
+                    r |= S[i];
+                }
+            }
+
+            return r;
+        }
+        #endregion
+
+        #region IsLog2
+        public static bool IsLog2(ulong v)
+        {
+            return (v & (v - 1)) == 0;
+        }
+
+        #endregion
+
         public static double Fract(double i)
         {
             return i - System.Math.Truncate(i);

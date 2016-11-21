@@ -537,6 +537,64 @@ namespace Kokoro.Math
         #endregion
 
         #region CreatePerspectiveFieldOfView
+        /// <summary>
+        /// Creates a perspective projection matrix.
+        /// </summary>
+        /// <param name="fovy">Angle of the field of view in the y direction (in radians)</param>
+        /// <param name="aspect">Aspect ratio of the view (width / height)</param>
+        /// <param name="zNear">Distance to the near clip plane</param>
+        /// <param name="result">A projection matrix that transforms camera space to raster space</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown under the following conditions:
+        /// <list type="bullet">
+        /// <item>fovy is zero, less than zero or larger than Math.PI</item>
+        /// <item>aspect is negative or zero</item>
+        /// <item>zNear is negative or zero</item>
+        /// <item>zFar is negative or zero</item>
+        /// <item>zNear is larger than zFar</item>
+        /// </list>
+        /// </exception>
+        public static void CreatePerspectiveFieldOfView(double fovy, double aspect, double zNear, out Matrix4d result)
+        {
+            if (fovy <= 0 || fovy > MathHelper.Pi)
+                throw new ArgumentOutOfRangeException("fovy");
+            if (aspect <= 0)
+                throw new ArgumentOutOfRangeException("aspect");
+            if (zNear <= 0)
+                throw new ArgumentOutOfRangeException("zNear");
+
+            double f = (1.0d / System.Math.Tan(fovy * 0.5d));
+            result = new Matrix4d(
+                f / aspect, 0.0f, 0.0f, 0.0f,
+                0.0f, f, 0.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, -1.0f,
+                0.0f, 0.0f, zNear, 0.0f
+                );
+        }
+
+        /// <summary>
+        /// Creates a perspective projection matrix.
+        /// </summary>
+        /// <param name="fovy">Angle of the field of view in the y direction (in radians)</param>
+        /// <param name="aspect">Aspect ratio of the view (width / height)</param>
+        /// <param name="zNear">Distance to the near clip plane</param>
+        /// <returns>A projection matrix that transforms camera space to raster space</returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown under the following conditions:
+        /// <list type="bullet">
+        /// <item>fovy is zero, less than zero or larger than Math.PI</item>
+        /// <item>aspect is negative or zero</item>
+        /// <item>zNear is negative or zero</item>
+        /// <item>zFar is negative or zero</item>
+        /// <item>zNear is larger than zFar</item>
+        /// </list>
+        /// </exception>
+        public static Matrix4d CreatePerspectiveFieldOfView(double fovy, double aspect, double zNear)
+        {
+            Matrix4d result;
+            CreatePerspectiveFieldOfView(fovy, aspect, zNear, out result);
+            return result;
+        }
 
         /// <summary>
         /// Creates a perspective projection matrix.

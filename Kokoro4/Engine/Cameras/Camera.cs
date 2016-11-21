@@ -14,22 +14,22 @@ namespace Kokoro.Engine.Cameras
         /// <summary>
         /// The Camera's View Matrix
         /// </summary>
-        public Matrix4 View { get; internal set; }
+        public Matrix4d View { get; internal set; }
 
         /// <summary>
         /// The Camera's Projection Matrix
         /// </summary>
-        public Matrix4 Projection { get; internal set; }
+        public Matrix4d Projection { get; internal set; }
 
         public List<RenderPass> PostProcessingEffects { get; set; }
 
         public ulong LayerMask { get; set; }
 
-        private Vector3 pos;
+        private Vector3d pos;
         /// <summary>
         /// The 3D Position of the Camera
         /// </summary>
-        public Vector3 Position
+        public Vector3d Position
         {
             get
             {
@@ -46,10 +46,10 @@ namespace Kokoro.Engine.Cameras
         /// </summary>
         public Camera(string name)
         {
-            View = Matrix4.LookAt(new Vector3(-1, 0, 0), Vector3.Zero, Vector3.UnitY);
-            Position = -Vector3.UnitX;
+            View = Matrix4d.LookAt(new Vector3d(-1, 0, 0), Vector3d.Zero, Vector3d.UnitY);
+            Position = -Vector3d.UnitX;
             PostProcessingEffects = new List<RenderPass>();
-            SetProjection((float)(90.0f/180.0f * System.Math.PI), 16f / 9f, 0.1f);  //FOV = 90
+            SetProjection((float)(114.0f/360.0f * System.Math.PI), 16f / 9f, 0.1f);  //FOV = 90
             this.Name = name;
         }
 
@@ -77,7 +77,7 @@ namespace Kokoro.Engine.Cameras
 
         public void SetProjection(float fov, float aspectRatio, float nearClip)
         {
-            Projection = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearClip);
+            Projection = Matrix4d.CreatePerspectiveFieldOfView(fov, aspectRatio, nearClip);//, 10000000000);
         }
     }
 }

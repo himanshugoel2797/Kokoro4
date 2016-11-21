@@ -118,6 +118,7 @@ namespace Kokoro.Engine.Graphics
                 GL.CreateTextures((OpenTK.Graphics.OpenGL.TextureTarget)src.GetTextureTarget(), 1, out id);
                 inited = true;
             }
+            
 
             switch (src.GetDimensions())
             {

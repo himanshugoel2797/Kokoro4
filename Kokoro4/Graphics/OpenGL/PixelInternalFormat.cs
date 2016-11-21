@@ -567,6 +567,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         /// Original was GL_DEPTH_COMPONENT32F = 0x8CAC
         /// </summary>
         DepthComponent32f = ((int)0x8CAC),
+
         /// <summary>
         /// Original was GL_DEPTH32F_STENCIL8 = 0x8CAD
         /// </summary>

@@ -1,6 +1,7 @@
 ﻿using Kokoro.Engine;
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
+using Kokoro.Engine.Voxel;
 using Kokoro.Math;
 using Kokoro.StateMachine;
 using System;
@@ -23,10 +24,10 @@ namespace TestApplication
         FirstPersonCamera camera;
         GBuffer gbuf;
 
-        struct transformData
+        public float km(float val)
         {
-            public Matrix4[] matrices;
-        };
+            return val * 1000f;
+        }
 
         public void Update(double interval)
         {
@@ -44,12 +45,26 @@ namespace TestApplication
 
             if (!inited)
             {
-                gbuf = new GBuffer(1280, 720);
+
+                int side = 128;
+
+                VoxelOctree octree = new VoxelOctree(0, 128);
+
+                for (int k = 0; k <= side; k++)
+                for (int j = 0; j <= side; j++)
+                for (int i = 0; i <= side; i++)
+                {
+                    octree.Add(new VoxelColor() { R = 255, G = 0, B = 255, A = 255 }, i - side / 2, j - side / 2, k - side / 2, 1);
+                }
+
+                octree.Optimize();
+                
+                gbuf = new GBuffer(1920, 1080);
                 grp = new MeshGroup(3 * 11000, 3 * 11000);
                 mesh = new Mesh(grp, 25000, 25000, "car_0A.k4_stmesh");
                 fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create(grp);
-                cube = Kokoro.Graphics.Prefabs.SphereFactory.Create(grp);
-                camera = new FirstPersonCamera(Vector3.Zero, Vector3.UnitX, "FPV");
+                cube = Kokoro.Graphics.Prefabs.CubeFactory.Create(grp);
+                camera = new FirstPersonCamera(Vector3d.UnitX * 1000, Vector3d.UnitY, "FPV");
                 camera.Enabled = true;
 
                 EngineManager.AddCamera(camera);
@@ -63,7 +78,7 @@ namespace TestApplication
                 {
                     byte* data = transform_params.Update();
 
-                    var matrices = new Matrix4[] { Matrix4.CreateTranslation(10, 0, 0), Matrix4.Scale(695700 * 1000) * Matrix4.CreateTranslation(-Vector3.UnitX * 1000000 * 1000) };
+                    var matrices = new Matrix4[] { Matrix4.CreateTranslation(10, 0, 0), Matrix4.Scale(km(695500)) * Matrix4.CreateTranslation(Vector3.UnitX * 100.00f + Vector3.UnitY * km(149604618)), Matrix4.Scale(km(6378.1f)) * Matrix4.CreateTranslation(Vector3.UnitX * 100.00f), Matrix4.Scale(km(1737f)) * Matrix4.CreateTranslation(Vector3.UnitX * (100.00f - km(384472f))) };
 
                     fixed (Matrix4* mats = matrices)
                     {
@@ -84,7 +99,7 @@ namespace TestApplication
                 queue = new RenderQueue();
                 queue.ClearAndBeginRecording();
                 queue.ClearFramebufferBeforeSubmit = true;
-                queue.RecordDraw(new RenderQueue.DrawData() { Meshes = new Mesh[] { mesh, cube }, State = state });
+                queue.RecordDraw(new RenderQueue.DrawData() { Meshes = new Mesh[] { mesh, cube, cube, cube }, State = state });
                 queue.EndRecording();
 
                 handle = ((Framebuffer)gbuf)[FramebufferAttachment.ColorAttachment0].GetHandle(TextureSampler.Default);
@@ -101,11 +116,41 @@ namespace TestApplication
                 inited = true;
             }
 
-            state.ShaderProgram.Set("View", EngineManager.View);
-            state.ShaderProgram.Set("Projection", EngineManager.Projection);
+
+            state.ShaderProgram.Set("View", Matrix4.Identity);
+            state.ShaderProgram.Set("Projection", Matrix4.Identity);
             fsq_state.ShaderProgram.Set("AlbedoMap", handle);
 
+            unsafe
+            {
+                byte* data = transform_params.Update();
+
+                var tmp = EngineManager.View * EngineManager.Projection;
+                var eye = Vector3d.Transform(Vector3d.UnitX * km(6000.00f), tmp);
+                Matrix4 result = new Matrix4((float)tmp.M11, (float)tmp.M12, (float)tmp.M13, (float)tmp.M14,
+                                             (float)tmp.M21, (float)tmp.M22, (float)tmp.M23, (float)tmp.M24,
+                                             (float)tmp.M31, (float)tmp.M32, (float)tmp.M33, (float)tmp.M34,
+                                             (float)eye.X, (float)eye.Y, (float)eye.Z, (float)tmp.M44);
+
+
+                var matrices = new Matrix4[] { Matrix4.CreateTranslation(10, 0, 0), Matrix4.Scale(km(695500)) * Matrix4.CreateTranslation(Vector3.UnitX * 100.00f + Vector3.UnitY * km(149604618)), Matrix4.Scale(km(6378.1f)) * result, Matrix4.Scale(km(1737f)) * Matrix4.CreateTranslation(Vector3.UnitX * (100.00f - km(384472f))) };
+
+                fixed (Matrix4* mats = matrices)
+                {
+                    long* s = (long*)mats;
+                    long* d = (long*)data;
+
+                    for (int i = 0; i < sizeof(Matrix4) * matrices.Length / sizeof(long); i++)
+                    {
+                        d[i] = s[i];
+                    }
+                }
+                transform_params.UpdateDone();
+            }
+
+            //Kokoro.Graphics.OpenGL.GraphicsDevice.Wireframe = true;
             queue.Submit();
+            Kokoro.Graphics.OpenGL.GraphicsDevice.Wireframe = false;
             fsq_queue.Submit();
         }
 
