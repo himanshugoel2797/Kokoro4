@@ -34,17 +34,40 @@ namespace Kokoro.Math
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector2 : IEquatable<Vector2>
     {
+
         #region Fields
+        private System.Numerics.Vector2 SIMD_vec;
 
         /// <summary>
         /// The X component of the Vector2.
         /// </summary>
-        public float X;
+        public float X
+        {
+            get
+            {
+                return SIMD_vec.X;
+            }
+
+            set
+            {
+                SIMD_vec.X = value;
+            }
+        }
 
         /// <summary>
         /// The Y component of the Vector2.
         /// </summary>
-        public float Y;
+        public float Y
+        {
+            get
+            {
+                return SIMD_vec.Y;
+            }
+            set
+            {
+                SIMD_vec.Y = value;
+            }
+        }
 
         #endregion
 
@@ -56,6 +79,7 @@ namespace Kokoro.Math
         /// <param name="value">The value that will initialize this instance.</param>
         public Vector2(float value)
         {
+            SIMD_vec = new System.Numerics.Vector2();
             X = value;
             Y = value;
         }
@@ -67,6 +91,7 @@ namespace Kokoro.Math
         /// <param name="y">The y coordinate of the net Vector2.</param>
         public Vector2(float x, float y)
         {
+            SIMD_vec = new System.Numerics.Vector2();
             X = x;
             Y = y;
         }
@@ -78,6 +103,7 @@ namespace Kokoro.Math
         [Obsolete]
         public Vector2(Vector2 v)
         {
+            SIMD_vec = new System.Numerics.Vector2();
             X = v.X;
             Y = v.Y;
         }
@@ -89,6 +115,7 @@ namespace Kokoro.Math
         [Obsolete]
         public Vector2(Vector3 v)
         {
+            SIMD_vec = new System.Numerics.Vector2();
             X = v.X;
             Y = v.Y;
         }
@@ -100,6 +127,7 @@ namespace Kokoro.Math
         [Obsolete]
         public Vector2(Vector4 v)
         {
+            SIMD_vec = new System.Numerics.Vector2();
             X = v.X;
             Y = v.Y;
         }
@@ -109,77 +137,6 @@ namespace Kokoro.Math
         #region Public Members
 
         #region Instance
-
-        #region public void Add()
-
-        /// <summary>Add the Vector passed as parameter to this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Add() method instead.")]
-        public void Add(Vector2 right)
-        {
-            this.X += right.X;
-            this.Y += right.Y;
-        }
-
-        /// <summary>Add the Vector passed as parameter to this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Add() method instead.")]
-        public void Add(ref Vector2 right)
-        {
-            this.X += right.X;
-            this.Y += right.Y;
-        }
-
-        #endregion public void Add()
-
-        #region public void Sub()
-
-        /// <summary>Subtract the Vector passed as parameter from this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Subtract() method instead.")]
-        public void Sub(Vector2 right)
-        {
-            this.X -= right.X;
-            this.Y -= right.Y;
-        }
-
-        /// <summary>Subtract the Vector passed as parameter from this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Subtract() method instead.")]
-        public void Sub(ref Vector2 right)
-        {
-            this.X -= right.X;
-            this.Y -= right.Y;
-        }
-
-        #endregion public void Sub()
-
-        #region public void Mult()
-
-        /// <summary>Multiply this instance by a scalar.</summary>
-        /// <param name="f">Scalar operand.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Mult(float f)
-        {
-            this.X *= f;
-            this.Y *= f;
-        }
-
-        #endregion public void Mult()
-
-        #region public void Div()
-
-        /// <summary>Divide this instance by a scalar.</summary>
-        /// <param name="f">Scalar operand.</param>
-        [Obsolete("Use static Divide() method instead.")]
-        public void Div(float f)
-        {
-            float mult = 1.0f / f;
-            this.X *= mult;
-            this.Y *= mult;
-        }
-
-        #endregion public void Div()
 
         #region public float Length
 
@@ -192,7 +149,7 @@ namespace Kokoro.Math
         {
             get
             {
-                return (float)System.Math.Sqrt(X * X + Y * Y);
+                return SIMD_vec.Length();
             }
         }
 
@@ -234,7 +191,7 @@ namespace Kokoro.Math
         {
             get
             {
-                return X * X + Y * Y;
+                return SIMD_vec.LengthSquared();
             }
         }
 
@@ -291,46 +248,12 @@ namespace Kokoro.Math
         /// </summary>
         public void NormalizeFast()
         {
-            float scale = (float)MathHelper.InverseSqrtFast(X * X + Y * Y);
+            float scale = (float)this.LengthFast;
             X *= scale;
             Y *= scale;
         }
 
         #endregion
-
-        #region public void Scale()
-
-        /// <summary>
-        /// Scales the current Vector2 by the given amounts.
-        /// </summary>
-        /// <param name="sx">The scale of the X component.</param>
-        /// <param name="sy">The scale of the Y component.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Scale(float sx, float sy)
-        {
-            this.X = X * sx;
-            this.Y = Y * sy;
-        }
-
-        /// <summary>Scales this instance by the given parameter.</summary>
-        /// <param name="scale">The scaling of the individual components.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Scale(Vector2 scale)
-        {
-            this.X *= scale.X;
-            this.Y *= scale.Y;
-        }
-
-        /// <summary>Scales this instance by the given parameter.</summary>
-        /// <param name="scale">The scaling of the individual components.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Scale(ref Vector2 scale)
-        {
-            this.X *= scale.X;
-            this.Y *= scale.Y;
-        }
-
-        #endregion public void Scale()
 
         #endregion
 
@@ -365,105 +288,6 @@ namespace Kokoro.Math
 
         #endregion
 
-        #region Obsolete
-
-        #region Sub
-
-        /// <summary>
-        /// Subtract one Vector from another
-        /// </summary>
-        /// <param name="a">First operand</param>
-        /// <param name="b">Second operand</param>
-        /// <returns>Result of subtraction</returns>
-        [Obsolete("Use static Subtract() method instead.")]
-        public static Vector2 Sub(Vector2 a, Vector2 b)
-        {
-            a.X -= b.X;
-            a.Y -= b.Y;
-            return a;
-        }
-
-        /// <summary>
-        /// Subtract one Vector from another
-        /// </summary>
-        /// <param name="a">First operand</param>
-        /// <param name="b">Second operand</param>
-        /// <param name="result">Result of subtraction</param>
-        [Obsolete("Use static Subtract() method instead.")]
-        public static void Sub(ref Vector2 a, ref Vector2 b, out Vector2 result)
-        {
-            result.X = a.X - b.X;
-            result.Y = a.Y - b.Y;
-        }
-
-        #endregion
-
-        #region Mult
-
-        /// <summary>
-        /// Multiply a vector and a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <returns>Result of the multiplication</returns>
-        [Obsolete("Use static Multiply() method instead.")]
-        public static Vector2 Mult(Vector2 a, float f)
-        {
-            a.X *= f;
-            a.Y *= f;
-            return a;
-        }
-
-        /// <summary>
-        /// Multiply a vector and a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <param name="result">Result of the multiplication</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public static void Mult(ref Vector2 a, float f, out Vector2 result)
-        {
-            result.X = a.X * f;
-            result.Y = a.Y * f;
-        }
-
-        #endregion
-
-        #region Div
-
-        /// <summary>
-        /// Divide a vector by a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <returns>Result of the division</returns>
-        [Obsolete("Use static Divide() method instead.")]
-        public static Vector2 Div(Vector2 a, float f)
-        {
-            float mult = 1.0f / f;
-            a.X *= mult;
-            a.Y *= mult;
-            return a;
-        }
-
-        /// <summary>
-        /// Divide a vector by a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <param name="result">Result of the division</param>
-        [Obsolete("Use static Divide() method instead.")]
-        public static void Div(ref Vector2 a, float f, out Vector2 result)
-        {
-            float mult = 1.0f / f;
-            result.X = a.X * mult;
-            result.Y = a.Y * mult;
-        }
-
-        #endregion
-
-        #endregion
-
         #region Add
 
         /// <summary>
@@ -486,7 +310,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of operation.</param>
         public static void Add(ref Vector2 a, ref Vector2 b, out Vector2 result)
         {
-            result = new Vector2(a.X + b.X, a.Y + b.Y);
+            result = a.SIMD_vec + b.SIMD_vec;
         }
 
         #endregion
@@ -513,7 +337,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of subtraction</param>
         public static void Subtract(ref Vector2 a, ref Vector2 b, out Vector2 result)
         {
-            result = new Vector2(a.X - b.X, a.Y - b.Y);
+            result = a.SIMD_vec - b.SIMD_vec;
         }
 
         #endregion
@@ -540,7 +364,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of the operation.</param>
         public static void Multiply(ref Vector2 vector, float scale, out Vector2 result)
         {
-            result = new Vector2(vector.X * scale, vector.Y * scale);
+            result = vector.SIMD_vec * scale;
         }
 
         /// <summary>
@@ -563,7 +387,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of the operation.</param>
         public static void Multiply(ref Vector2 vector, ref Vector2 scale, out Vector2 result)
         {
-            result = new Vector2(vector.X * scale.X, vector.Y * scale.Y);
+            result = vector.SIMD_vec * scale.SIMD_vec;
         }
 
         #endregion
@@ -613,7 +437,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of the operation.</param>
         public static void Divide(ref Vector2 vector, ref Vector2 scale, out Vector2 result)
         {
-            result = new Vector2(vector.X / scale.X, vector.Y / scale.Y);
+            result = vector.SIMD_vec / scale.SIMD_vec;
         }
 
         #endregion
@@ -641,6 +465,7 @@ namespace Kokoro.Math
         /// <param name="result">The component-wise minimum</param>
         public static void ComponentMin(ref Vector2 a, ref Vector2 b, out Vector2 result)
         {
+            result = new Vector2();
             result.X = a.X < b.X ? a.X : b.X;
             result.Y = a.Y < b.Y ? a.Y : b.Y;
         }
@@ -670,6 +495,7 @@ namespace Kokoro.Math
         /// <param name="result">The component-wise maximum</param>
         public static void ComponentMax(ref Vector2 a, ref Vector2 b, out Vector2 result)
         {
+            result = new Vector2();
             result.X = a.X > b.X ? a.X : b.X;
             result.Y = a.Y > b.Y ? a.Y : b.Y;
         }
@@ -731,6 +557,7 @@ namespace Kokoro.Math
         /// <param name="result">The clamped vector</param>
         public static void Clamp(ref Vector2 vec, ref Vector2 min, ref Vector2 max, out Vector2 result)
         {
+            result = new Vector2();
             result.X = vec.X < min.X ? min.X : vec.X > max.X ? max.X : vec.X;
             result.Y = vec.Y < min.Y ? min.Y : vec.Y > max.Y ? max.Y : vec.Y;
         }
@@ -759,6 +586,7 @@ namespace Kokoro.Math
         /// <param name="result">The normalized vector</param>
         public static void Normalize(ref Vector2 vec, out Vector2 result)
         {
+            result = new Vector2();
             float scale = 1.0f / vec.Length;
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
@@ -788,6 +616,7 @@ namespace Kokoro.Math
         /// <param name="result">The normalized vector</param>
         public static void NormalizeFast(ref Vector2 vec, out Vector2 result)
         {
+            result = new Vector2();
             float scale = (float)MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y);
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
@@ -846,6 +675,7 @@ namespace Kokoro.Math
         /// <param name="result">a when blend=0, b when blend=1, and a linear combination otherwise</param>
         public static void Lerp(ref Vector2 a, ref Vector2 b, float blend, out Vector2 result)
         {
+            result = new Vector2();
             result.X = blend * (b.X - a.X) + a.X;
             result.Y = blend * (b.Y - a.Y) + a.Y;
         }
@@ -1094,6 +924,10 @@ namespace Kokoro.Math
 
         #endregion
 
+        public static implicit operator Vector2(System.Numerics.Vector2 v)
+        {
+            return new Vector2(v.X, v.Y);
+        }
 
         public static Vector2 Round(Vector2 a)
         {
@@ -1104,7 +938,7 @@ namespace Kokoro.Math
         {
             get
             {
-                switch(x)
+                switch (x)
                 {
                     case 0:
                         return X;

@@ -664,12 +664,14 @@ namespace Kokoro.Math
         }
         public void Transform(ref Vector3 vector, out Vector3 result)
         {
+            result = new Vector3();
             result.X = R0C0 * vector.X + R0C1 * vector.Y + R0C2 * vector.Z;
             result.Y = R1C0 * vector.X + R1C1 * vector.Y + R1C2 * vector.Z;
             result.Z = R2C0 * vector.X + R2C1 * vector.Y + R2C2 * vector.Z;
         }
         public static void Transform(ref Matrix3 matrix, ref Vector3 vector, out Vector3 result)
         {
+            result = new Vector3();
             result.X = matrix.R0C0 * vector.X + matrix.R0C1 * vector.Y + matrix.R0C2 * vector.Z;
             result.Y = matrix.R1C0 * vector.X + matrix.R1C1 * vector.Y + matrix.R1C2 * vector.Z;
             result.Z = matrix.R2C0 * vector.X + matrix.R2C1 * vector.Y + matrix.R2C2 * vector.Z;

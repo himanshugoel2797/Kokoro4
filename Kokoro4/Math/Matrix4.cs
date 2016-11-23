@@ -35,6 +35,8 @@ namespace Kokoro.Math
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix4 : IEquatable<Matrix4>
     {
+        //private System.Numerics.Matrix4x4 SIMD_Mat;
+
         #region Fields
 
         /// <summary>

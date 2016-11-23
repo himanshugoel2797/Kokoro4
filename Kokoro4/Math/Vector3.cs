@@ -39,21 +39,35 @@ namespace Kokoro.Math
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Fields
+        private System.Numerics.Vector3 SIMD_vec;
+
 
         /// <summary>
         /// The X component of the Vector3.
         /// </summary>
-        public float X;
+        public float X
+        {
+            get { return SIMD_vec.X; }
+            set { SIMD_vec.X = value; }
+        }
 
         /// <summary>
         /// The Y component of the Vector3.
         /// </summary>
-        public float Y;
+        public float Y
+        {
+            get { return SIMD_vec.Y; }
+            set { SIMD_vec.Y = value; }
+        }
 
         /// <summary>
         /// The Z component of the Vector3.
         /// </summary>
-        public float Z;
+        public float Z
+        {
+            get { return SIMD_vec.Z; }
+            set { SIMD_vec.Z = value; }
+        }
 
         #endregion
 
@@ -61,6 +75,7 @@ namespace Kokoro.Math
 
         public Vector3(string value)
         {
+            SIMD_vec = new System.Numerics.Vector3();
             value = value.Replace("{", "").Replace("}", "").Trim();
             string[] parts = value.Split(',');
 
@@ -75,6 +90,7 @@ namespace Kokoro.Math
         /// <param name="value">The value that will initialize this instance.</param>
         public Vector3(float value)
         {
+            SIMD_vec = new System.Numerics.Vector3();
             X = value;
             Y = value;
             Z = value;
@@ -88,6 +104,7 @@ namespace Kokoro.Math
         /// <param name="z">The z component of the Vector3.</param>
         public Vector3(float x, float y, float z)
         {
+            SIMD_vec = new System.Numerics.Vector3();
             X = x;
             Y = y;
             Z = z;
@@ -99,6 +116,7 @@ namespace Kokoro.Math
         /// <param name="v">The Vector2 to copy components from.</param>
         public Vector3(Vector2 v)
         {
+            SIMD_vec = new System.Numerics.Vector3();
             X = v.X;
             Y = v.Y;
             Z = 0.0f;
@@ -110,6 +128,7 @@ namespace Kokoro.Math
         /// <param name="v">The Vector3 to copy components from.</param>
         public Vector3(Vector3 v)
         {
+            SIMD_vec = new System.Numerics.Vector3();
             X = v.X;
             Y = v.Y;
             Z = v.Z;
@@ -121,6 +140,7 @@ namespace Kokoro.Math
         /// <param name="v">The Vector4 to copy components from.</param>
         public Vector3(Vector4 v)
         {
+            SIMD_vec = new System.Numerics.Vector3();
             X = v.X;
             Y = v.Y;
             Z = v.Z;
@@ -131,83 +151,6 @@ namespace Kokoro.Math
         #region Public Members
 
         #region Instance
-
-        #region public void Add()
-
-        /// <summary>Add the Vector passed as parameter to this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Add() method instead.")]
-        public void Add(Vector3 right)
-        {
-            this.X += right.X;
-            this.Y += right.Y;
-            this.Z += right.Z;
-        }
-
-        /// <summary>Add the Vector passed as parameter to this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Add() method instead.")]
-        public void Add(ref Vector3 right)
-        {
-            this.X += right.X;
-            this.Y += right.Y;
-            this.Z += right.Z;
-        }
-
-        #endregion public void Add()
-
-        #region public void Sub()
-
-        /// <summary>Subtract the Vector passed as parameter from this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Subtract() method instead.")]
-        public void Sub(Vector3 right)
-        {
-            this.X -= right.X;
-            this.Y -= right.Y;
-            this.Z -= right.Z;
-        }
-
-        /// <summary>Subtract the Vector passed as parameter from this instance.</summary>
-        /// <param name="right">Right operand. This parameter is only read from.</param>
-        [Obsolete("Use static Subtract() method instead.")]
-        public void Sub(ref Vector3 right)
-        {
-            this.X -= right.X;
-            this.Y -= right.Y;
-            this.Z -= right.Z;
-        }
-
-        #endregion public void Sub()
-
-        #region public void Mult()
-
-        /// <summary>Multiply this instance by a scalar.</summary>
-        /// <param name="f">Scalar operand.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Mult(float f)
-        {
-            this.X *= f;
-            this.Y *= f;
-            this.Z *= f;
-        }
-
-        #endregion public void Mult()
-
-        #region public void Div()
-
-        /// <summary>Divide this instance by a scalar.</summary>
-        /// <param name="f">Scalar operand.</param>
-        [Obsolete("Use static Divide() method instead.")]
-        public void Div(float f)
-        {
-            float mult = 1.0f / f;
-            this.X *= mult;
-            this.Y *= mult;
-            this.Z *= mult;
-        }
-
-        #endregion public void Div()
 
         #region public float Length
 
@@ -220,7 +163,7 @@ namespace Kokoro.Math
         {
             get
             {
-                return (float)System.Math.Sqrt(X * X + Y * Y + Z * Z);
+                return SIMD_vec.Length();
             }
         }
 
@@ -262,7 +205,7 @@ namespace Kokoro.Math
         {
             get
             {
-                return X * X + Y * Y + Z * Z;
+                return SIMD_vec.LengthSquared();
             }
         }
 
@@ -297,44 +240,6 @@ namespace Kokoro.Math
         }
 
         #endregion
-
-        #region public void Scale()
-
-        /// <summary>
-        /// Scales the current Vector3 by the given amounts.
-        /// </summary>
-        /// <param name="sx">The scale of the X component.</param>
-        /// <param name="sy">The scale of the Y component.</param>
-        /// <param name="sz">The scale of the Z component.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Scale(float sx, float sy, float sz)
-        {
-            this.X = X * sx;
-            this.Y = Y * sy;
-            this.Z = Z * sz;
-        }
-
-        /// <summary>Scales this instance by the given parameter.</summary>
-        /// <param name="scale">The scaling of the individual components.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Scale(Vector3 scale)
-        {
-            this.X *= scale.X;
-            this.Y *= scale.Y;
-            this.Z *= scale.Z;
-        }
-
-        /// <summary>Scales this instance by the given parameter.</summary>
-        /// <param name="scale">The scaling of the individual components.</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public void Scale(ref Vector3 scale)
-        {
-            this.X *= scale.X;
-            this.Y *= scale.Y;
-            this.Z *= scale.Z;
-        }
-
-        #endregion public void Scale()
 
         #endregion
 
@@ -373,112 +278,7 @@ namespace Kokoro.Math
         public static readonly int SizeInBytes = Marshal.SizeOf(new Vector3());
 
         #endregion
-
-        #region Obsolete
-
-        #region Sub
-
-        /// <summary>
-        /// Subtract one Vector from another
-        /// </summary>
-        /// <param name="a">First operand</param>
-        /// <param name="b">Second operand</param>
-        /// <returns>Result of subtraction</returns>
-        [Obsolete("Use static Subtract() method instead.")]
-        public static Vector3 Sub(Vector3 a, Vector3 b)
-        {
-            a.X -= b.X;
-            a.Y -= b.Y;
-            a.Z -= b.Z;
-            return a;
-        }
-
-        /// <summary>
-        /// Subtract one Vector from another
-        /// </summary>
-        /// <param name="a">First operand</param>
-        /// <param name="b">Second operand</param>
-        /// <param name="result">Result of subtraction</param>
-        [Obsolete("Use static Subtract() method instead.")]
-        public static void Sub(ref Vector3 a, ref Vector3 b, out Vector3 result)
-        {
-            result.X = a.X - b.X;
-            result.Y = a.Y - b.Y;
-            result.Z = a.Z - b.Z;
-        }
-
-        #endregion
-
-        #region Mult
-
-        /// <summary>
-        /// Multiply a vector and a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <returns>Result of the multiplication</returns>
-        [Obsolete("Use static Multiply() method instead.")]
-        public static Vector3 Mult(Vector3 a, float f)
-        {
-            a.X *= f;
-            a.Y *= f;
-            a.Z *= f;
-            return a;
-        }
-
-        /// <summary>
-        /// Multiply a vector and a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <param name="result">Result of the multiplication</param>
-        [Obsolete("Use static Multiply() method instead.")]
-        public static void Mult(ref Vector3 a, float f, out Vector3 result)
-        {
-            result.X = a.X * f;
-            result.Y = a.Y * f;
-            result.Z = a.Z * f;
-        }
-
-        #endregion
-
-        #region Div
-
-        /// <summary>
-        /// Divide a vector by a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <returns>Result of the division</returns>
-        [Obsolete("Use static Divide() method instead.")]
-        public static Vector3 Div(Vector3 a, float f)
-        {
-            float mult = 1.0f / f;
-            a.X *= mult;
-            a.Y *= mult;
-            a.Z *= mult;
-            return a;
-        }
-
-        /// <summary>
-        /// Divide a vector by a scalar
-        /// </summary>
-        /// <param name="a">Vector operand</param>
-        /// <param name="f">Scalar operand</param>
-        /// <param name="result">Result of the division</param>
-        [Obsolete("Use static Divide() method instead.")]
-        public static void Div(ref Vector3 a, float f, out Vector3 result)
-        {
-            float mult = 1.0f / f;
-            result.X = a.X * mult;
-            result.Y = a.Y * mult;
-            result.Z = a.Z * mult;
-        }
-
-        #endregion
-
-        #endregion
-
+        
         #region Converters
         public static Vector3 FromSpherical(Vector3 SphericalCoord)
         {
@@ -520,7 +320,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of operation.</param>
         public static void Add(ref Vector3 a, ref Vector3 b, out Vector3 result)
         {
-            result = new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+            result = a.SIMD_vec + b.SIMD_vec;
         }
 
         #endregion
@@ -547,7 +347,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of subtraction</param>
         public static void Subtract(ref Vector3 a, ref Vector3 b, out Vector3 result)
         {
-            result = new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+            result = a.SIMD_vec - b.SIMD_vec;
         }
 
         #endregion
@@ -574,7 +374,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of the operation.</param>
         public static void Multiply(ref Vector3 vector, float scale, out Vector3 result)
         {
-            result = new Vector3(vector.X * scale, vector.Y * scale, vector.Z * scale);
+            result = vector.SIMD_vec * scale;
         }
 
         /// <summary>
@@ -597,7 +397,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of the operation.</param>
         public static void Multiply(ref Vector3 vector, ref Vector3 scale, out Vector3 result)
         {
-            result = new Vector3(vector.X * scale.X, vector.Y * scale.Y, vector.Z * scale.Z);
+            result = vector.SIMD_vec * scale.SIMD_vec;
         }
 
         #endregion
@@ -647,7 +447,7 @@ namespace Kokoro.Math
         /// <param name="result">Result of the operation.</param>
         public static void Divide(ref Vector3 vector, ref Vector3 scale, out Vector3 result)
         {
-            result = new Vector3(vector.X / scale.X, vector.Y / scale.Y, vector.Z / scale.Z);
+            result = vector.SIMD_vec / scale.SIMD_vec;
         }
 
         #endregion
@@ -676,6 +476,7 @@ namespace Kokoro.Math
         /// <param name="result">The component-wise minimum</param>
         public static void ComponentMin(ref Vector3 a, ref Vector3 b, out Vector3 result)
         {
+            result = new Vector3();
             result.X = a.X < b.X ? a.X : b.X;
             result.Y = a.Y < b.Y ? a.Y : b.Y;
             result.Z = a.Z < b.Z ? a.Z : b.Z;
@@ -707,6 +508,7 @@ namespace Kokoro.Math
         /// <param name="result">The component-wise maximum</param>
         public static void ComponentMax(ref Vector3 a, ref Vector3 b, out Vector3 result)
         {
+            result = new Vector3();
             result.X = a.X > b.X ? a.X : b.X;
             result.Y = a.Y > b.Y ? a.Y : b.Y;
             result.Z = a.Z > b.Z ? a.Z : b.Z;
@@ -770,6 +572,7 @@ namespace Kokoro.Math
         /// <param name="result">The clamped vector</param>
         public static void Clamp(ref Vector3 vec, ref Vector3 min, ref Vector3 max, out Vector3 result)
         {
+            result = new Vector3();
             result.X = vec.X < min.X ? min.X : vec.X > max.X ? max.X : vec.X;
             result.Y = vec.Y < min.Y ? min.Y : vec.Y > max.Y ? max.Y : vec.Y;
             result.Z = vec.Z < min.Z ? min.Z : vec.Z > max.Z ? max.Z : vec.Z;
@@ -800,6 +603,7 @@ namespace Kokoro.Math
         /// <param name="result">The normalized vector</param>
         public static void Normalize(ref Vector3 vec, out Vector3 result)
         {
+            result = new Vector3();
             float scale = 1.0f / vec.Length;
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
@@ -831,6 +635,7 @@ namespace Kokoro.Math
         /// <param name="result">The normalized vector</param>
         public static void NormalizeFast(ref Vector3 vec, out Vector3 result)
         {
+            result = new Vector3();
             float scale = (float)MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z);
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
@@ -849,7 +654,7 @@ namespace Kokoro.Math
         /// <returns>The dot product of the two inputs</returns>
         public static float Dot(Vector3 left, Vector3 right)
         {
-            return left.X * right.X + left.Y * right.Y + left.Z * right.Z;
+            return System.Numerics.Vector3.Dot(left.SIMD_vec, right.SIMD_vec);
         }
 
         /// <summary>
@@ -860,7 +665,7 @@ namespace Kokoro.Math
         /// <param name="result">The dot product of the two inputs</param>
         public static void Dot(ref Vector3 left, ref Vector3 right, out float result)
         {
-            result = left.X * right.X + left.Y * right.Y + left.Z * right.Z;
+            result = Dot(left, right);
         }
 
         #endregion
@@ -889,9 +694,7 @@ namespace Kokoro.Math
         /// <param name="result">The cross product of the two inputs</param>
         public static void Cross(ref Vector3 left, ref Vector3 right, out Vector3 result)
         {
-            result = new Vector3(left.Y * right.Z - left.Z * right.Y,
-                left.Z * right.X - left.X * right.Z,
-                left.X * right.Y - left.Y * right.X);
+            result = System.Numerics.Vector3.Cross(left.SIMD_vec, right.SIMD_vec);
         }
 
         #endregion
@@ -922,6 +725,7 @@ namespace Kokoro.Math
         /// <param name="result">a when blend=0, b when blend=1, and a linear combination otherwise</param>
         public static void Lerp(ref Vector3 a, ref Vector3 b, float blend, out Vector3 result)
         {
+            result = new Vector3();
             result.X = blend * (b.X - a.X) + a.X;
             result.Y = blend * (b.Y - a.Y) + a.Y;
             result.Z = blend * (b.Z - a.Z) + a.Z;
@@ -979,10 +783,10 @@ namespace Kokoro.Math
         /// <returns>The transformed vector</returns>
         public static Vector3 TransformVector(Vector3 vec, Matrix4 mat)
         {
-            Vector3 v;
-            v.X = Vector3.Dot(vec, new Vector3(mat.Column0));
-            v.Y = Vector3.Dot(vec, new Vector3(mat.Column1));
-            v.Z = Vector3.Dot(vec, new Vector3(mat.Column2));
+            Vector3 v = new Vector3();
+            v.X = System.Numerics.Vector3.Dot(vec.SIMD_vec, new Vector3(mat.Column0).SIMD_vec);
+            v.Y = System.Numerics.Vector3.Dot(vec.SIMD_vec, new Vector3(mat.Column1).SIMD_vec);
+            v.Z = System.Numerics.Vector3.Dot(vec.SIMD_vec, new Vector3(mat.Column2).SIMD_vec);
             return v;
         }
 
@@ -994,6 +798,7 @@ namespace Kokoro.Math
         /// <param name="result">The transformed vector</param>
         public static void TransformVector(ref Vector3 vec, ref Matrix4 mat, out Vector3 result)
         {
+            result = new Vector3();
             result.X = vec.X * mat.Row0.X +
                        vec.Y * mat.Row1.X +
                        vec.Z * mat.Row2.X;
@@ -1045,10 +850,10 @@ namespace Kokoro.Math
         /// <returns>The transformed normal</returns>
         public static Vector3 TransformNormalInverse(Vector3 norm, Matrix4 invMat)
         {
-            Vector3 n;
-            n.X = Vector3.Dot(norm, new Vector3(invMat.Row0));
-            n.Y = Vector3.Dot(norm, new Vector3(invMat.Row1));
-            n.Z = Vector3.Dot(norm, new Vector3(invMat.Row2));
+            Vector3 n = new Vector3();
+            n.X = System.Numerics.Vector3.Dot(norm.SIMD_vec, new Vector3(invMat.Row0).SIMD_vec);
+            n.Y = System.Numerics.Vector3.Dot(norm.SIMD_vec, new Vector3(invMat.Row1).SIMD_vec);
+            n.Z = System.Numerics.Vector3.Dot(norm.SIMD_vec, new Vector3(invMat.Row2).SIMD_vec);
             return n;
         }
 
@@ -1062,6 +867,7 @@ namespace Kokoro.Math
         /// <param name="result">The transformed normal</param>
         public static void TransformNormalInverse(ref Vector3 norm, ref Matrix4 invMat, out Vector3 result)
         {
+            result = new Vector3();
             result.X = norm.X * invMat.Row0.X +
                        norm.Y * invMat.Row0.Y +
                        norm.Z * invMat.Row0.Z;
@@ -1081,10 +887,10 @@ namespace Kokoro.Math
         /// <returns>The transformed position</returns>
         public static Vector3 TransformPosition(Vector3 pos, Matrix4 mat)
         {
-            Vector3 p;
-            p.X = Vector3.Dot(pos, new Vector3(mat.Column0)) + mat.Row3.X;
-            p.Y = Vector3.Dot(pos, new Vector3(mat.Column1)) + mat.Row3.Y;
-            p.Z = Vector3.Dot(pos, new Vector3(mat.Column2)) + mat.Row3.Z;
+            Vector3 p = new Vector3();
+            p.X = System.Numerics.Vector3.Dot(pos.SIMD_vec, new Vector3(mat.Column0).SIMD_vec) + mat.Row3.X;
+            p.Y = System.Numerics.Vector3.Dot(pos.SIMD_vec, new Vector3(mat.Column1).SIMD_vec) + mat.Row3.Y;
+            p.Z = System.Numerics.Vector3.Dot(pos.SIMD_vec, new Vector3(mat.Column2).SIMD_vec) + mat.Row3.Z;
             return p;
         }
 
@@ -1094,6 +900,7 @@ namespace Kokoro.Math
         /// <param name="result">The transformed position</param>
         public static void TransformPosition(ref Vector3 pos, ref Matrix4 mat, out Vector3 result)
         {
+            result = new Vector3();
             result.X = pos.X * mat.Row0.X +
                        pos.Y * mat.Row1.X +
                        pos.Z * mat.Row2.X +
@@ -1191,6 +998,7 @@ namespace Kokoro.Math
         /// <param name="result">The transformed vector</param>
         public static void TransformPerspective(ref Vector3 vec, ref Matrix4 mat, out Vector3 result)
         {
+            result = new Vector3();
             Vector4 v = new Vector4(vec, 1);
             Vector4.Transform(ref v, ref mat, out v);
             result.X = v.X / v.W;
@@ -1422,6 +1230,11 @@ namespace Kokoro.Math
         }
 
         #endregion
+
+        public static implicit operator Vector3(System.Numerics.Vector3 v)
+        {
+            return new Vector3(v.X, v.Y, v.Z);
+        }
 
         public static Vector3 Round(Vector3 a)
         {

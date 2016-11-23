@@ -455,11 +455,13 @@ namespace Kokoro.Math
         }
         public void Transform(ref Vector2 vector, out Vector2 result)
         {
+            result = new Vector2();
             result.X = R0C0 * vector.X + R0C1 * vector.Y;
             result.Y = R1C0 * vector.X + R1C1 * vector.Y;
         }
         public static void Transform(ref Matrix2 matrix, ref Vector2 vector, out Vector2 result)
         {
+            result = new Vector2();
             result.X = matrix.R0C0 * vector.X + matrix.R0C1 * vector.Y;
             result.Y = matrix.R1C0 * vector.X + matrix.R1C1 * vector.Y;
         }
