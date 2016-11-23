@@ -1,4 +1,5 @@
-﻿using Kokoro.Math;
+﻿using Kokoro.Graphics.Prefabs;
+using Kokoro.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace Kokoro.Engine.Voxel
     {
         public static Mesh Voxelize(MeshGroup grp, VoxelOctree octree, double x, double y, double z, uint adj_mask0)
         {
+            Mesh cube = CubeFactory.Create(grp);
+
             #region Voxelization routine
             Action<VoxelOctree, double, double, double, uint> build_mesh = null;
             build_mesh = (a, x_c, y_c, z_c, adj_mask) =>

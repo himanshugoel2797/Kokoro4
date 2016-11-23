@@ -18,14 +18,21 @@ namespace Kokoro.Engine.Graphics
     {
         public struct DrawData
         {
-            public Mesh[] Meshes;
+            public MeshData[] Meshes;
             public RenderState State;
+        }
+
+        public struct MeshData
+        {
+            public Mesh Mesh;
+            public int InstanceCount;
+            public int BaseInstance;
         }
 
         private class Bucket
         {
             public RenderState State;
-            public List<Mesh> meshes;
+            public List<MeshData> meshes;
             public uint offset;
         }
 
@@ -80,7 +87,7 @@ namespace Kokoro.Engine.Graphics
             //Group the meshes by state changes and mesh groups
             for (int i = 0; i < draw.Meshes.Length; i++)
             {
-                var meshGrp = draw.Meshes[i].Parent;
+                var meshGrp = draw.Meshes[i].Mesh.Parent;
                 var renderState = draw.State;
                 var tuple_RndrState_meshGrp = new Tuple<MeshGroup, RenderState>(meshGrp, renderState);
 
@@ -91,7 +98,7 @@ namespace Kokoro.Engine.Graphics
                     buckets[tuple_RndrState_meshGrp] = new Bucket()
                     {
                         State = renderState,
-                        meshes = new List<Mesh>()
+                        meshes = new List<MeshData>()
                     };
 
                     if (!RenderStates.Contains(renderState)) RenderStates.Add(renderState);
@@ -141,11 +148,11 @@ namespace Kokoro.Engine.Graphics
                     {
                         var mesh = bkt.meshes[j];
 
-                        data_ui[(j * 5) + 1] = (uint)mesh.IndexCount;   //count
-                        data_ui[(j * 5) + 2] = 1;   //instanceCount
-                        data_ui[(j * 5) + 3] = (uint)mesh.StartOffset;   //first
-                        data_ui[(j * 5) + 4] = (uint)mesh.StartOffset;   //baseVertex
-                        data_ui[(j * 5) + 5] = 0;   //baseInstance
+                        data_ui[(j * 5) + 1] = (uint)mesh.Mesh.IndexCount;   //count
+                        data_ui[(j * 5) + 2] = (uint)mesh.InstanceCount;   //instanceCount
+                        data_ui[(j * 5) + 3] = (uint)mesh.Mesh.StartOffset;   //first
+                        data_ui[(j * 5) + 4] = (uint)mesh.Mesh.StartOffset;   //baseVertex
+                        data_ui[(j * 5) + 5] = (uint)mesh.BaseInstance;   //baseInstance
                     }
 
                     //Move the data pointer forward
@@ -177,7 +184,7 @@ namespace Kokoro.Engine.Graphics
                     var bkt = buckets[new Tuple<MeshGroup, RenderState>(MeshGroups[RenderStates[i]][j], RenderStates[i])];
 
                     EngineManager.SetRenderState(bkt.State);
-                    EngineManager.SetCurrentMeshGroup(bkt.meshes[0].Parent);
+                    EngineManager.SetCurrentMeshGroup(bkt.meshes[0].Mesh.Parent);
 
                     GraphicsDevice.SetMultiDrawParameterBuffer(multiDrawParams);
                     GraphicsDevice.SetParameterBuffer(multiDrawParams);

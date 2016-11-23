@@ -101,18 +101,22 @@ namespace Kokoro.Engine.Voxel
                 return;
 
             VoxelColor[] cols = new VoxelColor[Children.Length];
-            bool hasNull = false;
+
             bool hasChildren = false;
+            bool hasNull = false;
+            bool childHasChildren = false;
 
             for (int i = 0; i < Children.Length; i++)
             {
                 if (Children[i] != null)
                 {
+                    hasChildren = true;
+
                     Children[i].Optimize();
                     cols[i] = Children[i].Color;
 
                     if (Children[i].Children != null)
-                        hasChildren = true;
+                        childHasChildren = true;
                 }
                 else
                 {
@@ -128,7 +132,10 @@ namespace Kokoro.Engine.Voxel
             Color = VoxelColor.Average(cols);
 
             //If all the colors are the same, collapse the children
-            if (cols.Length == 1 && cols[0] == Color && !hasNull && !hasChildren)
+            if (cols.Length == 1 && cols[0] == Color && !hasNull && !childHasChildren)
+                Children = null;
+
+            if (!hasChildren)
                 Children = null;
 
         }

@@ -17,7 +17,7 @@ namespace TestApplication
         bool inited = false;
         MeshGroup grp;
         Mesh fsq;
-        Mesh[] meshes;
+        RenderQueue.MeshData[] meshes;
         RenderState state, fsq_state;
         RenderQueue queue, fsq_queue;
         TextureHandle handle;
@@ -46,35 +46,98 @@ namespace TestApplication
             //Perform render
             int side = 1 << 8;
 
-            int lim = 120;
+            int lim = 100;
 
             if (!inited)
             {
                 gbuf = new GBuffer(1920, 1080);
-                grp = new MeshGroup(3 * 11000, 3 * 11000);
+                grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 3 * 11000, 3 * 11000);
                 fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create(grp);
                 camera = new FirstPersonCamera(Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
-                
+
                 //mesh = new Mesh(grp, 25000, 25000, "car_0A.k4_stmesh");
 
                 EngineManager.AddCamera(camera);
                 EngineManager.SetVisibleCamera(camera.Name);
 
-                List<Mesh> meshList = new List<Mesh>();
+                List<RenderQueue.MeshData> meshList = new List<RenderQueue.MeshData>();
                 List<Matrix4> transforms = new List<Matrix4>();
 
                 octree = new VoxelOctree(0, 1 << 10);
-
+                
                 for (int k = 0; k <= side; k++)
                     for (int j = 0; j <= side; j++)
                         for (int i = 0; i <= side; i++)
                         {
-                            if ((i - side / 2 >= lim | j - side / 2 >= lim | k - side / 2 >= lim) || ( i - side / 2 < -lim | j - side / 2 < -lim | k - side / 2 < -lim))
+                            if ((i - side / 2 >= lim | j - side / 2 >= lim | k - side / 2 >= lim) || (i - side / 2 < -lim | j - side / 2 < -lim | k - side / 2 < -lim))
                                 octree.Add(new VoxelColor() { R = 255, G = 0, B = 255, A = 255 }, i - side / 2, j - side / 2, k - side / 2, 1);
                         }
 
                 octree.Optimize();
+
+                //Free up the memory from the octree before proceeding
+                GC.Collect(GC.GetGeneration(octree), GCCollectionMode.Optimized, false);
+
+                Mesh cube = Kokoro.Graphics.Prefabs.CubeFactory.Create(grp);
+                int inst_cnt = 0;
+
+                int maxLevel = 6;
+
+                #region Voxelization routine
+                Action<VoxelOctree, double, double, double, uint> build_mesh = null;
+                build_mesh = (a, x_c, y_c, z_c, adj_mask) =>
+                {
+                    if (a.Children == null | a.Level == maxLevel)
+                    {
+                        if (a.Color.A == 0) return;
+
+                        float obj_side = (a.Data.WorldSide >> (a.Level + 2));
+
+                        //Make this actually generate the geometry based on the adjacency mask
+                        inst_cnt++;
+                        transforms.Add(Matrix4.Scale(a.Data.WorldSide >> a.Level) * Matrix4.CreateTranslation((float)(x_c - obj_side), (float)(y_c - obj_side), (float)(z_c - obj_side)));
+                        return;
+                    }
+
+                    for (int i = 0; i < a.Children.Length; i++)
+                    {
+                        VoxelOctree child = a.Children[i];
+
+
+                        if (child == null)
+                        {
+                            long x_side = ((i & 1) == 1 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> (a.Level + 2));
+                            long y_side = ((i & 2) == 2 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> (a.Level + 2));
+                            long z_side = ((i & 4) == 4 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> (a.Level + 2));
+
+                            //These voxels are not visible
+                            //meshList.Add(cube);
+                            //transforms.Add(Matrix4.Scale(a.Data.WorldSide >> (a.Level + 1)) * Matrix4.CreateTranslation((float)(x_c + x_side), (float)(y_c + y_side), (float)(z_c + z_side)));
+                        }
+                        else
+                        {
+                            double x_side = ((i & 1) == 1 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
+                            double y_side = ((i & 2) == 2 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
+                            double z_side = ((i & 4) == 4 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
+
+                            x_side /= 4;
+                            y_side /= 4;
+                            z_side /= 4;
+
+                            //Depending on the location, we will depend on the adjacency data passed down
+                            //Actually, adjacency data will not work, we do not have enough high resolution data
+
+                            //TODO calculate adjacency mask for the child and pass it down in the last parameter
+                            build_mesh(child, x_c + x_side, y_c + y_side, z_c + z_side, 0);
+                        }
+                    }
+                };
+                #endregion
+
+                build_mesh(octree, 0, 0, 0, 0);
+
+                meshList.Add(new RenderQueue.MeshData() { Mesh = cube, InstanceCount = inst_cnt, BaseInstance = 0 });
                 meshes = meshList.ToArray();
 
 
@@ -115,7 +178,7 @@ namespace TestApplication
                 fsq_queue = new RenderQueue(1);
                 fsq_queue.ClearAndBeginRecording();
                 fsq_queue.ClearFramebufferBeforeSubmit = true;
-                fsq_queue.RecordDraw(new RenderQueue.DrawData() { Meshes = new Mesh[] { fsq }, State = fsq_state });
+                fsq_queue.RecordDraw(new RenderQueue.DrawData() { Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { Mesh = fsq, BaseInstance = 0, InstanceCount = 1 }}, State = fsq_state });
                 fsq_queue.EndRecording();
 
                 inited = true;
