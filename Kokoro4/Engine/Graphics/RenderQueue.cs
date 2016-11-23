@@ -35,18 +35,24 @@ namespace Kokoro.Engine.Graphics
 
         private ShaderStorageBuffer multiDrawParams;
         private bool isRecording = false;
+        private int maxDrawCount = 0;
 
         private const int EntrySize = 0;
 
         public bool ClearFramebufferBeforeSubmit { get; set; } = false;
 
-        public RenderQueue()
+        public RenderQueue(int MaxDrawCount)
         {
             buckets = new Dictionary<Tuple<MeshGroup, RenderState>, Bucket>();
             RenderStates = new List<RenderState>();
             MeshGroups = new Dictionary<RenderState, List<MeshGroup>>();
 
-            multiDrawParams = new ShaderStorageBuffer(16384);
+
+            if (MaxDrawCount < 4096)
+                MaxDrawCount = 4096;
+
+            maxDrawCount = MaxDrawCount;
+            multiDrawParams = new ShaderStorageBuffer(MaxDrawCount * 5 * sizeof(uint));
         }
 
         public void ClearAndBeginRecording()
@@ -176,7 +182,7 @@ namespace Kokoro.Engine.Graphics
                     GraphicsDevice.SetMultiDrawParameterBuffer(multiDrawParams);
                     GraphicsDevice.SetParameterBuffer(multiDrawParams);
 
-                    GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, bkt.offset + sizeof(uint), bkt.offset, true);
+                    GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, bkt.offset + sizeof(uint), bkt.offset, maxDrawCount, true);
                 }
             }
         }

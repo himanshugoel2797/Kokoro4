@@ -16,42 +16,42 @@ namespace Kokoro.Engine.Cameras
     public class FirstPersonCamera : Camera
     {//TODO setup collisions
 
-        public Vector3d Direction;
-        public Vector3d Up;
+        public Vector3 Direction;
+        public Vector3 Up;
 
         float leftrightRot = MathHelper.PiOver2;
         float updownRot = -MathHelper.Pi / 10.0f;
         public float rotationSpeed = 200f;
         public float moveSpeed = 50000f;
         Vector2 mousePos;
-        Vector3d cameraRotatedUpVector;
+        Vector3 cameraRotatedUpVector;
 
         /// <summary>
         /// Create a new First Person Camera
         /// </summary>
         /// <param name="Position">The Position of the Camera</param>
         /// <param name="Direction">The Direction the Camera initially faces</param>
-        public FirstPersonCamera(Vector3d Position, Vector3d Direction, string name) : base(name)
+        public FirstPersonCamera(Vector3 Position, Vector3 Direction, string name) : base(name)
         {
             this.Position = Position;
             this.Direction = Direction;
-            View = Matrix4d.LookAt(Position, Position + Direction, Vector3d.UnitZ);
-            this.Up = Vector3d.UnitZ;
+            View = Matrix4.LookAt(Position, Position + Direction, Vector3.UnitZ);
+            this.Up = Vector3.UnitZ;
         }
 
-        private Matrix4d UpdateViewMatrix()
+        private Matrix4 UpdateViewMatrix()
         {
-            Matrix4d cameraRotation = Matrix4d.CreateRotationX(updownRot) * Matrix4d.CreateRotationY(leftrightRot);
+            Matrix4 cameraRotation = Matrix4.CreateRotationX(updownRot) * Matrix4.CreateRotationY(leftrightRot);
 
-            Vector3d cameraOriginalTarget = new Vector3d(0, 0, -1);
-            Vector3d cameraOriginalUpVector = new Vector3d(0, 1, 0);
+            Vector3 cameraOriginalTarget = new Vector3(0, 0, -1);
+            Vector3 cameraOriginalUpVector = new Vector3(0, 1, 0);
 
-            Direction = Vector3d.Transform(cameraOriginalTarget, cameraRotation);
-            Vector3d cameraFinalTarget = Position + Direction;
+            Direction = Vector3.Transform(cameraOriginalTarget, cameraRotation);
+            Vector3 cameraFinalTarget = Position + Direction;
 
-            cameraRotatedUpVector = Vector3d.Transform(cameraOriginalUpVector, cameraRotation);
+            cameraRotatedUpVector = Vector3.Transform(cameraOriginalUpVector, cameraRotation);
 
-            return Matrix4d.LookAt(Position, cameraFinalTarget, cameraRotatedUpVector);
+            return Matrix4.LookAt(Position, cameraFinalTarget, cameraRotatedUpVector);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Kokoro.Engine.Cameras
                 mousePos = Mouse.MousePos;
             }
             UpdateViewMatrix();
-            Vector3d Right = Vector3d.Cross(cameraRotatedUpVector, Direction);
+            Vector3 Right = Vector3.Cross(cameraRotatedUpVector, Direction);
 
             if (Keyboard.IsKeyPressed(Key.Up))
             {
@@ -112,7 +112,7 @@ namespace Kokoro.Engine.Cameras
             }
 #endif
             //View = UpdateViewMatrix();
-            View = Matrix4d.LookAt(Position, Position + Direction, cameraRotatedUpVector);
+            View = Matrix4.LookAt(Position, Position + Direction, cameraRotatedUpVector);
             base.Update(interval);
         }
     }

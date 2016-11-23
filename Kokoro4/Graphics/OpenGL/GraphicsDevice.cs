@@ -567,12 +567,12 @@ namespace Kokoro.Graphics.OpenGL
                 GL.MultiDrawArraysIndirect((OpenTK.Graphics.OpenGL.PrimitiveType)type, (IntPtr)byteOffset, count, 0);
         }
 
-        public static void MultiDrawIndirectCount(Engine.Graphics.PrimitiveType type, uint byteOffset, uint countOffset, bool indexed)
+        public static void MultiDrawIndirectCount(Engine.Graphics.PrimitiveType type, uint byteOffset, uint countOffset, int maxCount, bool indexed)
         {
             if (indexed)
-                GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, (IntPtr)byteOffset, (IntPtr)countOffset, 4096, 0);
+                GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, (IntPtr)byteOffset, (IntPtr)countOffset, maxCount, 0);
             else
-                GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, (IntPtr)byteOffset, (IntPtr)countOffset, 4096, 5 * sizeof(int) /*Each entry is formatted as index data, so work accordingly*/);
+                GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, (IntPtr)byteOffset, (IntPtr)countOffset, maxCount, 5 * sizeof(int) /*Each entry is formatted as index data, so work accordingly*/);
         }
         #endregion
 

@@ -26,8 +26,8 @@ namespace Kokoro.Engine
         public static StateManager StateManager { get; private set; }
         public static MeshGroup CurrentMeshGroup { get; private set; }
 
-        public static Matrix4d View { get { if (VisibleCamera == null) return Matrix4d.Identity; return VisibleCamera.View; } }
-        public static Matrix4d Projection { get { if (VisibleCamera == null) return Matrix4d.Identity; return VisibleCamera.Projection; } }
+        public static Matrix4 View { get { if (VisibleCamera == null) return Matrix4.Identity; return VisibleCamera.View; } }
+        public static Matrix4 Projection { get { if (VisibleCamera == null) return Matrix4.Identity; return VisibleCamera.Projection; } }
         public static Camera VisibleCamera { get; private set; }
 
         public static string Name { get { return GraphicsDevice.Name; } set { GraphicsDevice.Name = value; } }

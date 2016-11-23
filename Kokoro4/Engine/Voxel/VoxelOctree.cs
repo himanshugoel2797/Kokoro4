@@ -55,8 +55,14 @@ namespace Kokoro.Engine.Voxel
         Z
     }
 
+    public class VoxelOctreeData
+    {
+        public long WorldSide;
+    }
+
     public class VoxelOctree
     {
+
         //Color of node
         public VoxelColor Color { get; set; } = VoxelColor.Zero;
 
@@ -65,18 +71,27 @@ namespace Kokoro.Engine.Voxel
 
         public VoxelOctree Parent { get; private set; }
 
-        //Current octree level
-        public long Level { get; set; }
+        public VoxelOctreeData Data { get; private set; }
 
-        //Current voxel side
-        public long Side { get; set; }
+        //Current octree level
+        public int Level { get; set; }
 
         public const int ChildrenCount = 8;
 
-        public VoxelOctree(long lvl, long side)
+        public VoxelOctree(int lvl, long side)
+        {
+            Data = new VoxelOctreeData()
+            {
+                WorldSide = side
+            };
+
+            Level = lvl;
+        }
+
+        private VoxelOctree(int lvl, VoxelOctreeData data)
         {
             Level = lvl;
-            Side = side;
+            Data = data;
         }
 
         //Optimize tree by checking children if they're all set and all the same color
@@ -86,6 +101,8 @@ namespace Kokoro.Engine.Voxel
                 return;
 
             VoxelColor[] cols = new VoxelColor[Children.Length];
+            bool hasNull = false;
+            bool hasChildren = false;
 
             for (int i = 0; i < Children.Length; i++)
             {
@@ -93,9 +110,13 @@ namespace Kokoro.Engine.Voxel
                 {
                     Children[i].Optimize();
                     cols[i] = Children[i].Color;
+
+                    if (Children[i].Children != null)
+                        hasChildren = true;
                 }
                 else
                 {
+                    hasNull = true;
                     cols[i] = VoxelColor.Zero;
                 }
             }
@@ -107,7 +128,7 @@ namespace Kokoro.Engine.Voxel
             Color = VoxelColor.Average(cols);
 
             //If all the colors are the same, collapse the children
-            if (cols.Length == 1 & cols[0] == Color)
+            if (cols.Length == 1 && cols[0] == Color && !hasNull && !hasChildren)
                 Children = null;
 
         }
@@ -125,7 +146,7 @@ namespace Kokoro.Engine.Voxel
         private void Add(VoxelColor color, long X, long Y, long Z, long x_c, long y_c, long z_c, long side)
         {
             //If the side matches the side of this voxel, set the color and fill the entire voxel
-            if (side == Side)
+            if (side == Data.WorldSide >> Level)
             {
                 Color = color;
                 Children = null;  //drop all the children to mark them as free
@@ -143,7 +164,7 @@ namespace Kokoro.Engine.Voxel
 
             if (Children[idx] == null)
             {
-                Children[idx] = new VoxelOctree(Level + 1, Side / 2)
+                Children[idx] = new VoxelOctree(Level + 1, Data)
                 {
                     Color = color,
                     Children = null,
@@ -151,9 +172,9 @@ namespace Kokoro.Engine.Voxel
                 };
             }
 
-            long x_side = ((X >= x_c) ? 1 : -1) * Side / 4;
-            long y_side = ((Y >= y_c) ? 1 : -1) * Side / 4;
-            long z_side = ((Z >= z_c) ? 1 : -1) * Side / 4;
+            long x_side = ((X >= x_c) ? 1 : -1) * Data.WorldSide >> (Level + 2);
+            long y_side = ((Y >= y_c) ? 1 : -1) * Data.WorldSide >> (Level + 2);
+            long z_side = ((Z >= z_c) ? 1 : -1) * Data.WorldSide >> (Level + 2);
 
             Children[idx].Add(color, X, Y, Z, x_c + x_side, y_c + y_side, z_c + z_side, side);
         }
@@ -161,7 +182,7 @@ namespace Kokoro.Engine.Voxel
         //Add a voxel, specify a side length and a location
         public void Add(VoxelColor color, long X, long Y, long Z, long side)
         {
-            if (Math.MathHelper.IsLog2((ulong)side))
+            if (!Math.MathHelper.IsLog2((ulong)side))
                 throw new ArgumentException("side must be a power of 2");
 
             if (X % side != 0)

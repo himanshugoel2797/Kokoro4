@@ -19,6 +19,7 @@ namespace Kokoro.Graphics.OpenGL
             boundBuffers = new Dictionary<BufferTarget, List<Stack<int>>>();
             boundBuffers[BufferTarget.TransformFeedbackBuffer] = new List<Stack<int>>();
             boundBuffers[BufferTarget.UniformBuffer] = new List<Stack<int>>();
+            boundBuffers[BufferTarget.ShaderStorageBuffer] = new List<Stack<int>>();
 
             for (int i = 0; i < 8; i++)
             {
@@ -27,6 +28,9 @@ namespace Kokoro.Graphics.OpenGL
 
                 boundBuffers[BufferTarget.UniformBuffer].Add(new Stack<int>());
                 boundBuffers[BufferTarget.UniformBuffer][i].Push(0);
+
+                boundBuffers[BufferTarget.ShaderStorageBuffer].Add(new Stack<int>());
+                boundBuffers[BufferTarget.ShaderStorageBuffer][i].Push(0);
             }
 
             boundBuffers[BufferTarget.ArrayBuffer] = new List<Stack<int>>();
@@ -40,10 +44,6 @@ namespace Kokoro.Graphics.OpenGL
             boundBuffers[BufferTarget.ElementArrayBuffer] = new List<Stack<int>>();
             boundBuffers[BufferTarget.ElementArrayBuffer].Add(new Stack<int>());
             boundBuffers[BufferTarget.ElementArrayBuffer][0].Push(0);
-
-            boundBuffers[BufferTarget.UniformBuffer] = new List<Stack<int>>();
-            boundBuffers[BufferTarget.UniformBuffer].Add(new Stack<int>());
-            boundBuffers[BufferTarget.UniformBuffer][0].Push(0);
 
             boundTextures = new List<Dictionary<TextureTarget, Stack<int>>>();
             for (int i = 0; i < 8; i++)
@@ -84,7 +84,7 @@ namespace Kokoro.Graphics.OpenGL
         #region Uniform buffer object state
         public static void BindBuffer(BufferTarget target, int id, int index, IntPtr off, IntPtr size)
         {
-            if (target != BufferTarget.TransformFeedbackBuffer && target != BufferTarget.UniformBuffer) throw new Exception("Incorrect Function Called, Use other Overload");
+            if (target != BufferTarget.TransformFeedbackBuffer && target != BufferTarget.UniformBuffer && target != BufferTarget.ShaderStorageBuffer) throw new Exception("Incorrect Function Called, Use other Overload");
             if (boundBuffers[target][index].Count == 0) boundBuffers[target][index].Push(0);
 
             if (boundBuffers[target][index].Peek() != id || id == 0)
