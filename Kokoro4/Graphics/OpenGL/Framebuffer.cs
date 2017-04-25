@@ -53,7 +53,7 @@ namespace Kokoro.Engine.Graphics
             {
                 bindings[attachment] = value;
 
-                GL.NamedFramebufferTexture(id, (OpenTK.Graphics.OpenGL.FramebufferAttachment)attachment, value.id, 0);
+                GL.NamedFramebufferTexture(id, (OpenTK.Graphics.OpenGL.FramebufferAttachment)attachment, value.id, value.WriteLevel);
 
                 if (attachment != FramebufferAttachment.DepthAttachment)
                 {

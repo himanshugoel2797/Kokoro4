@@ -58,13 +58,14 @@ namespace Kokoro4.ContentProcessor.Texture
                     case "-nomips":
                         //Don't precalculate mipmaps
                         break;
+                    case "-array":
+                        //Following strings are a list of files to be put in the packed array texture.
+                        break;
                 }
             }
 
             //Cubemaps stored as BC6H
-            //Normal maps stored as BC5
-            //Color stored as BC7
-            //Depth stored as BC6H
+            //All other maps are compressed with the same format in order to allow packing into array textures.
 
         }
     }

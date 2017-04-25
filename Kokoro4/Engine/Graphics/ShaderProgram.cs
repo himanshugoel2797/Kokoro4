@@ -29,6 +29,11 @@ namespace Kokoro.Engine.Graphics
             prog.Set(name, handle);
         }
 
+        public void SetImageTexture(string name, Texture tex, int binding, int level, bool read, bool write)
+        {
+            prog.SetImageTexture(name, tex, binding, level, read, write);
+        }
+
         public void Set(string name, UniformBuffer ubo)
         {
             prog.Set(name, ubo);

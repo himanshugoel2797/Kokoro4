@@ -1,12 +1,10 @@
-﻿using Kokoro.Graphics.Input;
+﻿using Kokoro.Engine.Input;
 using Kokoro.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using Key = OpenTK.Input.Key;
 
 namespace Kokoro.Engine.Cameras
 {

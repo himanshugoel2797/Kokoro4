@@ -44,7 +44,7 @@ namespace TestApplication
             //Create renderstate with necessary state
             //Record draw to render queue
             //Perform render
-            int side = 1 << 8;
+            int side = 1 << 10;
 
             int lim = 100;
 
@@ -65,19 +65,22 @@ namespace TestApplication
                 List<Matrix4> transforms = new List<Matrix4>();
 
                 octree = new VoxelOctree(0, 1 << 10);
-                
+
                 for (int k = 0; k <= side; k++)
+                {
                     for (int j = 0; j <= side; j++)
                         for (int i = 0; i <= side; i++)
                         {
                             if ((i - side / 2 >= lim | j - side / 2 >= lim | k - side / 2 >= lim) || (i - side / 2 < -lim | j - side / 2 < -lim | k - side / 2 < -lim))
+                            {
                                 octree.Add(new VoxelColor() { R = 255, G = 0, B = 255, A = 255 }, i - side / 2, j - side / 2, k - side / 2, 1);
+                            }
                         }
-
-                octree.Optimize();
+                    octree.Optimize();
+                }
 
                 //Free up the memory from the octree before proceeding
-                GC.Collect(GC.GetGeneration(octree), GCCollectionMode.Optimized, false);
+                GC.Collect(GC.GetGeneration(octree), GCCollectionMode.Forced, true);
 
                 Mesh cube = Kokoro.Graphics.Prefabs.CubeFactory.Create(grp);
                 int inst_cnt = 0;
@@ -85,18 +88,19 @@ namespace TestApplication
                 int maxLevel = 6;
 
                 #region Voxelization routine
-                Action<VoxelOctree, double, double, double, uint> build_mesh = null;
-                build_mesh = (a, x_c, y_c, z_c, adj_mask) =>
+                Action<VoxelOctree, Vector3, uint> build_mesh = null;
+                build_mesh = (a, vec, adj_mask) =>
                 {
                     if (a.Children == null | a.Level == maxLevel)
                     {
                         if (a.Color.A == 0) return;
 
                         float obj_side = (a.Data.WorldSide >> (a.Level + 2));
+                        Vector3 obj_s = new Vector3(obj_side);
 
                         //Make this actually generate the geometry based on the adjacency mask
                         inst_cnt++;
-                        transforms.Add(Matrix4.Scale(a.Data.WorldSide >> a.Level) * Matrix4.CreateTranslation((float)(x_c - obj_side), (float)(y_c - obj_side), (float)(z_c - obj_side)));
+                        transforms.Add(Matrix4.Scale(a.Data.WorldSide >> a.Level) * Matrix4.CreateTranslation(vec - obj_s));
                         return;
                     }
 
@@ -117,9 +121,9 @@ namespace TestApplication
                         }
                         else
                         {
-                            double x_side = ((i & 1) == 1 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
-                            double y_side = ((i & 2) == 2 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
-                            double z_side = ((i & 4) == 4 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
+                            float x_side = ((i & 1) == 1 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
+                            float y_side = ((i & 2) == 2 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
+                            float z_side = ((i & 4) == 4 ? 1 : -1) * System.Math.Max(1, a.Data.WorldSide >> a.Level);
 
                             x_side /= 4;
                             y_side /= 4;
@@ -128,14 +132,16 @@ namespace TestApplication
                             //Depending on the location, we will depend on the adjacency data passed down
                             //Actually, adjacency data will not work, we do not have enough high resolution data
 
+                            Vector3 s = new Vector3(x_side, y_side, z_side);
+
                             //TODO calculate adjacency mask for the child and pass it down in the last parameter
-                            build_mesh(child, x_c + x_side, y_c + y_side, z_c + z_side, 0);
+                            build_mesh(child, vec + s, 0);
                         }
                     }
                 };
                 #endregion
 
-                build_mesh(octree, 0, 0, 0, 0);
+                build_mesh(octree, Vector3.Zero, 0);
 
                 meshList.Add(new RenderQueue.MeshData() { Mesh = cube, InstanceCount = inst_cnt, BaseInstance = 0 });
                 meshes = meshList.ToArray();
@@ -178,7 +184,7 @@ namespace TestApplication
                 fsq_queue = new RenderQueue(1);
                 fsq_queue.ClearAndBeginRecording();
                 fsq_queue.ClearFramebufferBeforeSubmit = true;
-                fsq_queue.RecordDraw(new RenderQueue.DrawData() { Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { Mesh = fsq, BaseInstance = 0, InstanceCount = 1 }}, State = fsq_state });
+                fsq_queue.RecordDraw(new RenderQueue.DrawData() { Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { Mesh = fsq, BaseInstance = 0, InstanceCount = 1 } }, State = fsq_state });
                 fsq_queue.EndRecording();
 
                 inited = true;

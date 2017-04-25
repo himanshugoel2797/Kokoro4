@@ -57,7 +57,7 @@ namespace Kokoro.Engine.Cameras
         /// Update the camera instance
         /// </summary>
         /// <param name="interval">The time elapsed in ticks since the last update</param>
-        public virtual void Update(double interval)
+        public override void Update(double interval)
         {
 
         }
@@ -78,6 +78,11 @@ namespace Kokoro.Engine.Cameras
         public void SetProjection(float fov, float aspectRatio, float nearClip)
         {
             Projection = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearClip);//, 10000000000);
+        }
+
+        public override void Dispose()
+        {
+
         }
     }
 }

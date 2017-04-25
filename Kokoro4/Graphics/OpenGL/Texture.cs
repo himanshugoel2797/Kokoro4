@@ -72,12 +72,27 @@ namespace Kokoro.Engine.Graphics
         internal TextureTarget texTarget;
         internal PixelFormat format;
 
-
+        private int _writeLevel;
+        private int _baseReadLevel;
+        private int _maxReadLevel;
 
         public int Width { get; internal set; }
         public int Height { get; internal set; }
         public int Depth { get; internal set; }
         public int LevelCount { get; internal set; }
+
+
+        public int WriteLevel { get; set; }
+        public int BaseReadLevel
+        {
+            get { return _baseReadLevel; }
+            set { if (_baseReadLevel != value) { _baseReadLevel = value; GL.TexParameterI((OpenTK.Graphics.OpenGL.TextureTarget)texTarget, TextureParameterName.TextureBaseLevel, ref _baseReadLevel); } }
+        }
+        public int MaxReadLevel
+        {
+            get { return _maxReadLevel; }
+            set { if (_maxReadLevel != value) { _maxReadLevel = value; GL.TexParameterI((OpenTK.Graphics.OpenGL.TextureTarget)texTarget, TextureParameterName.TextureMaxLevel, ref _maxReadLevel); } }
+        }
 
         public static float MaxAnisotropy { get; internal set; }
 
@@ -118,7 +133,7 @@ namespace Kokoro.Engine.Graphics
                 GL.CreateTextures((OpenTK.Graphics.OpenGL.TextureTarget)src.GetTextureTarget(), 1, out id);
                 inited = true;
             }
-            
+
 
             switch (src.GetDimensions())
             {

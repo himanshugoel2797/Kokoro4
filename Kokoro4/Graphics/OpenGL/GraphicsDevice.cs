@@ -1,4 +1,4 @@
-﻿using Kokoro.Graphics.Input.LowLevel;
+﻿using Kokoro.Engine.Input;
 using Kokoro.Math;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -388,9 +388,9 @@ namespace Kokoro.Graphics.OpenGL
         private static void Game_UpdateFrame(object sender, FrameEventArgs e)
         {
             //Update all the input sources
-            InputLL.IsFocused(Window.Focused);
-            Input.Mouse.Update();
-            Input.Keyboard.Update();
+            Input.LowLevel.InputLL.IsFocused(Window.Focused);
+            Engine.Input.Mouse.Update();
+            Engine.Input.Keyboard.Update();
 
             Update?.Invoke(e.Time);
         }
@@ -465,7 +465,7 @@ namespace Kokoro.Graphics.OpenGL
         private static void Window_Resize(object sender, EventArgs e)
         {
             GPUStateMachine.SetViewport(0, 0, game.ClientSize.Width, game.ClientSize.Height);
-            InputLL.SetWinXY(game.Location.X, game.Location.Y, game.ClientSize.Width, game.ClientSize.Height);
+            Input.LowLevel.InputLL.SetWinXY(game.Location.X, game.Location.Y, game.ClientSize.Width, game.ClientSize.Height);
             Framebuffer.RecreateDefaultFramebuffer();
         }
 
@@ -596,6 +596,11 @@ namespace Kokoro.Graphics.OpenGL
         {
             // render graphics
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        }
+
+        public static void ClearDepthBuffer()
+        {
+            GL.Clear(ClearBufferMask.DepthBufferBit);
         }
 
         public static void SaveTexture(Texture t, string file)

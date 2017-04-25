@@ -102,13 +102,14 @@ namespace Kokoro4.ContentProcessor.Mesh
             Assimp.AssimpContext ctxt = new AssimpContext();
             Assimp.Scene sc = ctxt.ImportFile(inputFile);
             Assimp.Mesh mesh = sc.Meshes[0];
-
+            
 
             //Convert the data to a format we can work with easily
             List<float> vertices = new List<float>();
             List<float> uvs = new List<float>();
             List<float> normals = new List<float>();
             List<ushort> indices = new List<ushort>();
+            
 
             for (int i = 0; i < mesh.VertexCount; i++)
             {

@@ -7,10 +7,12 @@ smooth in vec3 normPos;
 
 layout(location = 0) out vec4 ColorOUT;
 
-uniform sampler2D RGBA0;
-uniform sampler2D Depth0;
-uniform sampler2D Normal0;
-uniform sampler2D Material0;
+layout(location = 0, std140) uniform Material {
+	uvec2 RGBA0;
+	uvec2 Depth0;
+	uvec2 Normal0;
+	uvec2 Material0;
+};
 
 vec3 decode (vec2 enc)
 {
@@ -41,8 +43,4 @@ void main()
 
 		float AO = tmp.b;
 		float Cavity = tmp.a;
-
-
-
-
 }

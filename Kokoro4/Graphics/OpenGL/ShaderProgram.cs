@@ -56,7 +56,7 @@ namespace Kokoro.Graphics.OpenGL
             GL.LinkProgram(id);
         }
 
-        public void Set(string name, TextureHandle handle)
+        private int GetLoc(string name)
         {
             int loc = 0;
             if (!locs.ContainsKey(name))
@@ -65,8 +65,25 @@ namespace Kokoro.Graphics.OpenGL
                 locs[name] = loc;
             }
             else loc = locs[name];
+            return loc;
+        }
 
+        public void Set(string name, TextureHandle handle)
+        {
+            int loc = GetLoc(name);
             if (loc >= 0) GL.Arb.ProgramUniformHandle(id, loc, handle);
+        }
+
+        public void SetImageTexture(string name, Texture tex, int binding, int level, bool read, bool write)
+        {
+            TextureAccess acc = TextureAccess.ReadOnly;
+            if (read && write)
+                acc = TextureAccess.ReadWrite;
+            else if (!read && write)
+                acc = TextureAccess.WriteOnly;
+
+            int loc = GetLoc(name);
+            if (loc >= 0) GL.BindImageTexture(binding, tex.id, level, false, 0, acc, (SizedInternalFormat)tex.internalformat);
         }
 
         public void Set(string name, UniformBuffer ubo)
@@ -100,50 +117,26 @@ namespace Kokoro.Graphics.OpenGL
 
         public void Set(string name, Vector3 vec)
         {
-            int loc = 0;
-            if (!locs.ContainsKey(name))
-            {
-                loc = GL.GetProgramResourceLocation(id, ProgramInterface.Uniform, name);
-                locs[name] = loc;
-            }
-            else loc = locs[name];
+            int loc = GetLoc(name);
 
             if (loc >= 0) GL.ProgramUniform3(id, loc, vec.X, vec.Y, vec.Z);
         }
 
         public void Set(string name, Vector4 vec)
         {
-            int loc = 0;
-            if (!locs.ContainsKey(name))
-            {
-                loc = GL.GetProgramResourceLocation(id, ProgramInterface.Uniform, name);
-                locs[name] = loc;
-            }
-            else loc = locs[name];
+            int loc = GetLoc(name);
             if (loc >= 0) GL.ProgramUniform4(id, loc, vec.X, vec.Y, vec.Z, vec.W);
         }
 
         public void Set(string name, Vector2 vec)
         {
-            int loc = 0;
-            if (!locs.ContainsKey(name))
-            {
-                loc = GL.GetProgramResourceLocation(id, ProgramInterface.Uniform, name);
-                locs[name] = loc;
-            }
-            else loc = locs[name];
+            int loc = GetLoc(name);
             if (loc >= 0) GL.ProgramUniform2(id, loc, vec.X, vec.Y);
         }
 
         public void Set(string name, Matrix4 vec)
         {
-            int loc = 0;
-            if (!locs.ContainsKey(name))
-            {
-                loc = GL.GetProgramResourceLocation(id, ProgramInterface.Uniform, name);
-                locs[name] = loc;
-            }
-            else loc = locs[name];
+            int loc = GetLoc(name);
             if (loc >= 0) GL.ProgramUniformMatrix4(id, loc, 1, false, new float[] { vec.M11, vec.M12, vec.M13, vec.M14,
                                                                                     vec.M21, vec.M22, vec.M23, vec.M24,
                                                                                     vec.M31, vec.M32, vec.M33, vec.M34,
@@ -152,26 +145,13 @@ namespace Kokoro.Graphics.OpenGL
 
         public void Set(string name, float val)
         {
-            int loc = 0;
-            if (!locs.ContainsKey(name))
-            {
-                loc = GL.GetProgramResourceLocation(id, ProgramInterface.Uniform, name);
-                locs[name] = loc;
-            }
-            else loc = locs[name];
+            int loc = GetLoc(name);
             if (loc >= 0) GL.ProgramUniform1(id, loc, val);
         }
 
         public void Set(string name, int index)
         {
-            int loc = 0;
-            if (!locs.ContainsKey(name))
-            {
-                loc = GL.GetProgramResourceLocation(id, ProgramInterface.Uniform, name);
-                locs[name] = loc;
-            }
-            else loc = locs[name];
-
+            int loc = GetLoc(name);
             if (loc >= 0) GL.ProgramUniform1(id, loc, index);
         }
 

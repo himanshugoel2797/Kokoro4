@@ -42,8 +42,6 @@ namespace Kokoro.Engine
         [System.Runtime.InteropServices.DllImport("Kokoro4.Native.dll", EntryPoint = "LoadMesh")]
         extern static int LoadMesh(string file, IntPtr[] ptrs);//CAl
 
-        public Math.BoundingBox Bounds { get; set; }
-
         public int IndexCount { get; private set; }
         public int StartOffset { get { return offset; } }
 

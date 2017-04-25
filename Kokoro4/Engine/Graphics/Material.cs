@@ -11,5 +11,10 @@ namespace Kokoro.Engine.Graphics
         public bool Transparent { get; set; }
         public ShaderGroup Shaders { get; set; }
         public Dictionary<string, TextureHandle> Textures { get; set; }
+
+        public override void Dispose()
+        {
+
+        }
     }
 }

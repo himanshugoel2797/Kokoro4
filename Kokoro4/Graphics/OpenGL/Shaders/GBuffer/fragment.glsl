@@ -11,11 +11,11 @@ layout(location = 1) out vec4 Depth0;
 layout(location = 2) out vec4 Normal0;
 layout(location = 3) out vec4 Material0;
 
-uniform sampler2D AlbedoMap;
-uniform sampler2D AOMap;
-uniform sampler2D CavityMap;
-uniform sampler2D ReflectivityMap;
-uniform sampler2D DerivativeAOCavityMicrosurfaceMap;
+layout(bindless_sampler) uniform sampler2D AlbedoMap;
+layout(bindless_sampler) uniform sampler2D AOMap;
+layout(bindless_sampler) uniform sampler2D CavityMap;
+layout(bindless_sampler) uniform sampler2D ReflectivityMap;
+layout(bindless_sampler) uniform sampler2D DerivativeAOCavityMicrosurfaceMap;
 
 vec2 encode (vec3 n)
 {

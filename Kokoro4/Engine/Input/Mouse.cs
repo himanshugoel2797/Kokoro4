@@ -1,12 +1,12 @@
-﻿using Kokoro.Graphics.Input.LowLevel;
-using Kokoro.Math;
+﻿using Kokoro.Math;
+using Kokoro.Input.LowLevel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics.Input
+namespace Kokoro.Engine.Input
 {
     /// <summary>
     /// Stores the states of the Mouse buttons

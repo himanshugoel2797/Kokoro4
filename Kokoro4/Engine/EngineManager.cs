@@ -50,6 +50,11 @@ namespace Kokoro.Engine
             GraphicsDevice.Clear();
         }
 
+        public static void ClearDepthBuffer()
+        {
+            GraphicsDevice.ClearDepthBuffer();
+        }
+
         public static void SetRenderState(RenderState state)
         {
             GraphicsDevice.CullMode = state.CullMode;

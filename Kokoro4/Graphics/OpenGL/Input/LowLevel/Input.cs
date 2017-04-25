@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Kokoro.Math;
 using OpenTK.Input;
 
-namespace Kokoro.Graphics.Input.LowLevel
+namespace Kokoro.Input.LowLevel
 {
-    public static class InputLL
+    static class InputLL
     {
         static InputLL()
         {
@@ -41,12 +41,12 @@ namespace Kokoro.Graphics.Input.LowLevel
             }
         }
 
-        public static bool KeyDown(Key k)
+        public static bool KeyDown(Kokoro.Engine.Input.Key k)
         {
             if (!foc) return false;
             lock (locker)
             {
-                return kbdState[k];
+                return kbdState[(Key)k];
             }
         }
         #endregion
