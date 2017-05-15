@@ -177,7 +177,7 @@ namespace Kokoro4.ContentProcessor.Mesh
             }
 
             //TODO optimize all meshes for vertex cache performance and reduced overdraw using AMD's Tootle
-
+            for(int i = 0; i < )
 
             //Write the compressed data to the file
             if (isStatic)
