@@ -83,7 +83,7 @@ namespace Kokoro.Engine.Graphics
             return w;
         }
 
-        PixelType ITextureSource.GetType()
+        PixelType ITextureSource.GetPixelType()
         {
             return type;
         }

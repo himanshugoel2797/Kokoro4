@@ -24,7 +24,7 @@ namespace Kokoro.Engine.Graphics
         int GetLevels();
         PixelInternalFormat GetInternalFormat();
         PixelFormat GetFormat();
-        PixelType GetType();
+        PixelType GetPixelType();
         IntPtr GetPixelData(int level);
     }
 }

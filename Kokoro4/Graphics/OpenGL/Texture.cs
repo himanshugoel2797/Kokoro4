@@ -139,15 +139,15 @@ namespace Kokoro.Engine.Graphics
             {
                 case 1:
                     if (inited) GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
-                    GL.TextureSubImage1D(id, level, 0, src.GetWidth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage1D(id, level, 0, src.GetWidth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                     break;
                 case 2:
                     if (inited) GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
-                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                     break;
                 case 3:
                     if (inited) GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
-                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                     break;
             }
 

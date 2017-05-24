@@ -53,6 +53,11 @@ namespace Kokoro.Engine.Graphics
             TileY = tY;
             TileZ = tZ;
 
+            this.Width = src.GetWidth();
+            this.Height = src.GetHeight();
+            this.Depth = src.GetDepth();
+            this.LevelCount = src.GetLevels();
+
             this.texTarget = src.GetTextureTarget();
             this.internalformat = src.GetInternalFormat();
             this.format = src.GetFormat();
@@ -74,13 +79,13 @@ namespace Kokoro.Engine.Graphics
             switch (src.GetDimensions())
             {
                 case 1:
-                    GL.TextureSubImage1D(id, level, 0, src.GetWidth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage1D(id, level, 0, src.GetWidth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                     break;
                 case 2:
-                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth(), src.GetHeight(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                     break;
                 case 3:
-                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetType(), src.GetPixelData(level));
+                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth(), src.GetHeight(), src.GetDepth(), (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                     break;
             }
         }

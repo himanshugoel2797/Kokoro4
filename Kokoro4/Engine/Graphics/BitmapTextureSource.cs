@@ -16,77 +16,24 @@ using Kokoro.Graphics.Vulkan;
 
 namespace Kokoro.Engine.Graphics
 {
-    public class BitmapTextureSource : ITextureSource, IDisposable
+    public class BitmapTextureSource : RawTextureSource
     {
         Bitmap srcBmp;
         BitmapData bmpData;
 
-        public int Width { get; internal set; }
-        public int Height { get; internal set; }
-        public int Levels { get; set; }
-
-        public BitmapTextureSource(Bitmap bmp, int mipmapLevels)
+        public BitmapTextureSource(Bitmap bmp, int mipmapLevels) : base(2, bmp.Width, bmp.Height, 0, mipmapLevels, PixelFormat.Bgra, PixelInternalFormat.Rgba8, TextureTarget.Texture2D, PixelType.UnsignedByte)
         {
             srcBmp = (Bitmap)bmp.Clone();
             srcBmp.RotateFlip(RotateFlipType.Rotate180FlipX);
-            Width = bmp.Width;
-            Height = bmp.Height;
-            Levels = mipmapLevels;
 
             bmpData = srcBmp.LockBits(new Rectangle(0, 0, Width, Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
         }
 
         public BitmapTextureSource(string path, int mipmapLevels) : this(new Bitmap(path), mipmapLevels) { }
-
-
-        public int GetDepth()
-        {
-            return 0;
-        }
-
-        public int GetDimensions()
-        {
-            return 2;
-        }
-
-        public PixelFormat GetFormat()
-        {
-            return PixelFormat.Bgra;
-        }
-
-        public int GetHeight()
-        {
-            return Height;
-        }
-
-        public PixelInternalFormat GetInternalFormat()
-        {
-            return PixelInternalFormat.Rgba8;
-        }
-
-        public int GetLevels()
-        {
-            return Levels;
-        }
-
-        public IntPtr GetPixelData(int level)
+        
+        public override IntPtr GetPixelData(int level)
         {
             return bmpData.Scan0;
-        }
-
-        public TextureTarget GetTextureTarget()
-        {
-            return TextureTarget.Texture2D;
-        }
-
-        public int GetWidth()
-        {
-            return Width;
-        }
-
-        PixelType ITextureSource.GetType()
-        {
-            return PixelType.UnsignedByte;
         }
 
         #region IDisposable Support
