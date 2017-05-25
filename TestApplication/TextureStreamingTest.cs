@@ -23,6 +23,7 @@ namespace TestApplication
         private UniformBuffer ubo;
         private Texture tex;
         private TextureStreamer.TextureStream stream;
+        private TextureHandle handle;
 
         private TextureStreamer tStreamer;
 
@@ -70,14 +71,27 @@ namespace TestApplication
 
                 inited = true;
             }
-            
-            TextureHandle h = tex.GetHandle(stream.TargetSampler);
-            h.SetResidency(TextureResidency.Resident);
 
+            handle?.SetResidency(TextureResidency.NonResident);
+
+            if (stream != null)
+            {
+                TextureSampler sampler = stream.TargetSampler;
+                handle = tex.GetHandle(sampler);
+                handle.SetResidency(TextureResidency.Resident);
+
+                if (stream.IsDone)
+                {
+                    stream.Free();
+                    stream = null;
+                }
+            }
+
+            
             unsafe
             {
                 long* l = (long*)ubo.Update();
-                l[0] = h;
+                l[0] = handle;
                 ubo.UpdateDone();
             }
             queue.Submit();

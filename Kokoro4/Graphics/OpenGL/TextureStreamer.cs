@@ -58,8 +58,6 @@ namespace Kokoro.Engine.Graphics
                 TargetSampler = new TextureSampler();
                 TargetSampler.MinLOD = curLevel + 1;
                 TargetSampler.MaxLOD = maxLevels;
-
-                Console.WriteLine("Level Uploaded");
             }
 
             internal void Setup(ITextureSource src)
@@ -103,8 +101,9 @@ namespace Kokoro.Engine.Graphics
                 else
                 {
                     IsDone = true;
-                    owner.pending.Remove(this);
-                    owner.buffers.Enqueue(this);
+                    TargetSampler = new TextureSampler();
+                    TargetSampler.MinLOD = 0;
+                    TargetSampler.MaxLOD = maxLevels;
                 }
             }
 
@@ -112,7 +111,6 @@ namespace Kokoro.Engine.Graphics
             {
                 if (IsDone) return;
 
-                Console.WriteLine($"Test if Level Ready CurLevel: {TargetTexture.BaseReadLevel}");
                 if (uploadFence.Raised(1))
                 {
                     //Proceed to the next upload
@@ -123,10 +121,17 @@ namespace Kokoro.Engine.Graphics
                     {
                         //Finished and update buffers appropriately
                         IsDone = true;
-                        owner.pending.Remove(this);
-                        owner.buffers.Enqueue(this);
+                        TargetSampler = new TextureSampler();
+                        TargetSampler.MinLOD = 0;
+                        TargetSampler.MaxLOD = maxLevels;
                     }
                 }
+            }
+
+            public void Free()
+            {
+                owner.pending.Remove(this);
+                owner.buffers.Enqueue(this);
             }
 
             private void Dispose()
