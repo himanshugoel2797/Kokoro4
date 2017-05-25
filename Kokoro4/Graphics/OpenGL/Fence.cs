@@ -19,7 +19,6 @@ namespace Kokoro.Engine.Graphics
 
         public void PlaceFence()
         {
-            if (id != IntPtr.Zero) GL.DeleteSync(id);
             id = GL.FenceSync(SyncCondition.SyncGpuCommandsComplete, WaitSyncFlags.None);
             raised = false;
         }
@@ -46,7 +45,7 @@ namespace Kokoro.Engine.Graphics
             {
                 WaitSyncStatus s = GL.ClientWaitSync(id, ClientWaitSyncFlags.SyncFlushCommandsBit, timeout);
 
-                if (s == WaitSyncStatus.ConditionSatisfied || s == WaitSyncStatus.AlreadySignaled)
+                if (s == WaitSyncStatus.ConditionSatisfied | s == WaitSyncStatus.AlreadySignaled)
                 {
                     GL.DeleteSync(id);
                     raised = true;

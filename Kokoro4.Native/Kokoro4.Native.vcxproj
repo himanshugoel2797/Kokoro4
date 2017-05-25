@@ -22,7 +22,7 @@
     <ProjectGuid>{9DCA59CC-8C09-473C-8162-CA47A0B788CC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Kokoro4Native</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

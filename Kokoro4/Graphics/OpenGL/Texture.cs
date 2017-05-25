@@ -23,6 +23,8 @@ namespace Kokoro.Engine.Graphics
         internal Texture parent;
         private ComputeImage computeTex;
 
+        public TextureSampler Sampler { get; private set; }
+
         internal ComputeImage GetImageForCompute(ComputeMemoryFlags flags, int mipLevel)
         {
             if (computeTex == null || (computeTex.Flags != flags))
@@ -46,10 +48,11 @@ namespace Kokoro.Engine.Graphics
             return computeTex;
         }
 
-        internal TextureHandle(long hndl, Texture parent)
+        internal TextureHandle(long hndl, Texture parent, TextureSampler sampler)
         {
             this.hndl = hndl;
             this.parent = parent;
+            this.Sampler = sampler;
         }
 
         public void SetResidency(TextureResidency residency)
@@ -83,15 +86,17 @@ namespace Kokoro.Engine.Graphics
 
 
         public int WriteLevel { get; set; }
+
+        //TODO: these can't be changed once gethandle has been called
         public int BaseReadLevel
         {
             get { return _baseReadLevel; }
-            set { if (_baseReadLevel != value) { _baseReadLevel = value; GL.TexParameterI((OpenTK.Graphics.OpenGL.TextureTarget)texTarget, TextureParameterName.TextureBaseLevel, ref _baseReadLevel); } }
+            set { if (_baseReadLevel != value) { _baseReadLevel = value; GL.TextureParameter(id, TextureParameterName.TextureBaseLevel, (float)_baseReadLevel); } }
         }
         public int MaxReadLevel
         {
             get { return _maxReadLevel; }
-            set { if (_maxReadLevel != value) { _maxReadLevel = value; GL.TexParameterI((OpenTK.Graphics.OpenGL.TextureTarget)texTarget, TextureParameterName.TextureMaxLevel, ref _maxReadLevel); } }
+            set { if (_maxReadLevel != value) { _maxReadLevel = value; GL.TextureParameter(id, TextureParameterName.TextureMaxLevel, (float)_maxReadLevel); } }
         }
 
         public static float MaxAnisotropy { get; internal set; }
@@ -117,9 +122,9 @@ namespace Kokoro.Engine.Graphics
             if (!handles.ContainsKey(sampler.id))
             {
                 if (sampler.id != 0)
-                    handles[sampler.id] = new TextureHandle(GL.Arb.GetTextureSamplerHandle(id, sampler.id), this);
+                    handles[sampler.id] = new TextureHandle(GL.Arb.GetTextureSamplerHandle(id, sampler.id), this, sampler);
                 else
-                    handles[0] = new TextureHandle(GL.Arb.GetTextureHandle(id), this);
+                    handles[0] = new TextureHandle(GL.Arb.GetTextureHandle(id), this, sampler);
             }
 
             return handles[sampler.id];

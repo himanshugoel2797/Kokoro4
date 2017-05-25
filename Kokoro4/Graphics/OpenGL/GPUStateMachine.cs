@@ -40,6 +40,14 @@ namespace Kokoro.Graphics.OpenGL
             boundBuffers[BufferTarget.TextureBuffer] = new List<Stack<int>>();
             boundBuffers[BufferTarget.TextureBuffer].Add(new Stack<int>());
             boundBuffers[BufferTarget.TextureBuffer][0].Push(0);
+            
+            boundBuffers[BufferTarget.PixelUnpackBuffer] = new List<Stack<int>>();
+            boundBuffers[BufferTarget.PixelUnpackBuffer].Add(new Stack<int>());
+            boundBuffers[BufferTarget.PixelUnpackBuffer][0].Push(0);
+            
+            boundBuffers[BufferTarget.PixelPackBuffer] = new List<Stack<int>>();
+            boundBuffers[BufferTarget.PixelPackBuffer].Add(new Stack<int>());
+            boundBuffers[BufferTarget.PixelPackBuffer][0].Push(0);
 
             boundBuffers[BufferTarget.ElementArrayBuffer] = new List<Stack<int>>();
             boundBuffers[BufferTarget.ElementArrayBuffer].Add(new Stack<int>());

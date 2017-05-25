@@ -14,19 +14,19 @@ namespace Kokoro.Engine.Graphics
         public class TextureStream
         {
             private TextureStreamer owner;
-            internal int pboId;
-            internal Fence uploadFence;
-            internal int curLevel;
-            internal ITextureSource src;
+            private int pboId;
+            private Fence uploadFence;
+            private int curLevel, maxLevels;
+            private ITextureSource src;
             private int sz, dims;
 
-            public bool IsDone { get; internal set; }
-            public Texture TargetTexture { get; internal set; }
-
+            public bool IsDone { get; private set; }
+            public Texture TargetTexture { get; private set; }
+            public TextureSampler TargetSampler { get; private set; }
 
             public TextureStream(TextureStreamer owner)
             {
-                pboId = GL.GenBuffer();
+                GL.CreateBuffers(1, out pboId);
                 uploadFence = new Fence();
                 IsDone = true;
                 this.owner = owner;
@@ -52,21 +52,30 @@ namespace Kokoro.Engine.Graphics
                         GL.TextureSubImage3D(TargetTexture.id, curLevel, 0, 0, 0, TargetTexture.Width >> curLevel, TargetTexture.Height >> curLevel, TargetTexture.Depth >> curLevel, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), IntPtr.Zero);
                         break;
                 }
+                GPUStateMachine.UnbindBuffer(BufferTarget.PixelUnpackBuffer);
                 uploadFence.PlaceFence();
 
-                GPUStateMachine.UnbindBuffer(BufferTarget.PixelUnpackBuffer);
+                TargetSampler = new TextureSampler();
+                TargetSampler.MinLOD = curLevel + 1;
+                TargetSampler.MaxLOD = maxLevels;
+
+                Console.WriteLine("Level Uploaded");
             }
 
             internal void Setup(ITextureSource src)
             {
                 this.src = src;
                 IsDone = false;
-                curLevel = src.GetLevels() - 1;
+                maxLevels = curLevel = src.GetLevels() - 1;
                 dims = src.GetDimensions();
                 owner.pending.Add(this);
 
+                //Copy the data over, uploading the highest mipmap normally and the others asynchronously
                 TargetTexture = new Texture();
                 TargetTexture.SetData(src, curLevel);
+                TargetSampler = new TextureSampler();
+                TargetSampler.MinLOD = curLevel;
+                TargetSampler.MaxLOD = curLevel;
 
                 int pixelSize = 4;
 
@@ -83,7 +92,6 @@ namespace Kokoro.Engine.Graphics
                         break;
                 }
 
-                //Copy the data over, uploading the highest mipmap normally and the others asynchronously
 
                 curLevel--;
 
@@ -104,6 +112,7 @@ namespace Kokoro.Engine.Graphics
             {
                 if (IsDone) return;
 
+                Console.WriteLine($"Test if Level Ready CurLevel: {TargetTexture.BaseReadLevel}");
                 if (uploadFence.Raised(1))
                 {
                     //Proceed to the next upload

@@ -23,7 +23,8 @@ namespace TestApplication
             EngineManager.Name = EngineManager.EngineName;
 
             EngineManager.StateManager.AddState(nameof(TestScene), new TestScene());
-            EngineManager.StateManager.SetActiveState(nameof(TestScene));
+            EngineManager.StateManager.AddState(nameof(TextureStreamingTest), new TextureStreamingTest());
+            EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest));
 
             EngineManager.Run(60, 60);
             EngineManager.Exit();

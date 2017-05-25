@@ -44,7 +44,7 @@ namespace TestApplication
             //Create renderstate with necessary state
             //Record draw to render queue
             //Perform render
-            int side = 1 << 10;
+            int side = 1 << 2;
 
             int lim = 100;
 

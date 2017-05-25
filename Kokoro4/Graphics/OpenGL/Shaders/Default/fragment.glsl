@@ -1,13 +1,15 @@
 ﻿// Interpolated values from the vertex shaders
 in vec2 UV;
-in vec3 normal;
 
 // Ouput data
 layout(location = 0) out vec4 color;
 // Values that stay constant for the whole mesh.
-uniform sampler2D AlbedoMap;
+
+layout(binding = 0) uniform Material_t {
+	uvec2 Albedo;
+} Material;
 
 void main(){
-	vec3 n = normal * 0.5f + 0.5f;
-	color = vec4(n.x,n.y,n.z,1);
+	color = texture(sampler2D(Material.Albedo), UV);
+	color.a = 1;
 }
