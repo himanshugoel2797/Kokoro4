@@ -35,14 +35,31 @@ namespace Kokoro.Engine
 
         private static Dictionary<string, Camera> Cameras;
 
+        private static Queue<Action> BackgroundTasks;   //execute these tasks during waits and finally, before swapbuffers
+        private static Queue<Action> NextFrameTasks;    //tasks to execute starting next frame
+        private static List<Action> DeregisterTasks;    //tasks to deregister
+
         static EngineManager()
         {
             Name = EngineName;
             Cameras = new Dictionary<string, Camera>();
+            BackgroundTasks = new Queue<Action>();
+            NextFrameTasks = new Queue<Action>();
+            DeregisterTasks = new List<Action>();
 
             //Initialize the state machine
             StateManager = new StateManager();
             GraphicsDevice.GameLoop.RegisterIState(new _SceneMan());
+        }
+
+        public static void RegisterBackgroundTask(Action a)
+        {
+            BackgroundTasks.Enqueue(a);
+        }
+
+        public static void DeregisterBackgroundTask(Action a)
+        {
+            DeregisterTasks.Add(a);
         }
 
         public static void Clear()
@@ -67,9 +84,9 @@ namespace Kokoro.Engine
             GraphicsDevice.Framebuffer = state.Framebuffer;
             GraphicsDevice.SetDepthRange(state.NearPlane, state.FarPlane);
 
-            if(state.ShaderStorageBufferBindings != null)
+            if (state.ShaderStorageBufferBindings != null)
             {
-                for(int i = 0; i < state.ShaderStorageBufferBindings.Length; i++)
+                for (int i = 0; i < state.ShaderStorageBufferBindings.Length; i++)
                 {
                     GraphicsDevice.SetShaderStorageBufferBinding(state.ShaderStorageBufferBindings[i], i);
                 }
@@ -99,6 +116,35 @@ namespace Kokoro.Engine
             GraphicsDevice.Run(ups, fps);
         }
 
+        public static bool ExecuteBackgroundTasksUntil(Func<bool> a)
+        {
+            while(!a())
+            {
+                if (BackgroundTasks.Count == 0)
+                    return a();
+
+                ExecuteBackgroundTask();
+            }
+
+            return true;
+        }
+
+        public static void ExecuteBackgroundTask()
+        {
+            if (BackgroundTasks.Count == 0)
+                return;
+
+            Action a = BackgroundTasks.Dequeue();
+            if (DeregisterTasks.Contains(a))
+            {
+                DeregisterTasks.Remove(a);
+                return;
+            }
+            a();
+            NextFrameTasks.Enqueue(a);
+
+        }
+
         public static void Exit()
         {
             GraphicsDevice.Cleanup?.Invoke();
@@ -118,6 +164,15 @@ namespace Kokoro.Engine
             {
                 GraphicsDevice.Clear();
                 StateManager.Render(interval);
+                {
+                    for (int i = 0; i < BackgroundTasks.Count; i++)
+                    {
+                        ExecuteBackgroundTask();
+                    }
+                    var tmp = NextFrameTasks;
+                    NextFrameTasks = BackgroundTasks;
+                    BackgroundTasks = tmp;
+                }
                 GraphicsDevice.SwapBuffers();
             }
 

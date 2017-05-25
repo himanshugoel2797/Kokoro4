@@ -24,7 +24,7 @@ namespace Kokoro.Graphics.OpenGL
         CounterClockwise = 2305
     }
 
-    public class GraphicsDevice
+    public static class GraphicsDevice
     {
         static VertexArray curVarray;
         static ShaderProgram curProg;

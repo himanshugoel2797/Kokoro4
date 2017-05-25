@@ -183,6 +183,7 @@
     <Compile Include="Graphics\OpenGL\ShaderStorageBuffer.cs" />
     <Compile Include="Engine\Graphics\TextDrawer.cs" />
     <Compile Include="Graphics\OpenGL\TextureSampler.cs" />
+    <Compile Include="Graphics\OpenGL\TextureStreamer.cs" />
     <Compile Include="Graphics\OpenGL\TextureTarget.cs" />
     <Compile Include="Graphics\OpenGL\UniformBuffer.cs" />
     <Compile Include="Graphics\OpenGL\VertexArray.cs" />
