@@ -41,7 +41,7 @@ namespace Kokoro.Engine.Graphics
         {
             GL.CreateSamplers(1, out id);
 
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
         }
 
         internal TextureSampler(int id)
@@ -84,7 +84,7 @@ namespace Kokoro.Engine.Graphics
                     // TODO: dispose managed state (managed objects).
                 }
 
-                if (id != 0) GL.DeleteSampler(id);
+                if (id != 0) GraphicsDevice.QueueForDeletion(id, GLObjectType.Sampler);
                 id = 0;
                 
                 disposedValue = true;

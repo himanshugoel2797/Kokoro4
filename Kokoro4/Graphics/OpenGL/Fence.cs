@@ -14,7 +14,7 @@ namespace Kokoro.Engine.Graphics
 
         public Fence()
         {
-            Kokoro.Graphics.OpenGL.GraphicsDevice.Cleanup += Dispose;
+            Kokoro.Graphics.OpenGL.GraphicsDevice.Cleanup.Add(Dispose);
         }
 
         public void PlaceFence()

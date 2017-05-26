@@ -33,7 +33,7 @@ namespace Kokoro.Engine.Graphics
         {
             GL.CreateBuffers(1, out id);
             this.target = target;
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
             addr = IntPtr.Zero;
         }
 
@@ -43,7 +43,7 @@ namespace Kokoro.Engine.Graphics
             this.target = target;
 
             this.size = size;
-            
+
             GL.NamedBufferStorage(id, size, IntPtr.Zero, BufferStorageFlags.MapPersistentBit | BufferStorageFlags.MapWriteBit | (read ? BufferStorageFlags.MapReadBit : 0));
             addr = GL.MapNamedBufferRange(id, IntPtr.Zero, size, BufferAccessMask.MapPersistentBit | BufferAccessMask.MapFlushExplicitBit | BufferAccessMask.MapUnsynchronizedBit | BufferAccessMask.MapWriteBit | (read ? BufferAccessMask.MapReadBit : 0));
         }
@@ -123,7 +123,7 @@ namespace Kokoro.Engine.Graphics
 
                     }
                 }
-                GL.DeleteBuffer(id);
+                GraphicsDevice.QueueForDeletion(id, GLObjectType.Buffer);
                 id = 0;
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.

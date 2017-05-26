@@ -13,7 +13,7 @@ namespace Kokoro.Engine.Graphics
         public AsyncComputeProgram(AsyncComputeSource src, string entryPoint)
         {
             kern = src.prog.CreateKernel(entryPoint);
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
             Objects = new List<ComputeMemory>();
         }
 

@@ -21,7 +21,7 @@ namespace Kokoro.Engine.Graphics
             prog = new ComputeProgram(GraphicsDevice._comp_ctxt, src);
             prog.Build(new ComputeDevice[] { GraphicsDevice._comp_queue.Device }, "", build_handler, IntPtr.Zero);
 
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
         }
 
         #region IDisposable Support

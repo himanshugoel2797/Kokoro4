@@ -37,7 +37,7 @@ namespace Kokoro.Graphics.OpenGL
                 Console.WriteLine(errorLog);
                 throw new Exception("Shader Compilation Exception : " + errorLog);
             }
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
         }
 
 
@@ -53,7 +53,7 @@ namespace Kokoro.Graphics.OpenGL
                     // TODO: dispose managed state (managed objects).
                 }
 
-                if(id != 0)GL.DeleteShader(id);
+                if (id != 0) GraphicsDevice.QueueForDeletion(id, GLObjectType.Shader);
                 id = 0;
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
@@ -62,9 +62,10 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
-        ~IntShaderSource() {
-          // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-          Dispose(false);
+        ~IntShaderSource()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(false);
         }
 
         // This code added to correctly implement the disposable pattern.

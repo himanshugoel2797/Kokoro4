@@ -72,13 +72,22 @@ namespace TestApplication
                 inited = true;
             }
 
-            handle?.SetResidency(TextureResidency.NonResident);
 
             if (stream != null)
             {
+                handle?.SetResidency(TextureResidency.NonResident);
                 TextureSampler sampler = stream.TargetSampler;
                 handle = tex.GetHandle(sampler);
                 handle.SetResidency(TextureResidency.Resident);
+
+                GC.Collect();
+
+                unsafe
+                {
+                    long* l = (long*)ubo.Update();
+                    l[0] = handle;
+                    ubo.UpdateDone();
+                }
 
                 if (stream.IsDone)
                 {
@@ -87,13 +96,7 @@ namespace TestApplication
                 }
             }
 
-            
-            unsafe
-            {
-                long* l = (long*)ubo.Update();
-                l[0] = handle;
-                ubo.UpdateDone();
-            }
+
             queue.Submit();
 
         }

@@ -15,6 +15,8 @@ using VSyncMode = OpenTK.VSyncMode;
 using Kokoro.StateMachine;
 using Kokoro.Engine.Graphics;
 using Cloo;
+using Kokoro.Engine;
+using System.Collections.Concurrent;
 
 namespace Kokoro.Graphics.OpenGL
 {
@@ -46,7 +48,7 @@ namespace Kokoro.Graphics.OpenGL
         }
 
         public const int MaxIndirectDrawsUBO = 256;
-        public const int MaxIndirectDrawsSSBO = 1024; 
+        public const int MaxIndirectDrawsSSBO = 1024;
 
         public static Size WindowSize
         {
@@ -88,7 +90,7 @@ namespace Kokoro.Graphics.OpenGL
                 if (Window != null) Window.Title = gameName;
             }
         }
-        
+
 
         public static StateGroup GameLoop { get; set; }
 
@@ -117,7 +119,8 @@ namespace Kokoro.Graphics.OpenGL
                     GameLoop.Update = value;
             }
         }
-        public static Action Cleanup { get; set; }
+        public static WeakAction Cleanup { get; set; }
+        public static Action CleanupStrong { get; set; }
         public static OpenTK.Input.KeyboardDevice Keyboard { get { return game.Keyboard; } }
         public static OpenTK.Input.MouseDevice Mouse { get { return game.Mouse; } }
         public static GameWindow Window
@@ -186,7 +189,7 @@ namespace Kokoro.Graphics.OpenGL
                     if (cullMode == Engine.Graphics.CullFaceMode.None) CullEnabled = false;
                     else CullEnabled = true;
 
-                    if(cullMode != Engine.Graphics.CullFaceMode.None)GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
+                    if (cullMode != Engine.Graphics.CullFaceMode.None) GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
                 }
             }
         }
@@ -237,7 +240,7 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                if(clearDepth != value)
+                if (clearDepth != value)
                 {
                     clearDepth = value;
                     GL.ClearDepth(value);
@@ -254,7 +257,7 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                if(alphaSrc != value)
+                if (alphaSrc != value)
                 {
                     alphaSrc = value;
                     GL.BlendFunc((BlendingFactorSrc)alphaSrc, (BlendingFactorDest)alphaDst);
@@ -337,6 +340,8 @@ namespace Kokoro.Graphics.OpenGL
         internal static ComputeCommandQueue _comp_queue;
         internal static ComputeEventList _comp_events;
 
+        private static ConcurrentQueue<Tuple<int, GLObjectType>> DeletionQueue;
+
         [System.Security.SuppressUnmanagedCodeSecurity]
         [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")]
         extern static IntPtr wglGetCurrentDC();
@@ -351,9 +356,16 @@ namespace Kokoro.Graphics.OpenGL
             game.UpdateFrame += Game_UpdateFrame;
 
             GameLoop = new StateGroup();
+            Cleanup = new WeakAction();
+            DeletionQueue = new ConcurrentQueue<Tuple<int, GLObjectType>>();
 
             curVarray = null;
             curProg = null;
+        }
+
+        internal static void QueueForDeletion(int o, GLObjectType t)
+        {
+            DeletionQueue.Enqueue(new Tuple<int, GLObjectType>(o, t));
         }
 
         public static void Run(double ups, double fps)
@@ -380,8 +392,50 @@ namespace Kokoro.Graphics.OpenGL
             game.SwapBuffers();
         }
 
+        private static void DeleteObject(int o, GLObjectType t)
+        {
+            switch(t)
+            {
+                case GLObjectType.Buffer:
+                    GL.DeleteBuffer(o);
+                    break;
+                case GLObjectType.Fence:
+                    GL.DeleteSync((IntPtr)o);
+                    break;
+                case GLObjectType.Framebuffer:
+                    GL.DeleteFramebuffer(o);
+                    break;
+                case GLObjectType.Sampler:
+                    GL.DeleteSampler(o);
+                    break;
+                case GLObjectType.Shader:
+                    GL.DeleteShader(o);
+                    break;
+                case GLObjectType.ShaderProgram:
+                    GL.DeleteProgram(o);
+                    break;
+                case GLObjectType.Texture:
+                    GL.DeleteTexture(o);
+                    break;
+            }
+        }
+
+        public static void DeleteSomeObjects()
+        {
+            for (int i = 0; i < 20 && i < DeletionQueue.Count; i++)
+            {
+                if (DeletionQueue.TryDequeue(out var a))
+                    DeleteObject(a.Item1, a.Item2);
+            }
+        }
+
         public static void Exit()
         {
+            for (int i = 0; i < DeletionQueue.Count; i++)
+            {
+                if (DeletionQueue.TryDequeue(out var a))
+                    DeleteObject(a.Item1, a.Item2);
+            }
             game.Exit();
         }
 
@@ -416,14 +470,14 @@ namespace Kokoro.Graphics.OpenGL
 
             for (int i = 0; i < ComputePlatform.Platforms.Count; i++)
             {
-                if(ComputePlatform.Platforms[i].Vendor == vendorName)
+                if (ComputePlatform.Platforms[i].Vendor == vendorName)
                 {
                     plat = ComputePlatform.Platforms[i];
                     break;
                 }
             }
 
-            
+
             ComputeContextPropertyList props = new ComputeContextPropertyList(new ComputeContextProperty[]
             {
                 new ComputeContextProperty(ComputeContextPropertyName.Platform, plat.Handle.Value),
@@ -435,7 +489,7 @@ namespace Kokoro.Graphics.OpenGL
             _comp_queue = new ComputeCommandQueue(_comp_ctxt, _comp_ctxt.Devices[0], ComputeCommandQueueFlags.OutOfOrderExecution);
             _comp_events = new ComputeEventList();
 
-            Cleanup += () =>
+            CleanupStrong += () =>
             {
                 _comp_events.Clear();
                 _comp_queue.Dispose();
@@ -473,7 +527,7 @@ namespace Kokoro.Graphics.OpenGL
         {
             GL.Viewport(x, y, width, height);
         }
-        
+
         public static void SetVertexArray(VertexArray varray)
         {
             curVarray = varray;
@@ -527,7 +581,7 @@ namespace Kokoro.Graphics.OpenGL
             _comp_queue.AcquireGLObjects(prog.Objects, _comp_events);
             _comp_queue.Execute(prog.kern, new long[] { xoff, yoff, zoff }, new long[] { x, y, z }, new long[] { 4, 4, 4 }, _comp_events);
             _comp_queue.ReleaseGLObjects(prog.Objects, _comp_events);
-            while (_comp_events.Count > 10)_comp_events.RemoveAt(0);
+            while (_comp_events.Count > 10) _comp_events.RemoveAt(0);
         }
         #endregion
 
@@ -535,9 +589,9 @@ namespace Kokoro.Graphics.OpenGL
         public static void Draw(Engine.Graphics.PrimitiveType type, int first, int count, bool indexed)
         {
             if (count == 0) return;
-            
+
             curProg.Set(nameof(WindowSize), new Vector2(WindowSize.Width, WindowSize.Height));
-            
+
             if (indexed) GL.DrawElements((OpenTK.Graphics.OpenGL.PrimitiveType)type, count, DrawElementsType.UnsignedShort, IntPtr.Zero);
             else GL.DrawArrays((OpenTK.Graphics.OpenGL.PrimitiveType)type, first, count);
         }

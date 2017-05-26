@@ -114,7 +114,7 @@ namespace Kokoro.Engine.Graphics
         {
             id = 0;
             handles = new Dictionary<int, TextureHandle>();
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
         }
 
         public TextureHandle GetHandle(TextureSampler sampler)
@@ -198,7 +198,7 @@ namespace Kokoro.Engine.Graphics
                     // TODO: dispose managed state (managed objects).
                 }
 
-                if (id != 0) GL.DeleteTexture(id);
+                if (id != 0) GraphicsDevice.QueueForDeletion(id, GLObjectType.Texture);
                 id = 0;
 
                 disposedValue = true;

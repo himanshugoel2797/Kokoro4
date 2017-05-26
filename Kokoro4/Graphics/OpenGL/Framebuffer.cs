@@ -44,7 +44,7 @@ namespace Kokoro.Engine.Graphics
 
             GL.CreateFramebuffers(1, out id);
             bindings = new Dictionary<FramebufferAttachment, Texture>();
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
         }
 
         public Texture this[FramebufferAttachment attachment]
@@ -88,7 +88,7 @@ namespace Kokoro.Engine.Graphics
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
-                if (id != 0) GL.DeleteFramebuffer(id);
+                if (id != 0) GraphicsDevice.QueueForDeletion(id, GLObjectType.Framebuffer);
                 id = 0;
 
                 disposedValue = true;

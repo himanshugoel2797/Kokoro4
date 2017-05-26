@@ -46,7 +46,7 @@ namespace Kokoro.Graphics.OpenGL
 
 
             locs = new Dictionary<string, int>();
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
         }
 
 
@@ -169,7 +169,7 @@ namespace Kokoro.Graphics.OpenGL
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
-                if (id != 0) GL.DeleteProgram(id);
+                if (id != 0) GraphicsDevice.QueueForDeletion(id, GLObjectType.ShaderProgram);
                 id = 0;
 
                 disposedValue = true;

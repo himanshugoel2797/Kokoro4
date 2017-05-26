@@ -15,7 +15,7 @@ namespace Kokoro.Graphics.OpenGL
         public VertexArray()
         {
             GL.CreateVertexArrays(1, out id);
-            GraphicsDevice.Cleanup += Dispose;
+            GraphicsDevice.Cleanup.Add(Dispose);
         }
 
         public void SetElementBufferObject(GPUBuffer buffer)

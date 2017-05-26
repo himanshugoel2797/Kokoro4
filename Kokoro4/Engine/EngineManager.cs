@@ -47,6 +47,8 @@ namespace Kokoro.Engine
             NextFrameTasks = new Queue<Action>();
             DeregisterTasks = new List<Action>();
 
+            BackgroundTasks.Enqueue(GraphicsDevice.DeleteSomeObjects);
+
             //Initialize the state machine
             StateManager = new StateManager();
             GraphicsDevice.GameLoop.RegisterIState(new _SceneMan());
@@ -147,6 +149,7 @@ namespace Kokoro.Engine
 
         public static void Exit()
         {
+            GraphicsDevice.CleanupStrong();
             GraphicsDevice.Cleanup?.Invoke();
             GraphicsDevice.Exit();
         }

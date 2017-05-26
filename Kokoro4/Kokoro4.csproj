@@ -142,6 +142,7 @@
     <Compile Include="Engine\Graphics\BitmapTextureSource.cs" />
     <Compile Include="Engine\Voxel\Voxelizer.cs" />
     <Compile Include="Engine\Voxel\VoxelOctree.cs" />
+    <Compile Include="Engine\WeakAction.cs" />
     <Compile Include="Graphics\OpenGL\AsyncComputeProgram.cs" />
     <Compile Include="Graphics\OpenGL\AsyncComputeSource.cs" />
     <Compile Include="Graphics\OpenGL\BlendFunc.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Graphics\OpenGL\Framebuffer.cs" />
     <Compile Include="Engine\Graphics\FramebufferTextureSource.cs" />
     <Compile Include="Engine\Graphics\GBuffer.cs" />
+    <Compile Include="Graphics\OpenGL\GLObjectType.cs" />
     <Compile Include="Graphics\OpenGL\GPUBuffer.cs" />
     <Compile Include="Graphics\OpenGL\GPUStateMachine.cs" />
     <Compile Include="Graphics\OpenGL\GraphicsDevice.cs" />

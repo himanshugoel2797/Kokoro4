@@ -32,7 +32,7 @@ namespace Kokoro.Engine.Graphics
                 this.owner = owner;
 
                 EngineManager.RegisterBackgroundTask(UpdateProgress);
-                GraphicsDevice.Cleanup += Dispose;
+                GraphicsDevice.Cleanup.Add(Dispose);
             }
 
             private void Upload()
