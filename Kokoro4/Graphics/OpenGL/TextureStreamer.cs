@@ -130,6 +130,8 @@ namespace Kokoro.Engine.Graphics
 
             public void Free()
             {
+                TargetSampler = null;
+                TargetTexture = null;
                 owner.pending.Remove(this);
                 owner.buffers.Enqueue(this);
             }

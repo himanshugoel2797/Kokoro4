@@ -14,6 +14,7 @@ namespace Kokoro.Graphics.OpenGL
         Fence,
         Shader,
         ShaderProgram,
-        Framebuffer
+        Framebuffer,
+        VertexArray
     }
 }

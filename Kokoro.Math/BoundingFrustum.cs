@@ -140,7 +140,7 @@ namespace Kokoro.Math
 
         public void GetCorners(Vector3[] corners)
         {
-            throw new NotImplementedException();
+            corners = GetCorners();
         }
 
         public void Contains(ref BoundingBox box, out ContainmentType result)
@@ -293,12 +293,57 @@ namespace Kokoro.Math
 
         public bool Intersects(BoundingBox box)
         {
-            throw new NotImplementedException();
+            bool isIntersecting = false;
+            Vector3 vmin = Vector3.Zero, vmax = Vector3.Zero;
+            Plane[] planes = new Plane[] { this.Left, this.Right, this.Top, this.Bottom, this.Far, this.Near };
+
+            for (int i = 0; i < 6; i++)
+            {
+                // X axis 
+                if (planes[i].Normal.X > 0)
+                {
+                    vmin.X = box.Min.X;
+                    vmax.X = box.Max.X;
+                }
+                else
+                {
+                    vmin.X = box.Max.X;
+                    vmax.X = box.Min.X;
+                }
+                // Y axis 
+                if (planes[i].Normal.Y > 0)
+                {
+                    vmin.Y = box.Min.Y;
+                    vmax.Y = box.Max.Y;
+                }
+                else
+                {
+                    vmin.Y = box.Max.Y;
+                    vmax.Y = box.Min.Y;
+                }
+                // Z axis 
+                if (planes[i].Normal.Z > 0)
+                {
+                    vmin.Z = box.Min.Z;
+                    vmax.Z = box.Max.Z;
+                }
+                else
+                {
+                    vmin.Z = box.Max.Z;
+                    vmax.Z = box.Min.Z;
+                }
+                if (Vector3.Dot(planes[i].Normal, vmin) + planes[i].D > 0)
+                    return false;
+                if (Vector3.Dot(planes[i].Normal, vmax) + planes[i].D >= 0)
+                    isIntersecting = true;
+            }
+
+            return isIntersecting;
         }
 
         public void Intersects(ref BoundingBox box, out bool result)
         {
-            throw new NotImplementedException();
+            result = Intersects(box);
         }
 
         public bool Intersects(BoundingFrustum frustum)

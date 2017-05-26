@@ -394,7 +394,7 @@ namespace Kokoro.Graphics.OpenGL
 
         private static void DeleteObject(int o, GLObjectType t)
         {
-            switch(t)
+            switch (t)
             {
                 case GLObjectType.Buffer:
                     GL.DeleteBuffer(o);
@@ -416,6 +416,9 @@ namespace Kokoro.Graphics.OpenGL
                     break;
                 case GLObjectType.Texture:
                     GL.DeleteTexture(o);
+                    break;
+                case GLObjectType.VertexArray:
+                    GL.DeleteVertexArray(o);
                     break;
             }
         }

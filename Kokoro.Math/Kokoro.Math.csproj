@@ -75,6 +75,7 @@
     <Compile Include="Box2.cs" />
     <Compile Include="ColorTools.cs" />
     <Compile Include="ContainmentType.cs" />
+    <Compile Include="Data\QuadTree.cs" />
     <Compile Include="FNV1a.cs" />
     <Compile Include="Half.cs" />
     <Compile Include="MathHelper.cs" />
@@ -83,7 +84,7 @@
     <Compile Include="Matrix3d.cs" />
     <Compile Include="Matrix4.cs" />
     <Compile Include="Matrix4d.cs" />
-    <Compile Include="Octree.cs" />
+    <Compile Include="Data\Octree.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneIntersectionType.cs" />
     <Compile Include="Point.cs" />

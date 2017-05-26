@@ -74,7 +74,7 @@ namespace Kokoro.Graphics.OpenGL
                     // TODO: dispose managed state (managed objects).
                 }
 
-                GL.DeleteVertexArray(id);
+                if (id != 0) GraphicsDevice.QueueForDeletion(id, GLObjectType.VertexArray);
                 id = 0;
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.

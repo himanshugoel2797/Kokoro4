@@ -5,7 +5,7 @@ in vec2 UV;
 layout(location = 0) out vec4 color;
 // Values that stay constant for the whole mesh.
 
-layout(binding = 0) uniform Material_t {
+layout(std140) uniform Material_t {
 	uvec2 Albedo;
 } Material;
 
