@@ -63,7 +63,8 @@ namespace TestApplication
                 handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
-                GraphicsDevice.Wireframe = true;
+
+                //GraphicsDevice.Wireframe = true;
                 unsafe
                 {
                     long* l = (long*)textureUBO.Update();
@@ -75,7 +76,7 @@ namespace TestApplication
                 state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
                 state.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
 
-                terrainRenderer = new TerrainRenderer(100, grp, state, worldSSBO);
+                terrainRenderer = new TerrainRenderer(5000, grp, camera, state, worldSSBO);
 
                 inited = true;
             }
@@ -83,13 +84,19 @@ namespace TestApplication
             state.ShaderProgram.Set("View", camera.View);
             state.ShaderProgram.Set("Projection", camera.Projection);
 
+            bool terrainUpdateNeeded = false;
+
             if (updateCamPos)
             {
+                if (camPos != camera.Position | camDir != camera.Direction)
+                {
+                    terrainUpdateNeeded = true;
+                }
                 camPos = camera.Position;
                 camDir = camera.Direction;
             }
 
-            terrainRenderer.Update(camPos, camDir);
+            if (terrainUpdateNeeded) terrainRenderer.Update(camPos, camDir);
             terrainRenderer.Draw();
 
         }
