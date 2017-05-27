@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Math.Data
 {
-    public class QuadTree
+    public class QuadTree<T>
     {
-        public QuadTree TopLeft { get; private set; }
-        public QuadTree TopRight { get; private set; }
-        public QuadTree BottomLeft { get; private set; }
-        public QuadTree BottomRight { get; private set; }
+        public QuadTree<T> TopLeft { get; private set; }
+        public QuadTree<T> TopRight { get; private set; }
+        public QuadTree<T> BottomLeft { get; private set; }
+        public QuadTree<T> BottomRight { get; private set; }
 
         public Vector2 Min { get; private set; }
         public Vector2 Max { get; private set; }
@@ -20,6 +20,26 @@ namespace Kokoro.Math.Data
         {
             this.Max = max;
             this.Min = min;
+        }
+
+        public QuadTree<T> this[int idx]
+        {
+            get
+            {
+                switch (idx)
+                {
+                    case 0:
+                        return TopLeft;
+                    case 1:
+                        return TopRight;
+                    case 2:
+                        return BottomLeft;
+                    case 3:
+                        return BottomRight;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
         }
 
         //Sample grid, isolevel is density after which surface is present
@@ -36,10 +56,10 @@ namespace Kokoro.Math.Data
 
             Vector2 c = new Vector2((Max.X - Min.X) * 0.5f + Min.X, (Max.Y - Min.Y) * 0.5f + Min.Y);
 
-            TopLeft = new QuadTree(ml, tm);
-            TopRight = new QuadTree(c, Max);
-            BottomLeft = new QuadTree(Min, c);
-            BottomRight = new QuadTree(bm, mr);
+            TopLeft = new QuadTree<T>(ml, tm);
+            TopRight = new QuadTree<T>(c, Max);
+            BottomLeft = new QuadTree<T>(Min, c);
+            BottomRight = new QuadTree<T>(bm, mr);
         }
     }
 }

@@ -9,6 +9,7 @@ layout(std140) uniform Material_t {
 	uvec2 Albedo;
 } Material;
 
+
 void main(){
 	color = texture(sampler2D(Material.Albedo), UV);
 	color.a = 1;

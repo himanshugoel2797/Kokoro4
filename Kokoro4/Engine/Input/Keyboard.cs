@@ -27,6 +27,11 @@ namespace Kokoro.Engine.Input
             KeyMap = (Dictionary<string, Key>)xSer.Deserialize(s);
         }
 
+        public Keyboard()
+        {
+            KeyMap = new Dictionary<string, Key>();
+        }
+
         public void SaveKeyMap(string configFile)
         {
             Stream s = File.Open(configFile, FileMode.Create);
@@ -34,9 +39,14 @@ namespace Kokoro.Engine.Input
             xSer.Serialize(s, KeyMap);
         }
 
-        public bool IsKeyPressed(string name)
+        public bool IsKeyReleased(string name)
         {
-            return IsKeyPressed(KeyMap[name]);
+            return IsKeyReleased(KeyMap[name]);
+        }
+
+        public bool IsKeyDown(string name)
+        {
+            return IsKeyDown(KeyMap[name]);
         }
 
         internal static void Update()
@@ -45,7 +55,7 @@ namespace Kokoro.Engine.Input
 
             foreach (KeyValuePair<Key, Action> handler in handlers)
             {
-                if (IsKeyPressed(handler.Key)) handler.Value();
+                if (IsKeyDown(handler.Key)) handler.Value();
             }
         }
 
@@ -54,7 +64,12 @@ namespace Kokoro.Engine.Input
         /// </summary>
         /// <param name="k">The key to test</param>
         /// <returns>A boolean describing whether the key is pressed or not</returns>
-        internal static bool IsKeyPressed(Key k)
+        internal static bool IsKeyReleased(Key k)
+        {
+            return InputLL.KeyReleased(k);
+        }
+
+        internal static bool IsKeyDown(Key k)
         {
             return InputLL.KeyDown(k);
         }

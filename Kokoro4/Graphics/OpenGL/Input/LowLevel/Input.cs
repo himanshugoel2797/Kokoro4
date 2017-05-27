@@ -32,11 +32,13 @@ namespace Kokoro.Input.LowLevel
 
         #region Keyboard
         static KeyboardState kbdState;
+        static KeyboardState prevKbdState;
         static object locker;
         public static void UpdateKeyboard()
         {
             lock (locker)
             {
+                prevKbdState = kbdState;
                 kbdState = OpenTK.Input.Keyboard.GetState();
             }
         }
@@ -47,6 +49,18 @@ namespace Kokoro.Input.LowLevel
             lock (locker)
             {
                 return kbdState[(Key)k];
+            }
+        }
+        
+        public static bool KeyReleased(Kokoro.Engine.Input.Key k)
+        {
+            if (!foc) return false;
+            lock (locker)
+            {
+                if (prevKbdState == null)
+                    return false;
+
+                return prevKbdState[(Key)k] && !kbdState[(Key)k];
             }
         }
         #endregion

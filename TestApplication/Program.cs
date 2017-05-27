@@ -26,6 +26,7 @@ namespace TestApplication
             EngineManager.StateManager.AddState(nameof(TextureStreamingTest), new TextureStreamingTest());
             EngineManager.StateManager.AddState(nameof(QuadTreeTerrainTest), new QuadTreeTerrainTest());
             EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
+            //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest));
 
             EngineManager.Run(60, 60);
             EngineManager.Exit();

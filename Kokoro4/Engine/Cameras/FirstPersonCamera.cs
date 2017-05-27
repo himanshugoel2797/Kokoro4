@@ -72,39 +72,39 @@ namespace Kokoro.Engine.Cameras
             UpdateViewMatrix();
             Vector3 Right = Vector3.Cross(cameraRotatedUpVector, Direction);
 
-            if (Keyboard.IsKeyPressed(Key.Up))
+            if (Keyboard.IsKeyDown(Key.Up))
             {
                 Position += Direction * (float)(moveSpeed * interval / 10000f);
             }
-            else if (Keyboard.IsKeyPressed(Key.Down))
+            else if (Keyboard.IsKeyDown(Key.Down))
             {
                 Position -= Direction * (float)(moveSpeed * interval / 10000f);
             }
 
-            if (Keyboard.IsKeyPressed(Key.Left))
+            if (Keyboard.IsKeyDown(Key.Left))
             {
                 Position -= Right * (float)(moveSpeed * interval / 10000f);
             }
-            else if (Keyboard.IsKeyPressed(Key.Right))
+            else if (Keyboard.IsKeyDown(Key.Right))
             {
                 Position += Right * (float)(moveSpeed * interval / 10000f);
             }
 
 #if DEBUG
-            if (Keyboard.IsKeyPressed(Key.PageDown))
+            if (Keyboard.IsKeyDown(Key.PageDown))
             {
                 Position -= cameraRotatedUpVector * (float)(moveSpeed * interval / 10000f);
             }
-            else if (Keyboard.IsKeyPressed(Key.PageUp))
+            else if (Keyboard.IsKeyDown(Key.PageUp))
             {
                 Position += cameraRotatedUpVector * (float)(moveSpeed * interval / 10000f);
             }
 
-            if (Keyboard.IsKeyPressed(Key.Home))
+            if (Keyboard.IsKeyDown(Key.Home))
             {
                 moveSpeed += 0.02f * moveSpeed;
             }
-            else if (Keyboard.IsKeyPressed(Key.End))
+            else if (Keyboard.IsKeyDown(Key.End))
             {
                 moveSpeed -= 0.02f * moveSpeed;
             }

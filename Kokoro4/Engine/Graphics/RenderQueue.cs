@@ -76,6 +76,12 @@ namespace Kokoro.Engine.Graphics
             isRecording = true;
         }
 
+        public void BeginRecording()
+        {
+            if (isRecording) throw new Exception("Already recording.");
+            isRecording = true;
+        }
+
         public void RecordDraws(DrawData[] draws)
         {
             for (int i = 0; i < draws.Length; i++)

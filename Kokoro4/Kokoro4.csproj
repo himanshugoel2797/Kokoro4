@@ -119,6 +119,7 @@
     <Compile Include="Engine\GameObject.cs" />
     <Compile Include="Engine\GameObjectCollection.cs" />
     <Compile Include="Engine\Graphics\ArrayTextureSource.cs" />
+    <Compile Include="Engine\Graphics\DistanceState.cs" />
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />
     <Compile Include="Engine\Graphics\FramebufferAttachment.cs" />
     <Compile Include="Engine\Graphics\GraphicsObject.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Engine\Graphics\ShaderGroup.cs" />
     <Compile Include="Engine\Graphics\ShaderProgram.cs" />
     <Compile Include="Engine\Graphics\ShaderSource.cs" />
+    <Compile Include="Engine\Graphics\TerrainRenderer.cs" />
     <Compile Include="Engine\Light.cs" />
     <Compile Include="Engine\MeshGroup.cs" />
     <Compile Include="Engine\UI\UIControl.cs" />

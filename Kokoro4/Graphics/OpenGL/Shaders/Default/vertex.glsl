@@ -23,6 +23,7 @@ void main(){
 
 	// UV of the vertex. No special space for this one.
 	UV = vs_uv;
+	//UV = (vs_pos.xz/vec2(50)+vec2(1,1))/2.0;
 
 	vec2 n = vs_normal / 100.0f * PI/180.0f;
 	normal.x = cos(n.x) * sin(n.y);

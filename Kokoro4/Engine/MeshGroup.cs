@@ -58,13 +58,13 @@ namespace Kokoro.Engine
 
 
             vertices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * vertex_size, false);
-            uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(ushort), false);
+            uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(float), false);
             normals = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * sizeof(uint), false);
             indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer, index_cnt * sizeof(ushort), false);
 
             varray = new VertexArray();
             varray.SetBufferObject(0, vertices, vertex_comp_cnt, vAttribPtrType, false);
-            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.UnsignedShort, false);
+            varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float, false);
             varray.SetBufferObject(2, normals, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Short, false);
             varray.SetElementBufferObject(indices);
 
@@ -104,7 +104,7 @@ namespace Kokoro.Engine
                     normals.FlushBuffer((offset * sizeof(uint)), size * sizeof(uint));
                     break;
                 case IntPtrIndex.UV:
-                    uvs.FlushBuffer((offset * 2 * sizeof(ushort)), size * sizeof(ushort) * 2);
+                    uvs.FlushBuffer((offset * 2 * sizeof(float)), size * sizeof(float) * 2);
                     break;
                 case IntPtrIndex.Vertex:
                     vertices.FlushBuffer((offset * 3 * sizeof(float)), size * vertex_size);

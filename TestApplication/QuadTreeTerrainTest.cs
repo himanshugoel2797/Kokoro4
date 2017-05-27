@@ -1,6 +1,7 @@
 ﻿using Kokoro.Engine;
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
+using Kokoro.Engine.Input;
 using Kokoro.Graphics.OpenGL;
 using Kokoro.Graphics.Prefabs;
 using Kokoro.Math;
@@ -18,16 +19,18 @@ namespace TestApplication
         private bool inited = false;
         private FirstPersonCamera camera;
         private MeshGroup grp;
-        private Mesh mesh;
+        private TerrainRenderer terrainRenderer;
         private RenderState state;
         private RenderQueue queue;
         private UniformBuffer textureUBO;
         private ShaderStorageBuffer worldSSBO;
         private Texture tex;
-        private TextureStreamer.TextureStream stream;
         private TextureHandle handle;
 
-        private TextureStreamer tStreamer;
+        private Vector3 camPos, camDir;
+        private bool updateCamPos;
+
+        private Keyboard keybd;
 
         public void Enter(IState prev)
         {
@@ -42,67 +45,25 @@ namespace TestApplication
         {
             if (!inited)
             {
+                keybd = new Keyboard();
+                keybd.KeyMap.Add("ToggleCamPos", Key.Z);
+
                 camera = new FirstPersonCamera(Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
                 EngineManager.AddCamera(camera);
                 EngineManager.SetVisibleCamera(camera.Name);
 
-                tStreamer = new TextureStreamer(10);
+                grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 20000, 20000);
 
-                grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 10000, 10000);
-                mesh = QuadFactory.Create(grp, 10, 10);
-
-                BitmapTextureSource bitmapSrc = new BitmapTextureSource("test.png", 10);
-                stream = tStreamer.UploadTexture(bitmapSrc);
-                tex = stream.TargetTexture;
+                BitmapTextureSource bitmapSrc = new BitmapTextureSource("test.png", 1);
+                tex = new Texture();
+                tex.SetData(bitmapSrc, 0);
                 textureUBO = new UniformBuffer();
-                worldSSBO = new ShaderStorageBuffer(16 * sizeof(float));
-
-                GraphicsDevice.Wireframe = true;
-
-                unsafe
-                {
-                    float* f = (float*)worldSSBO.Update();
-                    float[] ident = (float[])Matrix4.Identity;
-
-                    for (int i = 0; i < ident.Length; i++)
-                    {
-                        f[i] = ident[i];
-                    }
-
-                    worldSSBO.UpdateDone();
-                }
-
-                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { worldSSBO }, new UniformBuffer[] { textureUBO }, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.None);
-                state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
-                state.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
-
-                queue = new RenderQueue(10);
-
-                queue.ClearAndBeginRecording();
-                queue.ClearFramebufferBeforeSubmit = true;
-                queue.RecordDraw(new RenderQueue.DrawData()
-                {
-                    Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = 1, Mesh = mesh } },
-                    State = state
-                });
-                queue.EndRecording();
-
-                inited = true;
-            }
-
-            state.ShaderProgram.Set("View", camera.View);
-            state.ShaderProgram.Set("Projection", camera.Projection);
-
-            if (stream != null)
-            {
-                handle?.SetResidency(TextureResidency.NonResident);
-                TextureSampler sampler = stream.TargetSampler;
-                handle = tex.GetHandle(sampler);
+                worldSSBO = new ShaderStorageBuffer(16 * sizeof(float) * 256);
+                handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
-                GC.Collect();
-
+                GraphicsDevice.Wireframe = true;
                 unsafe
                 {
                     long* l = (long*)textureUBO.Update();
@@ -110,21 +71,37 @@ namespace TestApplication
                     textureUBO.UpdateDone();
                 }
 
-                if (stream.IsDone)
-                {
-                    stream.Free();
-                    stream = null;
-                }
+                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { worldSSBO }, new UniformBuffer[] { textureUBO }, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.None);
+                state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
+                state.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
+
+                terrainRenderer = new TerrainRenderer(100, grp, state, worldSSBO);
+
+                inited = true;
             }
 
+            state.ShaderProgram.Set("View", camera.View);
+            state.ShaderProgram.Set("Projection", camera.Projection);
 
-            queue.Submit();
+            if (updateCamPos)
+            {
+                camPos = camera.Position;
+                camDir = camera.Direction;
+            }
+
+            terrainRenderer.Update(camPos, camDir);
+            terrainRenderer.Draw();
 
         }
 
         public void Update(double interval)
         {
             camera?.Update(interval);
+
+            if (keybd?.IsKeyReleased("ToggleCamPos") == true)
+            {
+                updateCamPos = !updateCamPos;
+            }
         }
     }
 }

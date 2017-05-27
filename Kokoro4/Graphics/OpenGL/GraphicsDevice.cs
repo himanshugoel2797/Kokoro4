@@ -540,11 +540,13 @@ namespace Kokoro.Graphics.OpenGL
         #region Shader Buffers
         public static void SetShaderStorageBufferBinding(ShaderStorageBuffer buf, int index)
         {
+            if (buf == null) return;
             GPUStateMachine.BindBuffer(BufferTarget.ShaderStorageBuffer, buf.buf.id, index, IntPtr.Zero, IntPtr.Zero);
         }
 
         public static void SetUniformBufferBinding(UniformBuffer buf, int index)
         {
+            if (buf == null) return;
             GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.buf.id, index, IntPtr.Zero, IntPtr.Zero);
         }
 
