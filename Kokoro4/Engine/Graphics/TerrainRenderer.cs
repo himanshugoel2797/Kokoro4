@@ -24,15 +24,29 @@ namespace Kokoro.Engine.Graphics
         RenderState state;
         ShaderStorageBuffer WorldBuffer;
         Camera cam;
-        const int quadSide = 10;
-        int maxLevels = 1;
+        const int quadSide = 50;
+        int maxLevels = 20;
+        int len = 2048;
+
+        float[] thresholds = new float[]
+        {
+            50,
+            50,
+            50,
+            50,
+            50,
+            50,
+            50,
+            50,
+            50,
+            50,
+        };
 
         public TerrainRenderer(float side, MeshGroup grp, Camera c, RenderState state, ShaderStorageBuffer ssbo)
         {
-            int len = 256;
 
             quad = QuadFactory.Create(grp, quadSide, quadSide);
-            Data = new QuadTree<TerrainData>(new Math.Vector2(side * -0.5f, side * -0.5f), new Math.Vector2(side * 0.5f, side * 0.5f));
+            Data = new QuadTree<TerrainData>(new Math.Vector2(side * -0.5f, side * -0.5f), new Math.Vector2(side * 0.5f, side * 0.5f), 0);
             this.side = side;
             this.state = state;
 
@@ -48,18 +62,22 @@ namespace Kokoro.Engine.Graphics
             Vector3 tr = new Vector3(d.Max.X, 0, d.Max.Y);
             Vector3 bl = new Vector3(d.Min.X, 0, d.Min.Y);
             Vector3 br = new Vector3(d.Max.X, 0, d.Min.Y);
+            Vector3 c = (tl + tr + bl + br) * 0.25f;
 
             float side = System.Math.Abs((d.Max.X - d.Min.X));
-            float dist_side = side;
+            float dist_side = side * 6;
 
             float dist_tl = (pos - tl).LengthSquared;
             float dist_tr = (pos - tr).LengthSquared;
-            float dist_bl = (pos - bl).LengthSquared; 
+            float dist_bl = (pos - bl).LengthSquared;
             float dist_br = (pos - br).LengthSquared;
+
+            float dist_c = (pos - c).LengthSquared;
 
             float min_dist0 = System.Math.Min(dist_tl, dist_tr);
             float min_dist1 = System.Math.Min(dist_bl, dist_br);
             float min_dist = System.Math.Min(min_dist0, min_dist1);
+            min_dist = System.Math.Min(min_dist, dist_c);
 
             float tl_a = Vector3.Dot(Vector3.Normalize(tl - pos), dir);
             float tr_a = Vector3.Dot(Vector3.Normalize(tr - pos), dir);
@@ -76,6 +94,15 @@ namespace Kokoro.Engine.Graphics
             bool br_vis = br_a >= 0;
 
 
+            /*if (50 * System.Math.Pow(2, (maxLevels - level)/16) >= min_dist)
+            {
+                if (d.Level < maxLevels - 1 && d.IsLeaf)
+                    d.Split();
+
+                return DistanceState.Visible;
+            }
+            return DistanceState.Invisible;*/
+
             //Inside tile
             if (dist_tl <= side && dist_tr <= side && dist_bl <= side && dist_br <= side)
                 return (d.IsLeaf ? DistanceState.Stop : DistanceState.Visible);
@@ -84,7 +111,7 @@ namespace Kokoro.Engine.Graphics
             if (!tl_vis && !tr_vis && !bl_vis && !br_vis)
                 return DistanceState.Load;
 
-            //TODO: find visibility bug
+            //TODO: fix heuristics to be flexible, or decide how many levels to support and code in the distance thresholds.
 
 
             //subdivide when very close to the current level relative to the side
@@ -116,10 +143,10 @@ namespace Kokoro.Engine.Graphics
 
             if (min_dist <= dist_side * dist_side)
             {
-                //if (min_dist <= dist_side * dist_side / 80)
+                if (min_dist <= dist_side * dist_side / 36)
                     return DistanceState.Visible;
-                //else
-                //    return DistanceState.Stop;
+                else
+                    return DistanceState.Stop;
             }
 
             return DistanceState.Invisible;
@@ -142,7 +169,7 @@ namespace Kokoro.Engine.Graphics
 
             if ((maxLevel == DistanceState.Stop) | (parentState == DistanceState.Visible && maxLevel == DistanceState.Invisible) | (maxLevel == DistanceState.Visible && tData.IsLeaf))
             {
-                transforms.Add(Matrix4.Scale(side / (1 << level)) * Matrix4.CreateTranslation(new Vector3(tData.Min.X * quadSide, 0, tData.Min.Y * quadSide)));
+                transforms.Add(Matrix4.Scale(side / (1 << level) * 1.0f / quadSide) * Matrix4.CreateTranslation(new Vector3(tData.Min.X, 0, tData.Min.Y)));
                 return;
             }
 
@@ -175,7 +202,10 @@ namespace Kokoro.Engine.Graphics
         public void Update(Vector3 pos, Vector3 dir)
         {
             transforms.Clear();
-            Traverse(Data, 0, pos / quadSide, dir, DistanceState.Visible);
+            Traverse(Data, 0, pos, dir, DistanceState.Visible);
+
+            if (transforms.Count > len)
+                throw new Exception();
 
             unsafe
             {

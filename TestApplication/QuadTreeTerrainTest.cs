@@ -59,12 +59,12 @@ namespace TestApplication
                 tex = new Texture();
                 tex.SetData(bitmapSrc, 0);
                 textureUBO = new UniformBuffer();
-                worldSSBO = new ShaderStorageBuffer(16 * sizeof(float) * 256);
+                worldSSBO = new ShaderStorageBuffer(16 * sizeof(float) * 2048);
                 handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
 
-                //GraphicsDevice.Wireframe = true;
+                GraphicsDevice.Wireframe = true;
                 unsafe
                 {
                     long* l = (long*)textureUBO.Update();
@@ -76,7 +76,7 @@ namespace TestApplication
                 state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
                 state.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
 
-                terrainRenderer = new TerrainRenderer(5000, grp, camera, state, worldSSBO);
+                terrainRenderer = new TerrainRenderer(50000, grp, camera, state, worldSSBO);
 
                 inited = true;
             }

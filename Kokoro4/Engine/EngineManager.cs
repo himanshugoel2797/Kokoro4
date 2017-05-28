@@ -120,7 +120,7 @@ namespace Kokoro.Engine
 
         public static bool ExecuteBackgroundTasksUntil(Func<bool> a)
         {
-            while(!a())
+            while (!a())
             {
                 if (BackgroundTasks.Count == 0)
                     return a();

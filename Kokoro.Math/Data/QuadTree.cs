@@ -16,12 +16,15 @@ namespace Kokoro.Math.Data
         public Vector2 Min { get; private set; }
         public Vector2 Max { get; private set; }
 
+        public int Level { get; private set; }
+
         public bool IsLeaf { get; private set; }
 
-        public QuadTree(Vector2 min, Vector2 max)
+        public QuadTree(Vector2 min, Vector2 max, int lvl)
         {
             this.Max = max;
             this.Min = min;
+            this.Level = lvl;
             IsLeaf = true;
         }
 
@@ -60,10 +63,10 @@ namespace Kokoro.Math.Data
             Vector2 c = new Vector2((Max.X - Min.X) * 0.5f + Min.X, (Max.Y - Min.Y) * 0.5f + Min.Y);
 
             IsLeaf = false;
-            TopLeft = new QuadTree<T>(ml, tm);
-            TopRight = new QuadTree<T>(c, Max);
-            BottomLeft = new QuadTree<T>(Min, c);
-            BottomRight = new QuadTree<T>(bm, mr);
+            TopLeft = new QuadTree<T>(ml, tm, Level + 1);
+            TopRight = new QuadTree<T>(c, Max, Level + 1);
+            BottomLeft = new QuadTree<T>(Min, c, Level + 1);
+            BottomRight = new QuadTree<T>(bm, mr, Level + 1);
         }
     }
 }
