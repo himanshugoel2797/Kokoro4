@@ -114,6 +114,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\CoroutineManager.cs" />
     <Compile Include="Engine\EngineComponent.cs" />
     <Compile Include="Engine\EngineManager.cs" />
     <Compile Include="Engine\GameObject.cs" />
