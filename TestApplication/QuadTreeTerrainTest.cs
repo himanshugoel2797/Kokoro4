@@ -23,8 +23,7 @@ namespace TestApplication
         private Texture tex;
         private TextureHandle handle;
 
-        private Vector3 camPos, camDir;
-        private bool updateCamPos = true;
+        private Vector3 camPos;
 
         private Keyboard keybd;
 
@@ -59,8 +58,6 @@ namespace TestApplication
             if (!inited)
             {
                 keybd = new Keyboard();
-                keybd.KeyMap.Add("ToggleCamPos", Key.Z);
-
                 camera = new FirstPersonCamera(keybd, Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
                 EngineManager.AddCamera(camera);
@@ -71,33 +68,23 @@ namespace TestApplication
                 BitmapTextureSource bitmapSrc = new BitmapTextureSource("heightmap.png", 1);
                 tex = new Texture();
                 tex.SetData(bitmapSrc, 0);
-                
+
                 handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
-
                 //GraphicsDevice.Wireframe = true;
-                
-                terrainRenderer = new TerrainRenderer(5000, grp, Framebuffer.Default, handle);
+
+                terrainRenderer = new TerrainRenderer(5000, grp, Framebuffer.Default, handle, 0, 2, 0);
 
                 inited = true;
             }
 
-            
-            bool terrainUpdateNeeded = false;
 
-
-            if (updateCamPos)
+            if (camPos != camera.Position)
             {
-                if (camPos != camera.Position)
-                {
-                    terrainUpdateNeeded = true;
-                }
                 camPos = camera.Position;
-                camDir = camera.Direction;
+                terrainRenderer.Update(camPos, camera.Direction);
             }
-
-            if (terrainUpdateNeeded) terrainRenderer.Update(camPos, camDir);
             terrainRenderer.Draw(camera.View, camera.Projection);
 
         }
@@ -105,11 +92,6 @@ namespace TestApplication
         public void Update(double interval)
         {
             camera?.Update(interval);
-
-            if (keybd?.IsKeyReleased("ToggleCamPos") == true)
-            {
-                updateCamPos = !updateCamPos;
-            }
         }
     }
 }

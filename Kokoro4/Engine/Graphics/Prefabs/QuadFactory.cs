@@ -10,7 +10,7 @@ namespace Kokoro.Graphics.Prefabs
 {
     public class QuadFactory
     {
-        public static Mesh Create(MeshGroup grp, ushort xSize, ushort ySize, Vector3 idxs)
+        public static Mesh Create(MeshGroup grp, ushort xSize, ushort ySize, Vector3 normal, Vector3 idxs)
         {
             float[] vertices = new float[(xSize + 1) * (ySize + 1) * 3];
             uint[] norms = new uint[(xSize + 1) * (ySize + 1)];
@@ -23,7 +23,7 @@ namespace Kokoro.Graphics.Prefabs
                     vertices[i * 3 + (int)idxs.Y] = 0;
                     vertices[i * 3 + (int)idxs.Z] = y;
 
-                    norms[i] = Mesh.CompressNormal(0, 1, 0);
+                    norms[i] = Mesh.CompressNormal(normal.X, normal.Y, normal.Z);
 
                     uvs[i * 2 + 0] = (float)x / (float)xSize;
                     uvs[i * 2 + 1] = (float)y / (float)ySize;

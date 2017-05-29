@@ -2,6 +2,7 @@
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
 using Kokoro.Engine.Input;
+using Kokoro.Graphics.OpenGL;
 using Kokoro.Math;
 using Kokoro.StateMachine;
 
@@ -12,11 +13,11 @@ namespace TestApplication
         private bool inited = false;
         private FirstPersonCamera camera;
         private MeshGroup grp;
-        private TerrainRenderer terrainRenderer;
+        private TerrainRenderer[] terrainRenderers;
         private Texture tex;
         private TextureHandle handle;
 
-        private Vector3 camPos, camDir;
+        private Vector3 camPos;
         private bool updateCamPos = true;
 
         private Keyboard keybd;
@@ -41,7 +42,7 @@ namespace TestApplication
                 EngineManager.AddCamera(camera);
                 EngineManager.SetVisibleCamera(camera.Name);
 
-                grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 20000, 20000);
+                grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 100000, 100000);
 
                 BitmapTextureSource bitmapSrc = new BitmapTextureSource("heightmap.png", 1);
                 tex = new Texture();
@@ -50,22 +51,40 @@ namespace TestApplication
                 handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
-                terrainRenderer = new TerrainRenderer(5000, grp, Framebuffer.Default, handle);
+                //GraphicsDevice.Wireframe = true;
+
+                float side = 500;
+                float off = side * 0.5f;
+
+                terrainRenderers = new TerrainRenderer[] {
+                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 2, off),
+                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 2, -off),
+                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 1, off),
+                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 1, -off),
+                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 1, 2, off),
+                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 1, 2, -off),
+                };
+
+                terrainRenderers[0].Queue.ClearFramebufferBeforeSubmit = true;
 
                 inited = true;
             }
 
-            bool terrainUpdateNeeded = false;
 
             if (camPos != camera.Position)
             {
-                terrainUpdateNeeded = true;
-            }
-            camPos = camera.Position;
-            camDir = camera.Direction;
+                camPos = camera.Position;
 
-            if (terrainUpdateNeeded) terrainRenderer.Update(camPos, camDir);
-            terrainRenderer.Draw(camera.View, camera.Projection);
+                foreach(TerrainRenderer r in terrainRenderers)
+                r.Update(camPos, camera.Direction);
+            }
+
+            foreach(TerrainRenderer r in terrainRenderers)
+            {
+                //if(Vector3.Dot(camera.Direction, r.Normal) <= 0)
+                    r.Draw(camera.View, camera.Projection);
+
+            }
 
         }
 

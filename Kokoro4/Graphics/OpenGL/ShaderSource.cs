@@ -33,7 +33,7 @@ namespace Kokoro.Graphics.OpenGL
                 GL.GetShaderInfoLog(id, out errorLog);
 
                 GL.DeleteShader(id);
-
+                 
                 Console.WriteLine(errorLog);
                 throw new Exception("Shader Compilation Exception : " + errorLog);
             }

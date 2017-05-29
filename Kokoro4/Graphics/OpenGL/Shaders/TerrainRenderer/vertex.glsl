@@ -26,23 +26,27 @@ layout (std140) buffer heightmaps
 
 void main(){
 
-	// Output position of the vertex, in clip space : MVP * position
-
 	//Set the view position to zero and update all the vertex positions to be relative to the camera.
 	mat4 tmpView = View;
 	tmpView[3].xyz = vec3(0);
 	mat4 MVP = Projection * tmpView;
-	gl_Position =  MVP * vec4(vs_pos.x * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].x, 
-							  vs_pos.y * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].y + texture(sampler2D(HeightMapData.HeightMaps[gl_InstanceID]), vs_uv).x, 
-							  vs_pos.z * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].z, 1);
-
-	inst = gl_InstanceID;
-
-	// UV of the vertex. No special space for this one.
-	UV = vs_uv;
 	
 	vec2 n = vs_normal / 100.0f * PI/180.0f;
-	normal.x = cos(n.x) * sin(n.y);
-	normal.y = sin(n.x) * sin(n.y);
-	normal.z = cos(n.y);
+	vec3 vnorm = vec3(0);
+	vnorm.x = cos(n.x) * sin(n.y);
+	vnorm.y = sin(n.x) * sin(n.y);
+	vnorm.z = cos(n.y);
+
+	vec3 vpos = vs_pos;
+	vpos = vec3(vpos.x * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].x, 
+							  vpos.y * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].y, 
+							  vpos.z * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].z);
+
+	vpos += vnorm * texture(sampler2D(HeightMapData.HeightMaps[gl_InstanceID]), vs_uv).x;
+
+	gl_Position =  MVP * vec4(vpos.x, vpos.y, vpos.z, 1);
+
+	inst = gl_InstanceID;
+	UV = vs_uv;
+	normal = vnorm;
 }

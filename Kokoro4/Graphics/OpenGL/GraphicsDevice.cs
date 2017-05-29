@@ -174,7 +174,7 @@ namespace Kokoro.Graphics.OpenGL
             }
         }
 
-        static Engine.Graphics.CullFaceMode cullMode = Engine.Graphics.CullFaceMode.Back;
+        static Engine.Graphics.CullFaceMode cullMode = Engine.Graphics.CullFaceMode.None;
         public static Engine.Graphics.CullFaceMode CullMode
         {
             get

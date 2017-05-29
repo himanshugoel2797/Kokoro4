@@ -215,7 +215,7 @@ namespace Kokoro.Engine.Graphics
                 {
                     var bkt = buckets[new Tuple<MeshGroup, RenderState>(MeshGroups[RenderStates[i]][j], RenderStates[i])];
 
-                    if (!ClearFramebufferBeforeSubmit) EngineManager.SetRenderState(bkt.State); //State has been already set if ClearFramebufferBeforeSubmit is true.
+                    EngineManager.SetRenderState(bkt.State); //State has been already set if ClearFramebufferBeforeSubmit is true.
 
                     EngineManager.SetCurrentMeshGroup(bkt.meshes[0].Mesh.Parent);
 

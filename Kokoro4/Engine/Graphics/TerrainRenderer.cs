@@ -20,21 +20,36 @@ namespace Kokoro.Engine.Graphics
         QuadTree<TerrainData> Data;
         Mesh quad;
         float side;
-        RenderQueue queue;
-        RenderState state;
+        public RenderQueue Queue { get; private set; }
+        public RenderState State { get; private set; }
         ShaderStorageBuffer WorldBuffer, TextureBuffer;
         TextureHandle testTex;
         const int quadSide = 25;
         int maxLevels = 40;
         int len = 2048;
+        int XIndex, YIndex, ZIndex;
+        public float YOff { get; private set; }
+        public Vector3 Normal { get; private set; }
 
-        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, TextureHandle tex)
+        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, TextureHandle tex, int xindex, int zindex, float yOff)
         {
+            XIndex = xindex;
+            ZIndex = zindex;
+            YOff = yOff;
+            for (YIndex = 0; YIndex < 3; YIndex++)
+                if (YIndex != XIndex && YIndex != ZIndex)
+                    break;
 
             testTex = tex;
 
+            float[] norm_f = new float[3];
+            norm_f[XIndex] = 0;
+            norm_f[YIndex] = System.Math.Sign(yOff);
+            norm_f[ZIndex] = 0;
+            Normal = new Vector3(norm_f);
+
             this.side = side;
-            quad = QuadFactory.Create(grp, quadSide, quadSide, new Vector3(0, 1, 2));
+            quad = QuadFactory.Create(grp, quadSide, quadSide, Normal, new Vector3(XIndex, YIndex, ZIndex));
             Data = new QuadTree<TerrainData>(new Math.Vector2(side * -0.5f, side * -0.5f), new Math.Vector2(side * 0.5f, side * 0.5f), 0);
 
             WorldBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
@@ -53,20 +68,18 @@ namespace Kokoro.Engine.Graphics
                 }
             }
 
-            state = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, -1, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.Back);
-            state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
-            state.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
+            State = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff >= 0) ? CullFaceMode.Back : CullFaceMode.Front);
+            State.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
+            State.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
 
-            queue = new RenderQueue(len, true);
-            queue.ClearFramebufferBeforeSubmit = true;
-            
-            queue.ClearAndBeginRecording();
-            queue.RecordDraw(new RenderQueue.DrawData()
+            Queue = new RenderQueue(len, true);
+            Queue.ClearAndBeginRecording();
+            Queue.RecordDraw(new RenderQueue.DrawData()
             {
                 Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = len, Mesh = quad } },
-                State = state
+                State = State
             });
-            queue.EndRecording();
+            Queue.EndRecording();
 
         }
 
@@ -75,10 +88,30 @@ namespace Kokoro.Engine.Graphics
 
         private DistanceState GetMaxLevel(ref QuadTree<TerrainData> d, int level, Vector3 pos, Vector3 dir)
         {
-            Vector3 tl = new Vector3(d.Min.X, 0, d.Max.Y);
-            Vector3 tr = new Vector3(d.Max.X, 0, d.Max.Y);
-            Vector3 bl = new Vector3(d.Min.X, 0, d.Min.Y);
-            Vector3 br = new Vector3(d.Max.X, 0, d.Min.Y);
+            float[] tl_f = new float[3];
+            tl_f[XIndex] = d.Min.X;
+            tl_f[ZIndex] = d.Max.Y;
+            tl_f[YIndex] = YOff;
+
+            float[] tr_f = new float[3];
+            tr_f[XIndex] = d.Max.X;
+            tr_f[ZIndex] = d.Max.Y;
+            tr_f[YIndex] = YOff;
+
+            float[] bl_f = new float[3];
+            bl_f[XIndex] = d.Min.X;
+            bl_f[ZIndex] = d.Min.Y;
+            bl_f[YIndex] = YOff;
+
+            float[] br_f = new float[3];
+            br_f[XIndex] = d.Max.X;
+            br_f[ZIndex] = d.Min.Y;
+            br_f[YIndex] = YOff;
+
+            Vector3 tl = new Vector3(tl_f);
+            Vector3 tr = new Vector3(tr_f);
+            Vector3 bl = new Vector3(bl_f);
+            Vector3 br = new Vector3(br_f);
             Vector3 c = (tl + tr + bl + br) * 0.25f;
 
             float side = System.Math.Abs((d.Max.X - d.Min.X));
@@ -133,7 +166,12 @@ namespace Kokoro.Engine.Graphics
 
             if ((maxLevel == DistanceState.Stop) | (parentState == DistanceState.Visible && maxLevel == DistanceState.Invisible) | (maxLevel == DistanceState.Visible && tData.IsLeaf))
             {
-                positions.Add(new Vector3(tData.Min.X, 0, tData.Min.Y));
+                float[] pos_f = new float[3];
+                pos_f[XIndex] = tData.Min.X;
+                pos_f[YIndex] = YOff;
+                pos_f[ZIndex] = tData.Min.Y;
+
+                positions.Add(new Vector3(pos_f));
                 scales.Add(side / (1 << level) * 1.0f / quadSide);
                 return;
             }
@@ -148,7 +186,11 @@ namespace Kokoro.Engine.Graphics
                     //Check if this is visible and within range
                     //If so, proceed to traverse down it
                     Vector2 tDataCenter = (tData[i].Max - tData[i].Min) * 0.5f + tData[i].Min;
-                    Vector3 c = new Vector3(tDataCenter.X, 0, tDataCenter.Y);
+                    float[] c_f = new float[3];
+                    c_f[XIndex] = tDataCenter.X;
+                    c_f[YIndex] = YOff;
+                    c_f[ZIndex] = tDataCenter.Y;
+                    Vector3 c = new Vector3(c_f);
 
                     {
                         Traverse(tData[i], level + 1, pos, dir, maxLevel);
@@ -188,7 +230,7 @@ namespace Kokoro.Engine.Graphics
                 TextureBuffer.UpdateDone();
             }
 
-            queue.UpdateDrawParams(quad.Parent, state, new RenderQueue.MeshData()
+            Queue.UpdateDrawParams(quad.Parent, State, new RenderQueue.MeshData()
             {
                 Mesh = quad,
                 BaseInstance = 0,
@@ -198,9 +240,9 @@ namespace Kokoro.Engine.Graphics
 
         public void Draw(Matrix4 view, Matrix4 proj)
         {
-            state.ShaderProgram.Set("View", view);
-            state.ShaderProgram.Set("Projection", proj);
-            queue.Submit();
+            State.ShaderProgram.Set("View", view);
+            State.ShaderProgram.Set("Projection", proj);
+            Queue.Submit();
         }
     }
 }
