@@ -278,7 +278,7 @@ namespace Kokoro.Math
         public static readonly int SizeInBytes = Marshal.SizeOf(new Vector3());
 
         #endregion
-        
+
         #region Converters
         public static Vector3 FromSpherical(Vector3 SphericalCoord)
         {
@@ -1236,6 +1236,11 @@ namespace Kokoro.Math
             return new Vector3(v.X, v.Y, v.Z);
         }
 
+        public static explicit operator float[] (Vector3 v)
+        {
+            return new float[] { v.X, v.Y, v.Z };
+        }
+
         public static Vector3 Round(Vector3 a)
         {
             return new Vector3((float)System.Math.Round(a.X), (float)System.Math.Round(a.Y), (float)System.Math.Round(a.Z));
@@ -1248,7 +1253,7 @@ namespace Kokoro.Math
             Y = tmp.Y;
             Z = tmp.Z;
         }
-        
+
         public float this[int x]
         {
             get

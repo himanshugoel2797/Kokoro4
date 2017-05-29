@@ -59,7 +59,7 @@ namespace Kokoro.Engine.Graphics
                 MaxDrawCount = 4096;
 
             maxDrawCount = MaxDrawCount;
-            multiDrawParams = new ShaderStorageBuffer(MaxDrawCount * 5 * sizeof(uint));
+            multiDrawParams = new ShaderStorageBuffer(MaxDrawCount * 5 * sizeof(uint), false);
         }
 
         public void ClearAndBeginRecording()
@@ -174,7 +174,7 @@ namespace Kokoro.Engine.Graphics
 
         public void Submit()
         {
-            while (!multiDrawParams.IsReady()) ;    //Wait for the multidraw buffer to finish updating
+            while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating
 
             //Submit the multidraw calls
             for (int i = 0; i < RenderStates.Count; i++)
@@ -189,13 +189,27 @@ namespace Kokoro.Engine.Graphics
                 {
                     var bkt = buckets[new Tuple<MeshGroup, RenderState>(MeshGroups[RenderStates[i]][j], RenderStates[i])];
 
-                    EngineManager.SetRenderState(bkt.State);
+                    if (!ClearFramebufferBeforeSubmit) EngineManager.SetRenderState(bkt.State); //State has been already set if ClearFramebufferBeforeSubmit is true.
+
                     EngineManager.SetCurrentMeshGroup(bkt.meshes[0].Mesh.Parent);
 
                     GraphicsDevice.SetMultiDrawParameterBuffer(multiDrawParams);
                     GraphicsDevice.SetParameterBuffer(multiDrawParams);
 
                     GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, bkt.offset + sizeof(uint), bkt.offset, maxDrawCount, true);
+
+                    OpenTK.Graphics.OpenGL.GL.Finish();
+                    //Ensure the buffers aren't in use before next update
+                    RenderState state = bkt.State;
+
+                    for (int k = 0; state.ShaderStorageBufferBindings != null && k < state.ShaderStorageBufferBindings.Length; k++)
+                    {
+                        state.ShaderStorageBufferBindings[k].UpdateDone();
+                    }
+                    for (int k = 0; state.UniformBufferBindings != null && k < state.UniformBufferBindings.Length; k++)
+                    {
+                        state.UniformBufferBindings[k].UpdateDone();
+                    }
                 }
             }
         }

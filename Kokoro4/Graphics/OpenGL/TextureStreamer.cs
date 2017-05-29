@@ -111,7 +111,7 @@ namespace Kokoro.Engine.Graphics
             {
                 if (IsDone) return;
 
-                if (uploadFence.Raised(1))
+                if (uploadFence.Raised(10))
                 {
                     //Proceed to the next upload
                     curLevel--;

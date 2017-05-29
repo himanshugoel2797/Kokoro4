@@ -149,7 +149,7 @@ namespace TestApplication
 
                 unsafe
                 {
-                    transform_params = new ShaderStorageBuffer(transforms.Count * sizeof(Matrix4));
+                    transform_params = new ShaderStorageBuffer(transforms.Count * sizeof(Matrix4), false);
                     byte* data = transform_params.Update();
 
                     var matrices = transforms.ToArray();

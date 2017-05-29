@@ -88,17 +88,39 @@ namespace Kokoro.Engine
 
             if (state.ShaderStorageBufferBindings != null)
             {
-                for (int i = 0; i < state.ShaderStorageBufferBindings.Length; i++)
+                ShaderStorageBuffer[] pendingBindings = new ShaderStorageBuffer[state.ShaderStorageBufferBindings.Length];
+                Array.Copy(state.ShaderStorageBufferBindings, pendingBindings, pendingBindings.Length);
+                int pendingCnt = pendingBindings.Length;
+                while (pendingCnt > 0)
                 {
-                    GraphicsDevice.SetShaderStorageBufferBinding(state.ShaderStorageBufferBindings[i], i);
+                    for (int i = 0; i < pendingBindings.Length; i++)
+                    {
+                        if (pendingBindings[i] != null && pendingBindings[i].IsReady)
+                        {
+                            GraphicsDevice.SetShaderStorageBufferBinding(pendingBindings[i], i);
+                            pendingBindings[i] = null;
+                            pendingCnt--;
+                        }
+                    }
                 }
             }
 
             if (state.UniformBufferBindings != null)
             {
-                for (int i = 0; i < state.UniformBufferBindings.Length; i++)
+                UniformBuffer[] pendingBindings = new UniformBuffer[state.UniformBufferBindings.Length];
+                Array.Copy(state.UniformBufferBindings, pendingBindings, pendingBindings.Length);
+                int pendingCnt = pendingBindings.Length;
+                while (pendingCnt > 0)
                 {
-                    GraphicsDevice.SetUniformBufferBinding(state.UniformBufferBindings[i], i);
+                    for (int i = 0; i < pendingBindings.Length; i++)
+                    {
+                        if (pendingBindings[i] != null && pendingBindings[i].IsReady)
+                        {
+                            GraphicsDevice.SetUniformBufferBinding(pendingBindings[i], i);
+                            pendingBindings[i] = null;
+                            pendingCnt--;
+                        }
+                    }
                 }
             }
 
@@ -108,6 +130,8 @@ namespace Kokoro.Engine
 
         public static void SetCurrentMeshGroup(MeshGroup grp)
         {
+            ExecuteBackgroundTasksUntil(() => grp.IsReady);
+            while (!grp.IsReady) ;
             CurrentMeshGroup = grp;
             GraphicsDevice.SetVertexArray(grp.varray);
         }

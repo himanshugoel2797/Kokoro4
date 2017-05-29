@@ -64,7 +64,7 @@ namespace Kokoro.Engine
             Parent.FlushBuffer(MeshGroup.IntPtrIndex.Vertex, offset, alloc_size);
 
             if (IndexCount == 0)
-                throw new Exception("Failed to load mesh");
+                throw new Exception("Failed to load mesh"); 
         }
 
         public Mesh(MeshGroup parent, float[] vertices, float[] uv, uint[] norm, ushort[] indice)
@@ -91,6 +91,11 @@ namespace Kokoro.Engine
             System.Runtime.InteropServices.Marshal.Copy(uv, 0, ptrs[(int)MeshGroup.IntPtrIndex.UV], uv.Length);
             System.Runtime.InteropServices.Marshal.Copy((int[])(object)norm, 0, ptrs[(int)MeshGroup.IntPtrIndex.Normal], norm.Length);
             System.Runtime.InteropServices.Marshal.Copy(vertices, 0, ptrs[(int)MeshGroup.IntPtrIndex.Vertex], vertices.Length);
+
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.Index, offset, alloc_size);
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.Normal, offset, alloc_size);
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.UV, offset, alloc_size);
+            Parent.FlushBuffer(MeshGroup.IntPtrIndex.Vertex, offset, alloc_size);
         }
 
         public Mesh(Mesh src, bool lockChanges)

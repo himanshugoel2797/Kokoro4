@@ -95,7 +95,7 @@ namespace Kokoro.Graphics.OpenGL
             if (target != BufferTarget.TransformFeedbackBuffer && target != BufferTarget.UniformBuffer && target != BufferTarget.ShaderStorageBuffer) throw new Exception("Incorrect Function Called, Use other Overload");
             if (boundBuffers[target][index].Count == 0) boundBuffers[target][index].Push(0);
 
-            if (boundBuffers[target][index].Peek() != id || id == 0)
+            //if (boundBuffers[target][index].Peek() != id || id == 0)
             {
                 if (size == IntPtr.Zero) GL.BindBufferBase((BufferRangeTarget)target, index, id);
                 else GL.BindBufferRange((BufferRangeTarget)target, index, id, off, size);

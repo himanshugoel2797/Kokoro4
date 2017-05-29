@@ -24,35 +24,52 @@ namespace Kokoro.Engine.Graphics
         #endregion
 
 
-        private const int UniformBufferSize = 16 * 1024; 
+        private const int UniformBufferSize = 16 * 1024;
+        public const int UniformBufferMaxSize = (UniformBufferSize / rungs);
 
         static UniformBuffer()
         {
             maxBindPoints = GL.GetInteger(GetPName.MaxUniformBufferBindings);
         }
 
-
+        const int rungs = 4;
         internal GPUBuffer buf;
         internal int bindPoint = 0;
-        internal Fence readyFence;
+        internal int curRung = 0;
+        internal Fence[] readyFence;
+
+        public bool IsReady
+        {
+            get
+            {
+                return readyFence[curRung].Raised(1);
+            }
+        }
 
         public UniformBuffer()
         {
             buf = new GPUBuffer(BufferTarget.UniformBuffer, UniformBufferSize, false);
             bindPoint = getFreeBindPoint();
-            readyFence = new Fence();
-            readyFence.PlaceFence();
+
+            readyFence = new Fence[rungs];
+            for (int i = 0; i < rungs; i++)
+            {
+                readyFence[i] = new Fence();
+                readyFence[i].PlaceFence();
+            }
         }
 
         public unsafe byte* Update()
         {
-            while (!readyFence.Raised(0)) ;
-            return (byte*)buf.GetPtr();
+            curRung = (curRung + 1) % rungs;
+            while (!readyFence[curRung].Raised(0)) ;
+            return (byte*)buf.GetPtr() + curRung * UniformBufferMaxSize; ;
         }
 
         public void UpdateDone()
         {
-            readyFence.PlaceFence();
+            buf.FlushBuffer(curRung * UniformBufferMaxSize, UniformBufferMaxSize);
+            readyFence[curRung].PlaceFence();
         }
 
 

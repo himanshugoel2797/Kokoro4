@@ -22,39 +22,31 @@ namespace Kokoro.Engine.Graphics
         float side;
         RenderQueue queue;
         RenderState state;
-        ShaderStorageBuffer WorldBuffer;
+        ShaderStorageBuffer WorldBuffer, TextureBuffer;
+        TextureHandle testTex;
         Camera cam;
-        const int quadSide = 50;
-        int maxLevels = 20;
+        const int quadSide = 25;
+        int maxLevels = 40;
         int len = 2048;
 
-        float[] thresholds = new float[]
-        {
-            50,
-            50,
-            50,
-            50,
-            50,
-            50,
-            50,
-            50,
-            50,
-            50,
-        };
-
-        public TerrainRenderer(float side, MeshGroup grp, Camera c, RenderState state, ShaderStorageBuffer ssbo)
+        public TerrainRenderer(float side, MeshGroup grp, Camera c, RenderState state, ShaderStorageBuffer ssbo, ShaderStorageBuffer texBo, TextureHandle tex)
         {
 
-            quad = QuadFactory.Create(grp, quadSide, quadSide);
+            testTex = tex;
+            quad = QuadFactory.Create(grp, quadSide, quadSide, new Vector3(0, 1, 2));
             Data = new QuadTree<TerrainData>(new Math.Vector2(side * -0.5f, side * -0.5f), new Math.Vector2(side * 0.5f, side * 0.5f), 0);
             this.side = side;
             this.state = state;
 
             cam = c;
             WorldBuffer = ssbo;
+            TextureBuffer = texBo;
             queue = new RenderQueue(len);
             queue.ClearFramebufferBeforeSubmit = true;
         }
+
+        //Update SSBO to reduce size and add offset data for texturing corrections. scale, location, texture handle
+        //Stop rerecording commands, umrendered stuff just positioned out of the way
 
         private DistanceState GetMaxLevel(ref QuadTree<TerrainData> d, int level, Vector3 pos, Vector3 dir)
         {
@@ -65,7 +57,7 @@ namespace Kokoro.Engine.Graphics
             Vector3 c = (tl + tr + bl + br) * 0.25f;
 
             float side = System.Math.Abs((d.Max.X - d.Min.X));
-            float dist_side = side * 6;
+            float dist_side = side * 2;
 
             float dist_tl = (pos - tl).LengthSquared;
             float dist_tr = (pos - tr).LengthSquared;
@@ -79,6 +71,7 @@ namespace Kokoro.Engine.Graphics
             float min_dist = System.Math.Min(min_dist0, min_dist1);
             min_dist = System.Math.Min(min_dist, dist_c);
 
+            /*
             float tl_a = Vector3.Dot(Vector3.Normalize(tl - pos), dir);
             float tr_a = Vector3.Dot(Vector3.Normalize(tr - pos), dir);
             float bl_a = Vector3.Dot(Vector3.Normalize(bl - pos), dir);
@@ -92,7 +85,7 @@ namespace Kokoro.Engine.Graphics
             bool tr_vis = tr_a >= 0;
             bool bl_vis = bl_a >= 0;
             bool br_vis = br_a >= 0;
-
+            */
 
             /*if (50 * System.Math.Pow(2, (maxLevels - level)/16) >= min_dist)
             {
@@ -106,21 +99,18 @@ namespace Kokoro.Engine.Graphics
             //Inside tile
             if (dist_tl <= side && dist_tr <= side && dist_bl <= side && dist_br <= side)
                 return (d.IsLeaf ? DistanceState.Stop : DistanceState.Visible);
-
-
-            if (!tl_vis && !tr_vis && !bl_vis && !br_vis)
-                return DistanceState.Load;
-
-            //TODO: fix heuristics to be flexible, or decide how many levels to support and code in the distance thresholds.
-
-
+            
+            //if (!tl_vis && !tr_vis && !bl_vis && !br_vis)
+            //    return DistanceState.Load;
+            
             //subdivide when very close to the current level relative to the side
-            if (min_dist <= dist_side * dist_side && d.IsLeaf)
+            if (min_dist <= dist_side * dist_side && d.IsLeaf && d.Level < maxLevels)
             {
                 d.Split();
                 maxLevels++;
             }
 
+            /*
             Matrix4 vp = cam.View * cam.Projection;
             Vector2 tl_s = Vector3.TransformPerspective(tl, vp).Xy;
             Vector2 tr_s = Vector3.TransformPerspective(tr, vp).Xy;
@@ -140,10 +130,11 @@ namespace Kokoro.Engine.Graphics
             //Stop going deeper if all the corners of the current level are already visible
             //if (tl_isIn && tr_isIn && bl_isIn && br_isIn)
             //    return DistanceState.Stop;
+            */
 
             if (min_dist <= dist_side * dist_side)
             {
-                if (min_dist <= dist_side * dist_side / 36)
+                if (min_dist <= dist_side * dist_side / 4)
                     return DistanceState.Visible;
                 else
                     return DistanceState.Stop;
@@ -153,23 +144,22 @@ namespace Kokoro.Engine.Graphics
 
         }
 
-        private List<Matrix4> transforms = new List<Matrix4>();
+        private List<Vector3> positions = new List<Vector3>();
+        private List<float> scales = new List<float>();
         private void Traverse(QuadTree<TerrainData> tData, int level, Vector3 pos, Vector3 dir, DistanceState parentState)
         {
             if (tData == null)
                 return;
 
-            bool endReached = true;
             DistanceState maxLevel = GetMaxLevel(ref tData, level, pos, dir);
 
             if (maxLevel == DistanceState.Load)
-            {
                 maxLevel = DistanceState.Stop;
-            }
 
             if ((maxLevel == DistanceState.Stop) | (parentState == DistanceState.Visible && maxLevel == DistanceState.Invisible) | (maxLevel == DistanceState.Visible && tData.IsLeaf))
             {
-                transforms.Add(Matrix4.Scale(side / (1 << level) * 1.0f / quadSide) * Matrix4.CreateTranslation(new Vector3(tData.Min.X, 0, tData.Min.Y)));
+                positions.Add(new Vector3(tData.Min.X, 0, tData.Min.Y));
+                scales.Add(side / (1 << level) * 1.0f / quadSide);
                 return;
             }
 
@@ -180,7 +170,6 @@ namespace Kokoro.Engine.Graphics
             {
                 if (tData[i] != null)
                 {
-                    endReached = false;
                     //Check if this is visible and within range
                     //If so, proceed to traverse down it
                     Vector2 tDataCenter = (tData[i].Max - tData[i].Min) * 0.5f + tData[i].Min;
@@ -191,40 +180,43 @@ namespace Kokoro.Engine.Graphics
                     }
                 }
             }
-
-            if (endReached)
-            {
-                //Add this to render
-                //transforms.Add(Matrix4.Scale(side / (1 << level)) * Matrix4.CreateTranslation(new Vector3(tData.Min.X * quadSide, 0, tData.Min.Y * quadSide)));
-            }
         }
 
         public void Update(Vector3 pos, Vector3 dir)
         {
-            transforms.Clear();
+            positions.Clear();
+            scales.Clear();
             Traverse(Data, 0, pos, dir, DistanceState.Visible);
 
-            if (transforms.Count > len)
+            if (positions.Count > len)
                 throw new Exception();
 
             unsafe
             {
                 float* f = (float*)WorldBuffer.Update();
-                for (int i = 0; i < transforms.Count; i++)
+                for (int i = 0; i < positions.Count; i++)
                 {
-                    float[] d = (float[])transforms[i];
-                    for (int j = 0; j < d.Length; j++)
+                    float[] p = (float[])(positions[i] - pos);
+                    float s = scales[i];
+                    for (int j = 0; j < p.Length; j++)
                     {
-                        f[i * 16 + j] = d[j];
+                        f[i * 4 + j] = p[j];
                     }
+                    f[i * 4 + 3] = s;
                 }
                 WorldBuffer.UpdateDone();
+
+                long* l = (long*)TextureBuffer.Update();
+                for (int i = 0; i < positions.Count; i++)
+                    l[i * 2] = testTex;
+
+                TextureBuffer.UpdateDone();
             }
 
             queue.ClearAndBeginRecording();
             queue.RecordDraw(new RenderQueue.DrawData()
             {
-                Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = transforms.Count, Mesh = quad } },
+                Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = positions.Count, Mesh = quad } },
                 State = state
             });
             queue.EndRecording();

@@ -23,12 +23,12 @@ namespace TestApplication
         private RenderState state;
         private RenderQueue queue;
         private UniformBuffer textureUBO;
-        private ShaderStorageBuffer worldSSBO;
+        private ShaderStorageBuffer worldSSBO, texSSBO;
         private Texture tex;
         private TextureHandle handle;
 
         private Vector3 camPos, camDir;
-        private bool updateCamPos;
+        private bool updateCamPos = true;
 
         private Keyboard keybd;
 
@@ -39,6 +39,23 @@ namespace TestApplication
 
         public void Exit(IState next)
         {
+        }
+
+        Vector3 pos;
+        double x = 0;
+        IEnumerator<Vector3> enume;
+        public IEnumerable<Vector3> GetCamPos()
+        {
+            while (true)
+            //for (double x = 0; x < System.Math.PI * 2; x += 0.1)
+            {
+                x += 0.1;
+                x = x % System.Math.PI * 2;
+
+                double y = System.Math.Sqrt(100 - x * x);
+                pos = new Vector3((float)x, 0.5f, (float)y);
+                yield return pos;
+            }
         }
 
         public void Render(double interval)
@@ -59,7 +76,9 @@ namespace TestApplication
                 tex = new Texture();
                 tex.SetData(bitmapSrc, 0);
                 textureUBO = new UniformBuffer();
-                worldSSBO = new ShaderStorageBuffer(16 * sizeof(float) * 2048);
+                worldSSBO = new ShaderStorageBuffer(16 * 2048, true);
+                texSSBO = new ShaderStorageBuffer(16 * 2048, true);
+
                 handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
@@ -67,16 +86,30 @@ namespace TestApplication
                 GraphicsDevice.Wireframe = true;
                 unsafe
                 {
-                    long* l = (long*)textureUBO.Update();
-                    l[0] = handle;
-                    textureUBO.UpdateDone();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        long* l = (long*)textureUBO.Update();
+                        l[0] = handle;
+                        textureUBO.UpdateDone();
+                    }
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        long* l = (long*)texSSBO.Update();
+                        for (int j = 0; j < 2048; j++)
+                        {
+                            l[j * 2] = handle;
+                        }
+                        texSSBO.UpdateDone();
+                    }
                 }
 
-                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { worldSSBO }, new UniformBuffer[] { textureUBO }, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.None);
+                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { worldSSBO, texSSBO }, new UniformBuffer[] { textureUBO }, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.None);
                 state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
+                state.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
                 state.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
 
-                terrainRenderer = new TerrainRenderer(50000, grp, camera, state, worldSSBO);
+                terrainRenderer = new TerrainRenderer(5000, grp, camera, state, worldSSBO, texSSBO, handle);
 
                 inited = true;
             }
@@ -85,6 +118,7 @@ namespace TestApplication
             state.ShaderProgram.Set("Projection", camera.Projection);
 
             bool terrainUpdateNeeded = false;
+
 
             if (updateCamPos)
             {

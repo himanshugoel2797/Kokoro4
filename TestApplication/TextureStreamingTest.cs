@@ -55,6 +55,20 @@ namespace TestApplication
                 tex = stream.TargetTexture;
                 ubo = new UniformBuffer();
 
+                handle = tex.GetHandle(TextureSampler.Default);
+
+                Console.WriteLine(OpenTK.Graphics.OpenGL.GL.GetInteger((OpenTK.Graphics.OpenGL.GetPName)OpenTK.Graphics.OpenGL.All.ShaderStorageBufferOffsetAlignment));
+
+                //Fill anything that will contain handles multiple times in order to have valid data everywhere.
+                unsafe
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        long* l = (long*)ubo.Update();
+                        l[0] = handle;
+                        ubo.UpdateDone();
+                    }
+                }
 
                 state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), null, new UniformBuffer[] { ubo }, false, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 0, CullFaceMode.None);
 

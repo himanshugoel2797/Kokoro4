@@ -24,12 +24,22 @@ namespace Kokoro.Engine
 
     public class MeshGroup : IDisposable
     {
-        GPUBuffer vertices, uvs, normals, indices;
+        internal GPUBuffer vertices, uvs, normals, indices;
+        internal Fence verticeF, uvF, normalF, indiceF;
+
         internal VertexArray varray;
         private int offset, vertex_cnt, index_cnt;
 
         private int vertex_comp_cnt = 0;
         private int vertex_size = 0;
+
+        public bool IsReady
+        {
+            get
+            {
+                return verticeF.Raised(1) && uvF.Raised(1) && normalF.Raised(1) && indiceF.Raised(1);
+            }
+        }
 
         public enum IntPtrIndex
         {
@@ -61,6 +71,16 @@ namespace Kokoro.Engine
             uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(float), false);
             normals = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * sizeof(uint), false);
             indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer, index_cnt * sizeof(ushort), false);
+
+            verticeF = new Fence();
+            uvF = new Fence();
+            normalF = new Fence();
+            indiceF = new Fence();
+
+            verticeF.PlaceFence();
+            uvF.PlaceFence();
+            normalF.PlaceFence();
+            indiceF.PlaceFence();
 
             varray = new VertexArray();
             varray.SetBufferObject(0, vertices, vertex_comp_cnt, vAttribPtrType, false);
@@ -99,15 +119,19 @@ namespace Kokoro.Engine
             {
                 case IntPtrIndex.Index:
                     indices.FlushBuffer((offset * sizeof(ushort)), size * sizeof(ushort));
+                    indiceF.PlaceFence();
                     break;
                 case IntPtrIndex.Normal:
                     normals.FlushBuffer((offset * sizeof(uint)), size * sizeof(uint));
+                    normalF.PlaceFence();
                     break;
                 case IntPtrIndex.UV:
                     uvs.FlushBuffer((offset * 2 * sizeof(float)), size * sizeof(float) * 2);
+                    uvF.PlaceFence();
                     break;
                 case IntPtrIndex.Vertex:
                     vertices.FlushBuffer((offset * 3 * sizeof(float)), size * vertex_size);
+                    verticeF.PlaceFence();
                     break;
             }
 

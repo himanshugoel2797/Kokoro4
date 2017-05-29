@@ -68,7 +68,7 @@ namespace Kokoro.Engine.Graphics
                     // TODO: dispose managed state (managed objects).
                 }
 
-                if(!raised)GraphicsDevice.QueueForDeletion((int)id, GLObjectType.Fence);
+                if (!raised) GraphicsDevice.QueueForDeletion((int)id, GLObjectType.Fence);
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
 

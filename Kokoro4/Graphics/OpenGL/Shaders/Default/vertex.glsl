@@ -17,6 +17,7 @@ layout (std140) buffer transforms
 } Transforms;
 
 void main(){
+
 	// Output position of the vertex, in clip space : MVP * position
 	mat4 MVP = Projection * View * Transforms.World[gl_InstanceID];
 	gl_Position =  MVP * vec4(vs_pos.x, vs_pos.y, vs_pos.z, 1);
