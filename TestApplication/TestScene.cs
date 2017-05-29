@@ -170,7 +170,7 @@ namespace TestApplication
                 state = new RenderState(gbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { transform_params }, new UniformBuffer[] { }, true, DepthFunc.Greater, 1, 0, BlendFactor.One, BlendFactor.Zero, new Vector4(0, 0.5f, 1.0f, 0.0f), 0, CullFaceMode.Back);
                 state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
 
-                queue = new RenderQueue(meshes.Length);
+                queue = new RenderQueue(meshes.Length, false);
                 queue.ClearAndBeginRecording();
                 queue.ClearFramebufferBeforeSubmit = true;
                 queue.RecordDraw(new RenderQueue.DrawData() { Meshes = meshes, State = state });
@@ -181,7 +181,7 @@ namespace TestApplication
 
                 fsq_state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Framebuffer/fragment.glsl")), null, null, false, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 0, CullFaceMode.None);
 
-                fsq_queue = new RenderQueue(1);
+                fsq_queue = new RenderQueue(1, false);
                 fsq_queue.ClearAndBeginRecording();
                 fsq_queue.ClearFramebufferBeforeSubmit = true;
                 fsq_queue.RecordDraw(new RenderQueue.DrawData() { Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { Mesh = fsq, BaseInstance = 0, InstanceCount = 1 } }, State = fsq_state });

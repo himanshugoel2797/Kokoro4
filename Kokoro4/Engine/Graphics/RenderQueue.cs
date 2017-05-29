@@ -45,11 +45,13 @@ namespace Kokoro.Engine.Graphics
         private int maxDrawCount = 0;
 
         private const int EntrySize = 0;
+        private bool transient;
 
         public bool ClearFramebufferBeforeSubmit { get; set; } = false;
 
-        public RenderQueue(int MaxDrawCount)
+        public RenderQueue(int MaxDrawCount, bool transient)
         {
+            this.transient = transient;
             buckets = new Dictionary<Tuple<MeshGroup, RenderState>, Bucket>();
             RenderStates = new List<RenderState>();
             MeshGroups = new Dictionary<RenderState, List<MeshGroup>>();
@@ -60,6 +62,29 @@ namespace Kokoro.Engine.Graphics
 
             maxDrawCount = MaxDrawCount;
             multiDrawParams = new ShaderStorageBuffer(MaxDrawCount * 5 * sizeof(uint), false);
+        }
+
+        public void UpdateDrawParams(MeshGroup grp, RenderState state, MeshData data)
+        {
+            Bucket b = buckets[new Tuple<MeshGroup, RenderState>(grp, state)];
+
+            int j = 0;
+            for (int i = 0; i < b.meshes.Count; i++)
+                if (b.meshes[i].Mesh == data.Mesh)
+                {
+                    j = i;
+                    break;
+                }
+
+            unsafe
+            {
+                uint* data_uint = (uint*)multiDrawParams.Update();
+
+                data_uint[b.offset / sizeof(uint) + (j * 5) + 2] = (uint)data.InstanceCount;
+                data_uint[b.offset / sizeof(uint) + (j * 5) + 5] = (uint)data.BaseInstance;
+
+                multiDrawParams.UpdateDone();
+            }
         }
 
         public void ClearAndBeginRecording()
@@ -174,7 +199,8 @@ namespace Kokoro.Engine.Graphics
 
         public void Submit()
         {
-            while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating
+            if (!transient)
+                while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating
 
             //Submit the multidraw calls
             for (int i = 0; i < RenderStates.Count; i++)
@@ -198,7 +224,6 @@ namespace Kokoro.Engine.Graphics
 
                     GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, bkt.offset + sizeof(uint), bkt.offset, maxDrawCount, true);
 
-                    OpenTK.Graphics.OpenGL.GL.Finish();
                     //Ensure the buffers aren't in use before next update
                     RenderState state = bkt.State;
 

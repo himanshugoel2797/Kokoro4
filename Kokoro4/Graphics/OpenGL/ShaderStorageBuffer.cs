@@ -29,7 +29,7 @@ namespace Kokoro.Engine.Graphics
 
         public ShaderStorageBuffer(GPUBuffer buf, bool stream)
         {
-            size = buf.size / (stream ? 3 : 1);
+            size = buf.size / (stream ? rungs : 1);
             this.buf = buf;
             this.stream = stream;
 
@@ -51,6 +51,26 @@ namespace Kokoro.Engine.Graphics
         public ShaderStorageBuffer(int size, bool stream) : this(new GPUBuffer(BufferTarget.ShaderStorageBuffer, AlignSize(size) * (stream ? rungs : 1), false), stream)
         {
 
+        }
+
+        internal int GetReadyOffset()
+        {
+            if (!stream)
+                return 0;
+
+            int idx = curRung;
+            for(int i = 0; i < rungs; i++)
+            {
+                if (readyFence[idx].Raised(1))
+                    return idx * size;
+
+                if (idx == 0)
+                    idx = rungs - 1;
+                else
+                    idx--;
+            }
+
+            return curRung - 1;
         }
 
         public unsafe byte* Update()

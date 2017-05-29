@@ -541,7 +541,7 @@ namespace Kokoro.Graphics.OpenGL
         public static void SetShaderStorageBufferBinding(ShaderStorageBuffer buf, int index)
         {
             if (buf == null) return;
-            GPUStateMachine.BindBuffer(BufferTarget.ShaderStorageBuffer, buf.buf.id, index, (IntPtr)(buf.curRung * buf.size), (IntPtr)buf.size);
+            GPUStateMachine.BindBuffer(BufferTarget.ShaderStorageBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.size);
         }
 
         public static void SetUniformBufferBinding(UniformBuffer buf, int index)
@@ -551,7 +551,7 @@ namespace Kokoro.Graphics.OpenGL
             int rd_rung = buf.curRung - 1;
             if (rd_rung < 0) rd_rung = 3;
 
-            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(rd_rung * UniformBuffer.UniformBufferMaxSize), (IntPtr)UniformBuffer.UniformBufferMaxSize);
+            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)UniformBuffer.UniformBufferMaxSize);
         }
 
         #endregion
@@ -645,7 +645,7 @@ namespace Kokoro.Graphics.OpenGL
         {
             _far = far;
             _near = near;
-            //GL.DepthRange(near, far);
+            GL.NV.DepthRange(near, far);
         }
 
         public static void GetDepthRange(out double near, out double far)

@@ -59,6 +59,23 @@ namespace Kokoro.Engine.Graphics
             }
         }
 
+        internal int GetReadyOffset()
+        {
+            int idx = curRung;
+            for (int i = 0; i < rungs; i++)
+            {
+                if (readyFence[idx].Raised(1))
+                    return idx * UniformBufferMaxSize;
+
+                if (idx == 0)
+                    idx = rungs - 1;
+                else
+                    idx--;
+            }
+
+            return curRung - 1;
+        }
+
         public unsafe byte* Update()
         {
             curRung = (curRung + 1) % rungs;

@@ -95,12 +95,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CPUProcGenTerrainTest.cs" />
     <Compile Include="FenceTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuadTreeTerrainTest.cs" />
     <Compile Include="TestScene.cs" />
     <Compile Include="TextureStreamingTest.cs" />
+    <Content Include="heightmap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="test.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

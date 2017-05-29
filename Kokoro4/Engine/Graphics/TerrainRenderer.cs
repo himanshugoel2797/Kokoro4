@@ -41,8 +41,17 @@ namespace Kokoro.Engine.Graphics
             cam = c;
             WorldBuffer = ssbo;
             TextureBuffer = texBo;
-            queue = new RenderQueue(len);
+            queue = new RenderQueue(len, true);
             queue.ClearFramebufferBeforeSubmit = true;
+            
+            queue.ClearAndBeginRecording();
+            queue.RecordDraw(new RenderQueue.DrawData()
+            {
+                Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = positions.Count, Mesh = quad } },
+                State = state
+            });
+            queue.EndRecording();
+
         }
 
         //Update SSBO to reduce size and add offset data for texturing corrections. scale, location, texture handle
@@ -99,10 +108,10 @@ namespace Kokoro.Engine.Graphics
             //Inside tile
             if (dist_tl <= side && dist_tr <= side && dist_bl <= side && dist_br <= side)
                 return (d.IsLeaf ? DistanceState.Stop : DistanceState.Visible);
-            
+
             //if (!tl_vis && !tr_vis && !bl_vis && !br_vis)
             //    return DistanceState.Load;
-            
+
             //subdivide when very close to the current level relative to the side
             if (min_dist <= dist_side * dist_side && d.IsLeaf && d.Level < maxLevels)
             {
@@ -213,13 +222,12 @@ namespace Kokoro.Engine.Graphics
                 TextureBuffer.UpdateDone();
             }
 
-            queue.ClearAndBeginRecording();
-            queue.RecordDraw(new RenderQueue.DrawData()
+            queue.UpdateDrawParams(quad.Parent, state, new RenderQueue.MeshData()
             {
-                Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = positions.Count, Mesh = quad } },
-                State = state
+                Mesh = quad,
+                BaseInstance = 0,
+                InstanceCount = positions.Count
             });
-            queue.EndRecording();
         }
 
         public void Draw()

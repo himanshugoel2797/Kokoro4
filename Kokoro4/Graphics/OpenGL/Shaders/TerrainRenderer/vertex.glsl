@@ -6,6 +6,7 @@ layout(location = 2) in vec2 vs_normal;
 // Output data ; will be interpolated for each fragment.
 out vec2 UV;
 out vec3 normal;
+out flat int inst;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 View;
@@ -34,6 +35,8 @@ void main(){
 	gl_Position =  MVP * vec4(vs_pos.x * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].x, 
 							  vs_pos.y * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].y + texture(sampler2D(HeightMapData.HeightMaps[gl_InstanceID]), vs_uv).x, 
 							  vs_pos.z * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].z, 1);
+
+	inst = gl_InstanceID;
 
 	// UV of the vertex. No special space for this one.
 	UV = vs_uv;

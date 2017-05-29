@@ -13,7 +13,7 @@ using Kokoro.Engine.Graphics;
 namespace TestApplication
 {
     static class Program
-    {
+    { 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -25,8 +25,11 @@ namespace TestApplication
             EngineManager.StateManager.AddState(nameof(TestScene), new TestScene());
             EngineManager.StateManager.AddState(nameof(TextureStreamingTest), new TextureStreamingTest());
             EngineManager.StateManager.AddState(nameof(QuadTreeTerrainTest), new QuadTreeTerrainTest());
+            EngineManager.StateManager.AddState(nameof(CPUProcGenTerrainTest), new CPUProcGenTerrainTest());
             EngineManager.StateManager.AddState(nameof(FenceTest), new FenceTest());
-            EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
+
+            EngineManager.StateManager.SetActiveState(nameof(CPUProcGenTerrainTest));
+            //EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest));
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));
 

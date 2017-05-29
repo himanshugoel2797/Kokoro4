@@ -2,19 +2,12 @@
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
 using Kokoro.Engine.Input;
-using Kokoro.Graphics.OpenGL;
-using Kokoro.Graphics.Prefabs;
 using Kokoro.Math;
 using Kokoro.StateMachine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestApplication
 {
-    class QuadTreeTerrainTest : IState
+    class CPUProcGenTerrainTest : IState
     {
         private bool inited = false;
         private FirstPersonCamera camera;
@@ -41,23 +34,6 @@ namespace TestApplication
         {
         }
 
-        Vector3 pos;
-        double x = 0;
-        IEnumerator<Vector3> enume;
-        public IEnumerable<Vector3> GetCamPos()
-        {
-            while (true)
-            //for (double x = 0; x < System.Math.PI * 2; x += 0.1)
-            {
-                x += 0.1;
-                x = x % System.Math.PI * 2;
-
-                double y = System.Math.Sqrt(100 - x * x);
-                pos = new Vector3((float)x, 0.5f, (float)y);
-                yield return pos;
-            }
-        }
-
         public void Render(double interval)
         {
             if (!inited)
@@ -82,8 +58,6 @@ namespace TestApplication
                 handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
-
-                //GraphicsDevice.Wireframe = true;
                 unsafe
                 {
                     for (int i = 0; i < 4; i++)
@@ -104,11 +78,10 @@ namespace TestApplication
                     }
                 }
 
-                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { worldSSBO, texSSBO }, new UniformBuffer[] { textureUBO }, true, DepthFunc.LEqual, -1, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.None);
+                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { worldSSBO, texSSBO }, null, true, DepthFunc.LEqual, -1, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.None);
                 state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
                 state.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
-                state.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
-
+                
                 terrainRenderer = new TerrainRenderer(5000, grp, camera, state, worldSSBO, texSSBO, handle);
 
                 inited = true;
