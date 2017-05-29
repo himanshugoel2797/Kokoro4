@@ -24,30 +24,46 @@ namespace Kokoro.Engine.Graphics
         RenderState state;
         ShaderStorageBuffer WorldBuffer, TextureBuffer;
         TextureHandle testTex;
-        Camera cam;
         const int quadSide = 25;
         int maxLevels = 40;
         int len = 2048;
 
-        public TerrainRenderer(float side, MeshGroup grp, Camera c, RenderState state, ShaderStorageBuffer ssbo, ShaderStorageBuffer texBo, TextureHandle tex)
+        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, TextureHandle tex)
         {
 
             testTex = tex;
+
+            this.side = side;
             quad = QuadFactory.Create(grp, quadSide, quadSide, new Vector3(0, 1, 2));
             Data = new QuadTree<TerrainData>(new Math.Vector2(side * -0.5f, side * -0.5f), new Math.Vector2(side * 0.5f, side * 0.5f), 0);
-            this.side = side;
-            this.state = state;
 
-            cam = c;
-            WorldBuffer = ssbo;
-            TextureBuffer = texBo;
+            WorldBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
+            TextureBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
+
+            unsafe
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    long* l = (long*)TextureBuffer.Update();
+                    for (int j = 0; j < len; j++)
+                    {
+                        l[j * 2] = tex;
+                    }
+                    TextureBuffer.UpdateDone();
+                }
+            }
+
+            state = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, -1, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.Back);
+            state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
+            state.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
+
             queue = new RenderQueue(len, true);
             queue.ClearFramebufferBeforeSubmit = true;
             
             queue.ClearAndBeginRecording();
             queue.RecordDraw(new RenderQueue.DrawData()
             {
-                Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = positions.Count, Mesh = quad } },
+                Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = len, Mesh = quad } },
                 State = state
             });
             queue.EndRecording();
@@ -80,37 +96,9 @@ namespace Kokoro.Engine.Graphics
             float min_dist = System.Math.Min(min_dist0, min_dist1);
             min_dist = System.Math.Min(min_dist, dist_c);
 
-            /*
-            float tl_a = Vector3.Dot(Vector3.Normalize(tl - pos), dir);
-            float tr_a = Vector3.Dot(Vector3.Normalize(tr - pos), dir);
-            float bl_a = Vector3.Dot(Vector3.Normalize(bl - pos), dir);
-            float br_a = Vector3.Dot(Vector3.Normalize(br - pos), dir);
-
-            float min_a0 = System.Math.Max(System.Math.Abs(tl_a), System.Math.Abs(tr_a));
-            float min_a1 = System.Math.Max(System.Math.Abs(bl_a), System.Math.Abs(br_a));
-            float min_a = System.Math.Max(min_a0, min_a1);
-
-            bool tl_vis = tl_a >= 0;
-            bool tr_vis = tr_a >= 0;
-            bool bl_vis = bl_a >= 0;
-            bool br_vis = br_a >= 0;
-            */
-
-            /*if (50 * System.Math.Pow(2, (maxLevels - level)/16) >= min_dist)
-            {
-                if (d.Level < maxLevels - 1 && d.IsLeaf)
-                    d.Split();
-
-                return DistanceState.Visible;
-            }
-            return DistanceState.Invisible;*/
-
             //Inside tile
             if (dist_tl <= side && dist_tr <= side && dist_bl <= side && dist_br <= side)
                 return (d.IsLeaf ? DistanceState.Stop : DistanceState.Visible);
-
-            //if (!tl_vis && !tr_vis && !bl_vis && !br_vis)
-            //    return DistanceState.Load;
 
             //subdivide when very close to the current level relative to the side
             if (min_dist <= dist_side * dist_side && d.IsLeaf && d.Level < maxLevels)
@@ -118,28 +106,6 @@ namespace Kokoro.Engine.Graphics
                 d.Split();
                 maxLevels++;
             }
-
-            /*
-            Matrix4 vp = cam.View * cam.Projection;
-            Vector2 tl_s = Vector3.TransformPerspective(tl, vp).Xy;
-            Vector2 tr_s = Vector3.TransformPerspective(tr, vp).Xy;
-            Vector2 bl_s = Vector3.TransformPerspective(bl, vp).Xy;
-            Vector2 br_s = Vector3.TransformPerspective(br, vp).Xy;
-
-            float len0 = (tl_s - tr_s).LengthSquared;
-            float len1 = (tr_s - br_s).LengthSquared;
-
-            bool tl_isIn = tl_s.X >= -1 && tl_s.X <= 1 && tl_s.Y >= -1 && tl_s.Y <= 1;
-            bool tr_isIn = tr_s.X >= -1 && tr_s.X <= 1 && tr_s.Y >= -1 && tr_s.Y <= 1;
-            bool bl_isIn = bl_s.X >= -1 && bl_s.X <= 1 && bl_s.Y >= -1 && bl_s.Y <= 1;
-            bool br_isIn = br_s.X >= -1 && br_s.X <= 1 && br_s.Y >= -1 && br_s.Y <= 1;
-
-            float area = len0 * len1;
-
-            //Stop going deeper if all the corners of the current level are already visible
-            //if (tl_isIn && tr_isIn && bl_isIn && br_isIn)
-            //    return DistanceState.Stop;
-            */
 
             if (min_dist <= dist_side * dist_side)
             {
@@ -230,8 +196,10 @@ namespace Kokoro.Engine.Graphics
             });
         }
 
-        public void Draw()
+        public void Draw(Matrix4 view, Matrix4 proj)
         {
+            state.ShaderProgram.Set("View", view);
+            state.ShaderProgram.Set("Projection", proj);
             queue.Submit();
         }
     }

@@ -23,14 +23,35 @@ namespace Kokoro.Engine.Cameras
         public float moveSpeed = 50000f;
         Vector2 mousePos;
         Vector3 cameraRotatedUpVector;
+        Keyboard kbd;
+
+        public const string UpBinding = "FirstPersonCamera.Up";
+        public const string DownBinding = "FirstPersonCamera.Down";
+        public const string LeftBinding = "FirstPersonCamera.Left";
+        public const string RightBinding = "FirstPersonCamera.Right";
+        public const string ForwardBinding = "FirstPersonCamera.Forward";
+        public const string BackwardBinding = "FirstPersonCamera.Backward";
+        public const string AccelerateBinding = "FirstPersonCamera.Accelerate";
+        public const string DecelerateBinding = "FirstPersonCamera.Decelerate";
 
         /// <summary>
         /// Create a new First Person Camera
         /// </summary>
         /// <param name="Position">The Position of the Camera</param>
         /// <param name="Direction">The Direction the Camera initially faces</param>
-        public FirstPersonCamera(Vector3 Position, Vector3 Direction, string name) : base(name)
+        public FirstPersonCamera(Keyboard kbd, Vector3 Position, Vector3 Direction, string name) : base(name)
         {
+            //Setup default key bindings
+            this.kbd = kbd;
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.ForwardBinding)) kbd.KeyMap.Add(FirstPersonCamera.ForwardBinding, Key.Up);
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.BackwardBinding)) kbd.KeyMap.Add(FirstPersonCamera.BackwardBinding, Key.Down);
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.LeftBinding)) kbd.KeyMap.Add(FirstPersonCamera.LeftBinding, Key.Left);
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.RightBinding)) kbd.KeyMap.Add(FirstPersonCamera.RightBinding, Key.Right);
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.UpBinding)) kbd.KeyMap.Add(FirstPersonCamera.UpBinding, Key.PageUp);
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.DownBinding)) kbd.KeyMap.Add(FirstPersonCamera.DownBinding, Key.PageDown);
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.AccelerateBinding)) kbd.KeyMap.Add(FirstPersonCamera.AccelerateBinding, Key.Home);
+            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.DecelerateBinding)) kbd.KeyMap.Add(FirstPersonCamera.DecelerateBinding, Key.End);
+
             this.Position = Position;
             this.Direction = Direction;
             View = Matrix4.LookAt(Position, Position + Direction, Vector3.UnitZ);
@@ -72,39 +93,39 @@ namespace Kokoro.Engine.Cameras
             UpdateViewMatrix();
             Vector3 Right = Vector3.Cross(cameraRotatedUpVector, Direction);
 
-            if (Keyboard.IsKeyDown(Key.Up))
+            if (kbd.IsKeyDown(ForwardBinding))
             {
                 Position += Direction * (float)(moveSpeed * interval / 10000f);
             }
-            else if (Keyboard.IsKeyDown(Key.Down))
+            else if (kbd.IsKeyDown(BackwardBinding))
             {
                 Position -= Direction * (float)(moveSpeed * interval / 10000f);
             }
 
-            if (Keyboard.IsKeyDown(Key.Left))
+            if (kbd.IsKeyDown(LeftBinding))
             {
                 Position -= Right * (float)(moveSpeed * interval / 10000f);
             }
-            else if (Keyboard.IsKeyDown(Key.Right))
+            else if (kbd.IsKeyDown(RightBinding))
             {
                 Position += Right * (float)(moveSpeed * interval / 10000f);
             }
 
 #if DEBUG
-            if (Keyboard.IsKeyDown(Key.PageDown))
+            if (kbd.IsKeyDown(DownBinding))
             {
                 Position -= cameraRotatedUpVector * (float)(moveSpeed * interval / 10000f);
             }
-            else if (Keyboard.IsKeyDown(Key.PageUp))
+            else if (kbd.IsKeyDown(UpBinding))
             {
                 Position += cameraRotatedUpVector * (float)(moveSpeed * interval / 10000f);
             }
 
-            if (Keyboard.IsKeyDown(Key.Home))
+            if (kbd.IsKeyDown(AccelerateBinding))
             {
                 moveSpeed += 0.02f * moveSpeed;
             }
-            else if (Keyboard.IsKeyDown(Key.End))
+            else if (kbd.IsKeyDown(DecelerateBinding))
             {
                 moveSpeed -= 0.02f * moveSpeed;
             }

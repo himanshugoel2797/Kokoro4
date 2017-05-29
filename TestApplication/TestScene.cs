@@ -1,6 +1,7 @@
 ﻿using Kokoro.Engine;
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
+using Kokoro.Engine.Input;
 using Kokoro.Engine.Voxel;
 using Kokoro.Math;
 using Kokoro.StateMachine;
@@ -53,7 +54,7 @@ namespace TestApplication
                 gbuf = new GBuffer(1920, 1080);
                 grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 3 * 11000, 3 * 11000);
                 fsq = Kokoro.Graphics.Prefabs.FullScreenQuadFactory.Create(grp);
-                camera = new FirstPersonCamera(Vector3.UnitX, Vector3.UnitY, "FPV");
+                camera = new FirstPersonCamera(new Keyboard(), Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
 
                 //mesh = new Mesh(grp, 25000, 25000, "car_0A.k4_stmesh");

@@ -20,10 +20,6 @@ namespace TestApplication
         private FirstPersonCamera camera;
         private MeshGroup grp;
         private TerrainRenderer terrainRenderer;
-        private RenderState state;
-        private RenderQueue queue;
-        private UniformBuffer textureUBO;
-        private ShaderStorageBuffer worldSSBO, texSSBO;
         private Texture tex;
         private TextureHandle handle;
 
@@ -65,7 +61,7 @@ namespace TestApplication
                 keybd = new Keyboard();
                 keybd.KeyMap.Add("ToggleCamPos", Key.Z);
 
-                camera = new FirstPersonCamera(Vector3.UnitX, Vector3.UnitY, "FPV");
+                camera = new FirstPersonCamera(keybd, Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
                 EngineManager.AddCamera(camera);
                 EngineManager.SetVisibleCamera(camera.Name);
@@ -75,48 +71,19 @@ namespace TestApplication
                 BitmapTextureSource bitmapSrc = new BitmapTextureSource("heightmap.png", 1);
                 tex = new Texture();
                 tex.SetData(bitmapSrc, 0);
-                textureUBO = new UniformBuffer();
-                worldSSBO = new ShaderStorageBuffer(16 * 2048, true);
-                texSSBO = new ShaderStorageBuffer(16 * 2048, true);
-
+                
                 handle = tex.GetHandle(TextureSampler.Default);
                 handle.SetResidency(TextureResidency.Resident);
 
 
                 //GraphicsDevice.Wireframe = true;
-                unsafe
-                {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        long* l = (long*)textureUBO.Update();
-                        l[0] = handle;
-                        textureUBO.UpdateDone();
-                    }
-
-                    for (int i = 0; i < 3; i++)
-                    {
-                        long* l = (long*)texSSBO.Update();
-                        for (int j = 0; j < 2048; j++)
-                        {
-                            l[j * 2] = handle;
-                        }
-                        texSSBO.UpdateDone();
-                    }
-                }
-
-                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { worldSSBO, texSSBO }, new UniformBuffer[] { textureUBO }, true, DepthFunc.LEqual, -1, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.None);
-                state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
-                state.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
-                state.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
-
-                terrainRenderer = new TerrainRenderer(5000, grp, camera, state, worldSSBO, texSSBO, handle);
+                
+                terrainRenderer = new TerrainRenderer(5000, grp, Framebuffer.Default, handle);
 
                 inited = true;
             }
 
-            state.ShaderProgram.Set("View", camera.View);
-            state.ShaderProgram.Set("Projection", camera.Projection);
-
+            
             bool terrainUpdateNeeded = false;
 
 
@@ -131,7 +98,7 @@ namespace TestApplication
             }
 
             if (terrainUpdateNeeded) terrainRenderer.Update(camPos, camDir);
-            terrainRenderer.Draw();
+            terrainRenderer.Draw(camera.View, camera.Projection);
 
         }
 

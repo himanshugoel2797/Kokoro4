@@ -96,6 +96,11 @@ namespace Kokoro.Math
             Z = value;
         }
 
+        public Vector3(float[] value)
+        {
+            SIMD_vec = new System.Numerics.Vector3(value[0], value[1], value[2]);
+        }
+
         /// <summary>
         /// Constructs a new Vector3.
         /// </summary>

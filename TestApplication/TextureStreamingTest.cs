@@ -1,6 +1,7 @@
 ﻿using Kokoro.Engine;
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
+using Kokoro.Engine.Input;
 using Kokoro.Graphics.Prefabs;
 using Kokoro.Math;
 using Kokoro.StateMachine;
@@ -40,7 +41,7 @@ namespace TestApplication
         {
             if (!inited)
             {
-                camera = new FirstPersonCamera(Vector3.UnitX, Vector3.UnitY, "FPV");
+                camera = new FirstPersonCamera(new Keyboard(), Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
                 EngineManager.AddCamera(camera);
                 EngineManager.SetVisibleCamera(camera.Name);
