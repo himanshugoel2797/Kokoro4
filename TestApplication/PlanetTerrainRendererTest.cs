@@ -2,18 +2,22 @@
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
 using Kokoro.Engine.Input;
-using Kokoro.Graphics.OpenGL;
 using Kokoro.Math;
 using Kokoro.StateMachine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace TestApplication
 {
-    class CPUProcGenTerrainTest : IState
+    class PlanetTerrainRendererTest : IState
     {
         private bool inited = false;
         private FirstPersonCamera camera;
         private MeshGroup grp;
-        private TerrainRenderer[] terrainRenderers;
+        private PlanetRenderer planetRenderer;
         private Texture tex;
         private TextureHandle handle;
 
@@ -36,6 +40,7 @@ namespace TestApplication
             if (!inited)
             {
                 keybd = new Keyboard();
+                keybd.KeyMap["ToggleCamera"] = Key.Z;
 
                 camera = new FirstPersonCamera(keybd, Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
@@ -55,36 +60,27 @@ namespace TestApplication
 
                 float side = 500;
                 float off = side * 0.5f;
+                Framebuffer fbuf = Framebuffer.Default;
 
-                terrainRenderers = new TerrainRenderer[] {
-                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 2, off),
-                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 2, -off),
-                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 1, off),
-                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 0, 1, -off),
-                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 1, 2, off),
-                new TerrainRenderer(side, grp, Framebuffer.Default, handle, 1, 2, -off),
-                };
-
-                terrainRenderers[0].Queue.ClearFramebufferBeforeSubmit = true;
+                planetRenderer = new PlanetRenderer(grp, Framebuffer.Default, 500);
 
                 inited = true;
             }
 
+            if (keybd.IsKeyReleased("ToggleCamera"))
+            {
+                updateCamPos = !updateCamPos;
+            }
 
-            if (camPos != camera.Position)
+            if (updateCamPos && camPos != camera.Position)
             {
                 camPos = camera.Position;
 
-                foreach(TerrainRenderer r in terrainRenderers)
-                r.Update(camPos, camera.Direction);
+                planetRenderer.Update(camPos, camera.Direction);
             }
 
-            foreach(TerrainRenderer r in terrainRenderers)
-            {
-                //if(Vector3.Dot(camera.Direction, r.Normal) <= 0)
-                    r.Draw(camera.View, camera.Projection);
-
-            }
+            //if(Vector3.Dot(camera.Direction, r.Normal) <= 0)
+            planetRenderer.Draw(camera.View, camera.Projection);
 
         }
 

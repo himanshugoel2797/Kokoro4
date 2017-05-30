@@ -189,7 +189,10 @@ namespace Kokoro.Graphics.OpenGL
                     if (cullMode == Engine.Graphics.CullFaceMode.None) CullEnabled = false;
                     else CullEnabled = true;
 
-                    if (cullMode != Engine.Graphics.CullFaceMode.None) GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
+                    if (cullMode != Engine.Graphics.CullFaceMode.None)
+                    {
+                        GL.CullFace((OpenTK.Graphics.OpenGL.CullFaceMode)cullMode);
+                    }
                 }
             }
         }
@@ -205,7 +208,7 @@ namespace Kokoro.Graphics.OpenGL
             {
                 if (cullEnabled != value)
                 {
-                    if (cullEnabled)
+                    if (value)
                         GL.Enable(EnableCap.CullFace);
                     else
                         GL.Disable(EnableCap.CullFace);
@@ -343,7 +346,7 @@ namespace Kokoro.Graphics.OpenGL
         private static ConcurrentQueue<Tuple<int, GLObjectType>> DeletionQueue;
 
         [System.Security.SuppressUnmanagedCodeSecurity]
-        [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")]
+        [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")] 
         extern static IntPtr wglGetCurrentDC();
 
         static GraphicsDevice()
@@ -645,7 +648,7 @@ namespace Kokoro.Graphics.OpenGL
         {
             _far = far;
             _near = near;
-            GL.NV.DepthRange(near, far);
+            GL.DepthRange(near, far);
         }
 
         public static void GetDepthRange(out double near, out double far)

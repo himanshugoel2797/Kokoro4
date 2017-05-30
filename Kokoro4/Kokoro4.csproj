@@ -125,6 +125,7 @@
     <Compile Include="Engine\Graphics\FramebufferAttachment.cs" />
     <Compile Include="Engine\Graphics\GraphicsObject.cs" />
     <Compile Include="Engine\Graphics\Material.cs" />
+    <Compile Include="Engine\Graphics\PlanetRenderer.cs" />
     <Compile Include="Engine\Graphics\Prefabs\QuadFactory.cs" />
     <Compile Include="Engine\Graphics\ProcessedArrayTextureSource.cs" />
     <Compile Include="Engine\Graphics\RawTextureSource.cs" />
@@ -413,6 +414,12 @@
     <None Include="Graphics\OpenGL\Shaders\SSR\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Graphics\OpenGL\Shaders\PlanetRenderer\fragment.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\OpenGL\Shaders\PlanetRenderer\vertex.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Graphics\OpenGL\Shaders\TiledDeferred\compute.glsl" />
     <None Include="packages.config" />
   </ItemGroup>

@@ -69,6 +69,31 @@ namespace Kokoro.Engine.Graphics
 
     public class Texture : IDisposable
     {
+        public static Texture Default { get; private set; }
+
+        static Texture()
+        {
+            GL.GetFloat((GetPName)OpenTK.Graphics.OpenGL.ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out float a);
+            MaxAnisotropy = a;
+
+            Default = new Texture();
+            var src = new System.Drawing.Bitmap(256, 256);
+            var g = System.Drawing.Graphics.FromImage(src);
+            g.FillRectangle(System.Drawing.Brushes.BlueViolet, 0, 0, 256, 256);
+            g.DrawRectangle(System.Drawing.Pens.Black, 0, 0, 256, 256);
+
+            for (int x = 0; x < 256; x += 16)
+                g.DrawLine(System.Drawing.Pens.Green, x, 0, x, 256);
+
+            for (int x = 0; x < 256; x += 16)
+                g.DrawLine(System.Drawing.Pens.Red, 0, x, 256, x);
+
+            BitmapTextureSource s = new BitmapTextureSource(src, 1);
+            Default.SetData(s, 0);
+            
+        }
+
+
 
         internal int id;
         internal PixelInternalFormat internalformat;
@@ -102,13 +127,7 @@ namespace Kokoro.Engine.Graphics
         public static float MaxAnisotropy { get; internal set; }
 
         private Dictionary<int, TextureHandle> handles;
-
-        static Texture()
-        {
-            float a = 0;
-            GL.GetFloat((GetPName)OpenTK.Graphics.OpenGL.ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out a);
-            MaxAnisotropy = a;
-        }
+        
 
         public Texture()
         {

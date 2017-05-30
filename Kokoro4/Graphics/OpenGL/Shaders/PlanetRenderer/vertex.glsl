@@ -11,6 +11,7 @@ out flat int inst;
 // Values that stay constant for the whole mesh.
 uniform mat4 View;
 uniform mat4 Projection;
+uniform float Radius;
 
 layout (std140) buffer transforms
 { 
@@ -37,6 +38,11 @@ void main(){
 	vnorm.z = cos(n.y);
 
 	vec3 vpos = vs_pos * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].xyz;
+	vpos = normalize(vpos);
+
+	vnorm = vpos;
+
+	vpos *= Radius;
 	vpos += vnorm * texture(sampler2D(HeightMapData.HeightMaps[gl_InstanceID].xy), vs_uv).x;
 
 	gl_Position =  MVP * vec4(vpos.x, vpos.y, vpos.z, 1);

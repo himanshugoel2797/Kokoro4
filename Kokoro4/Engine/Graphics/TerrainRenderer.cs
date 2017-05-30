@@ -12,7 +12,7 @@ namespace Kokoro.Engine.Graphics
 {
     public class TerrainRenderer
     {
-        struct TerrainData
+        protected struct TerrainData
         {
 
         }
@@ -23,15 +23,17 @@ namespace Kokoro.Engine.Graphics
         public RenderQueue Queue { get; private set; }
         public RenderState State { get; private set; }
         ShaderStorageBuffer WorldBuffer, TextureBuffer;
-        TextureHandle testTex;
         const int quadSide = 25;
-        int maxLevels = 40;
-        int len = 2048;
-        int XIndex, YIndex, ZIndex;
+        protected int maxLevels = 40;
+        protected int len = 2048;
+
+        public int XIndex { get; private set; }
+        public int YIndex { get; private set; }
+        public int ZIndex { get; private set; }
         public float YOff { get; private set; }
         public Vector3 Normal { get; private set; }
 
-        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, TextureHandle tex, int xindex, int zindex, float yOff)
+        protected TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, string vshader, string fshader)
         {
             XIndex = xindex;
             ZIndex = zindex;
@@ -39,8 +41,6 @@ namespace Kokoro.Engine.Graphics
             for (YIndex = 0; YIndex < 3; YIndex++)
                 if (YIndex != XIndex && YIndex != ZIndex)
                     break;
-
-            testTex = tex;
 
             float[] norm_f = new float[3];
             norm_f[XIndex] = 0;
@@ -55,6 +55,9 @@ namespace Kokoro.Engine.Graphics
             WorldBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
             TextureBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
 
+            TextureHandle h = Texture.Default.GetHandle(TextureSampler.Default);
+            h.SetResidency(TextureResidency.Resident);
+
             unsafe
             {
                 for (int i = 0; i < 3; i++)
@@ -62,13 +65,13 @@ namespace Kokoro.Engine.Graphics
                     long* l = (long*)TextureBuffer.Update();
                     for (int j = 0; j < len; j++)
                     {
-                        l[j * 2] = tex;
+                        l[j * 2] = h;
                     }
                     TextureBuffer.UpdateDone();
                 }
             }
 
-            State = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff >= 0) ? CullFaceMode.Back : CullFaceMode.Front);
+            State = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, vshader), ShaderSource.Load(ShaderType.FragmentShader, fshader)), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
             State.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
             State.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
 
@@ -83,10 +86,15 @@ namespace Kokoro.Engine.Graphics
 
         }
 
+        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff) : this(side, grp, fbuf, xindex, zindex, yOff, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl", "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")
+        {
+
+        }
+
         //Update SSBO to reduce size and add offset data for texturing corrections. scale, location, texture handle
         //Stop rerecording commands, umrendered stuff just positioned out of the way
 
-        private DistanceState GetMaxLevel(ref QuadTree<TerrainData> d, int level, Vector3 pos, Vector3 dir)
+        protected virtual DistanceState GetMaxLevel(ref QuadTree<TerrainData> d, int level, Vector3 pos, Vector3 dir)
         {
             float[] tl_f = new float[3];
             tl_f[XIndex] = d.Min.X;
@@ -137,7 +145,6 @@ namespace Kokoro.Engine.Graphics
             if (min_dist <= dist_side * dist_side && d.IsLeaf && d.Level < maxLevels)
             {
                 d.Split();
-                maxLevels++;
             }
 
             if (min_dist <= dist_side * dist_side)
@@ -213,7 +220,7 @@ namespace Kokoro.Engine.Graphics
                 float* f = (float*)WorldBuffer.Update();
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    float[] p = (float[])(positions[i] - pos);
+                    float[] p = (float[])(positions[i]);// - pos); 
                     float s = scales[i];
                     for (int j = 0; j < p.Length; j++)
                     {
@@ -223,11 +230,11 @@ namespace Kokoro.Engine.Graphics
                 }
                 WorldBuffer.UpdateDone();
 
-                long* l = (long*)TextureBuffer.Update();
-                for (int i = 0; i < positions.Count; i++)
-                    l[i * 2] = testTex;
+                //long* l = (long*)TextureBuffer.Update();
+                //for (int i = 0; i < positions.Count; i++)
+                //l[i * 2] = testTex;
 
-                TextureBuffer.UpdateDone();
+                //TextureBuffer.UpdateDone();
             }
 
             Queue.UpdateDrawParams(quad.Parent, State, new RenderQueue.MeshData()
