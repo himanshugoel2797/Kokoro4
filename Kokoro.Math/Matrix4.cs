@@ -707,8 +707,12 @@ namespace Kokoro.Math
             float y = (2.0f * zNear) / (top - bottom);
             float a = (right + left) / (right - left);
             float b = (top + bottom) / (top - bottom);
-            float c = -(zFar + zNear) / (zFar - zNear);
-            float d = -(2.0f * zFar * zNear) / (zFar - zNear);
+            //float c = -(zFar + zNear) / (zFar - zNear);
+            //float d = -(2.0f * zFar * zNear) / (zFar - zNear);
+
+            float c = -(zNear) / (zFar - zNear) - 1;
+            float d = -(zFar * zNear) / (zFar - zNear);
+
 
             result = new Matrix4(x, 0, 0, 0,
                                  0, y, 0, 0,

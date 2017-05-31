@@ -28,8 +28,9 @@ namespace TestApplication
             EngineManager.StateManager.AddState(nameof(CubeTerrainTest), new CubeTerrainTest());
             EngineManager.StateManager.AddState(nameof(PlanetTerrainRendererTest), new PlanetTerrainRendererTest());
             EngineManager.StateManager.AddState(nameof(FenceTest), new FenceTest());
+            EngineManager.StateManager.AddState(nameof(HeightfieldGITest), new HeightfieldGITest());
 
-            EngineManager.StateManager.SetActiveState(nameof(PlanetTerrainRendererTest));
+            EngineManager.StateManager.SetActiveState(nameof(HeightfieldGITest));
             //EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest));
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));

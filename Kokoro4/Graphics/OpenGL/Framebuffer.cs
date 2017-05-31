@@ -60,7 +60,7 @@ namespace Kokoro.Engine.Graphics
                     GL.NamedFramebufferDrawBuffers(id, bindings.Keys.Count,
                         bindings.Keys.Except(new FramebufferAttachment[] { FramebufferAttachment.DepthAttachment })
                         .OrderByDescending((a) => (int)a).Reverse().Cast<DrawBuffersEnum>().ToArray());
-                }
+                } 
 
                 if (GL.CheckNamedFramebufferStatus(id, FramebufferTarget.Framebuffer) != (All)FramebufferErrorCode.FramebufferComplete)
                 {

@@ -346,7 +346,7 @@ namespace Kokoro.Graphics.OpenGL
         private static ConcurrentQueue<Tuple<int, GLObjectType>> DeletionQueue;
 
         [System.Security.SuppressUnmanagedCodeSecurity]
-        [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")] 
+        [System.Runtime.InteropServices.DllImport("opengl32.dll", EntryPoint = "wglGetCurrentDC")]
         extern static IntPtr wglGetCurrentDC();
 
         static GraphicsDevice()

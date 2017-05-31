@@ -196,12 +196,12 @@ namespace Kokoro.Engine.Graphics
 
             isRecording = false;
         }
-
+         
         public void Submit()
         {
             if (!transient)
-                while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating
-
+                while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating  
+             
             //Submit the multidraw calls
             for (int i = 0; i < RenderStates.Count; i++)
             {

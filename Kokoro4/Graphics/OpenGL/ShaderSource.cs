@@ -23,24 +23,24 @@ namespace Kokoro.Graphics.OpenGL
             GL.CompileShader(id);
 
             this.sType = (OpenTK.Graphics.OpenGL.ShaderType)sType;
-
+             
             int result = 0;
             GL.GetShader(id, ShaderParameter.CompileStatus, out result);
             if (result == 0)
-            {
+            {     
                 //Fetch the error log
                 string errorLog = "";
                 GL.GetShaderInfoLog(id, out errorLog);
-
+                
                 GL.DeleteShader(id);
                  
                 Console.WriteLine(errorLog);
                 throw new Exception("Shader Compilation Exception : " + errorLog);
-            }
+            }    
             GraphicsDevice.Cleanup.Add(Dispose);
         }
 
-
+         
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

@@ -279,6 +279,12 @@
     <None Include="Graphics\OpenGL\Shaders\GBuffer\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Graphics\OpenGL\Shaders\HeightMapGI_A\fragment.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\OpenGL\Shaders\HeightMapGI_B\fragment.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Graphics\OpenGL\Shaders\HemisphereSampler\fragment.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

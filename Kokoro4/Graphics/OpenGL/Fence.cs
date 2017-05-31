@@ -14,15 +14,15 @@ namespace Kokoro.Engine.Graphics
         bool raised = false;
 
         public Fence()
-        {
+        {    
             GraphicsDevice.Cleanup.Add(Dispose);
         }
 
         public void PlaceFence()
-        {
+        {  
             id = GL.FenceSync(SyncCondition.SyncGpuCommandsComplete, WaitSyncFlags.None);
             raised = false;
-        }
+        } 
 
         public bool Raised(long timeout)
         {
@@ -93,3 +93,4 @@ namespace Kokoro.Engine.Graphics
         #endregion
     }
 }
+ 

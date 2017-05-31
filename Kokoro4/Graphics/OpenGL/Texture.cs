@@ -90,7 +90,7 @@ namespace Kokoro.Engine.Graphics
 
             BitmapTextureSource s = new BitmapTextureSource(src, 1);
             Default.SetData(s, 0);
-            
+
         }
 
 
@@ -109,6 +109,7 @@ namespace Kokoro.Engine.Graphics
         public int Depth { get; internal set; }
         public int LevelCount { get; internal set; }
 
+        public bool GenerateMipmaps { get; set; }
 
         public int WriteLevel { get; set; }
 
@@ -127,7 +128,7 @@ namespace Kokoro.Engine.Graphics
         public static float MaxAnisotropy { get; internal set; }
 
         private Dictionary<int, TextureHandle> handles;
-        
+
 
         public Texture()
         {
@@ -183,6 +184,11 @@ namespace Kokoro.Engine.Graphics
             this.format = src.GetFormat();
             this.internalformat = src.GetInternalFormat();
             this.texTarget = src.GetTextureTarget();
+
+            if(GenerateMipmaps)
+            {
+                GL.GenerateTextureMipmap(id);
+            }
         }
 
         public void SetTileMode(bool tileX, bool tileY)

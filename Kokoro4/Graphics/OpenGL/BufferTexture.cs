@@ -6,20 +6,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kokoro.Graphics.OpenGL
+namespace Kokoro.Engine.Graphics
 {
     public class BufferTexture
     {
         internal int id;
+        internal GPUBuffer buffer;
+        internal Fence fence;
 
-        public BufferTexture()
+        public BufferTexture(int size, SizedInternalFormat iFormat)
         {
             id = GL.GenTexture();
-        }
+            buffer = new GPUBuffer(BufferTarget.TextureBuffer, size, false);
 
-        public void SetStorage(GPUBuffer storage, SizedInternalFormat internalFormat)
-        {
-            GL.TextureBuffer(id, internalFormat, storage.id);
+            GL.TextureBuffer(id, iFormat, buffer.id);
         }
     }
 }

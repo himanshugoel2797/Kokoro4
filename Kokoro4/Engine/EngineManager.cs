@@ -184,7 +184,7 @@ namespace Kokoro.Engine
         {
             public void Update(double interval)
             {
-                StateManager.Update(interval);
+                StateManager.Update(interval); 
             }
 
             public void Render(double interval)
@@ -233,4 +233,4 @@ namespace Kokoro.Engine
         #endregion
 
     }
-}
+} 
