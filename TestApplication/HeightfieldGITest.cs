@@ -40,32 +40,33 @@ namespace TestApplication
             //Determine visibility angles from direction for each point and cache them in a second texture
             //Perform this calculation for n directions
             //
-             
+
             int net = 360;
-            int step = 5;    
+            int step = 10;
             int res = 512;
 
             if (!inited)
             {
-                 
+
                 Kokoro.Graphics.OpenGL.GraphicsDevice.WindowSize = new System.Drawing.Size(1024, 1024);
-                Texture srcMap = new Texture();  
-                srcMap.GenerateMipmaps = true; 
-                BitmapTextureSource srcMapSrc = new BitmapTextureSource("heightmap.png", 10); 
+                Texture srcMap = new Texture();
+                srcMap.GenerateMipmaps = true;
+                BitmapTextureSource srcMapSrc = new BitmapTextureSource("heightmap.png", 10);
                 srcMap.SetData(srcMapSrc, 0);
-                TextureHandle srcMapH = srcMap.GetHandle(TextureSampler.Default); 
-                srcMapH.SetResidency(TextureResidency.Resident); 
-                
+                srcMap.SetTileMode(false, false);
+                TextureHandle srcMapH = srcMap.GetHandle(TextureSampler.Default);
+                srcMapH.SetResidency(TextureResidency.Resident);
+
                 Texture srcColorMap = new Texture();
                 BitmapTextureSource srcColorMapSrc = new BitmapTextureSource("colormap.png", 1);
-                srcColorMap.SetData(srcColorMapSrc, 0);  
+                srcColorMap.SetData(srcColorMapSrc, 0);
                 TextureHandle srcColorMapH = srcColorMap.GetHandle(TextureSampler.Default);
                 srcColorMapH.SetResidency(TextureResidency.Resident);
-                 
+
                 Framebuffer[] fbufs = new Framebuffer[net / step];
-                 v_sh = new Texture[net / step];
+                v_sh = new Texture[net / step];  
                 u_sh = new Texture[net / step];
-                 
+
                 MeshGroup grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 100, 100);
                 Mesh fsq = FullScreenQuadFactory.Create(grp);
 
@@ -129,12 +130,12 @@ namespace TestApplication
                     {
                         Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = 1, Mesh = fsq }, },
                         State = state
-                    });
+                    }); 
                     queue.EndRecording();
 
                     float angle = i * (float)PI / 180.0f;
                     Vector2 dir = new Vector2((float)Cos(angle), (float)Sin(angle));
-
+       
                     state.ShaderProgram.Set("Direction", dir);
                     state.ShaderProgram.Set("SrcRadianceMultiplier", 0);
                     state.ShaderProgram.Set("SrcMap", srcMapH);
@@ -142,9 +143,14 @@ namespace TestApplication
 
                     state.ShaderProgram.SetUniformBufferMapping("V_dash", 0);
 
-                    queue.Submit();
+                    queue.Submit(); 
                 }
-                 
+
+                //Store direct illumination samples into a lower res image using UV coordinates
+                //Dynamic objects have their shadowing behaviors precomputed, if light hits surflet A, the opposite radiance is propogated out the other end, allowing for use of 'negative radiance' for shadowing
+                //Build spatial partition of sample points using clustering to optimize
+                //temporal solution, run a pass every frame    
+
                 stateF = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Framebuffer/fragment.glsl")), null, null, false, DepthFunc.None, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.Back);
                 queueF = new RenderQueue(10, false);
                 queueF.ClearAndBeginRecording();
@@ -160,8 +166,8 @@ namespace TestApplication
             }
 
             //idx = 52;  
-            idx = 0; 
-            TextureHandle h = u_sh[(idx++ / 60) % (net / step)].GetHandle(TextureSampler.Default);
+            //idx = 0; 
+            TextureHandle h = u_sh[(idx++ / 30) % (net / step)].GetHandle(TextureSampler.Default);
             h.SetResidency(TextureResidency.Resident);
             stateF.ShaderProgram.Set("AlbedoMap", h);
             queueF.Submit();

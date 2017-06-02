@@ -18,7 +18,7 @@ layout(bindless_sampler) uniform sampler2D SrcMap;
 layout(bindless_sampler) uniform sampler2D SrcColor;
 layout(bindless_sampler) uniform sampler2D SrcRadiance;
 
-#define DIV (128.0f)
+#define DIV (256.0f)
 #define MAX_STEPS (DIV * STEP)
 #define STEP (1.0f / DIV)
 
@@ -83,14 +83,14 @@ void main(){
 		float angle = clamp(atan((sampleHeight - height) / steps), 0, PI * 0.5);
 
 		//Maximize the blocking angle, prevent duplicates
-		bool control = angle >= wmax && prevUV != pos;
+		bool control = angle >= wmax;
 		prevUV = pos;
 		
-		//Set maxVal_H to the new maximum height
+		//Set wmax to the new maximum angle thus far
 		if(control)wmax = angle;
 
-		//Find a visible point and calculate the incoming radiance from that point
-		vec4 radiance = clamp(dot(normal, normalize(vec3(Direction.x, sampleHeight - height, Direction.y))), 0, 1) * texture(SrcColor, pos).rgba * 1.0f/(steps * steps + 1.0f);
+		//Find a visible point and calculate the incoming radiance from that point using the normalized lambert brdf
+		vec4 radiance = clamp(dot(normal, normalize(vec3(Direction.x, sampleHeight - height, Direction.y))) / PI, 0, 1) * texture(SrcColor, pos).rgba * 1.0f/(steps * steps + 1.0f);
 		if(control) IR += clamp(prevRadiance - radiance, vec4(0), vec4(1)) * V_dash_t.val[TABLE_INDEX(prevAngle)];
 		if(control) prevRadiance = radiance;
 		if(control) prevAngle = angle;
@@ -101,7 +101,7 @@ void main(){
 	//IR = clamp(dot(normal, normalize(vec3(Direction.x, texture(SrcMap, pos).r - height, Direction.y))), 0, 1) * texture(SrcColor, UV).rgba * 1.0f/(1 + 0.0001f);
 
 	//Store v's basis vector
-	v_sh.rgba = V_dash_t.val[TABLE_INDEX(PI * 0.5f)] - V_dash_t.val[TABLE_INDEX(wmax)];
+	v_sh.rgba = V_dash_t.val[TABLE_INDEX(wmax)];
 	
 	//Store incoming radiance
 	u_sh.rgba = IR;
@@ -110,9 +110,10 @@ void main(){
 	//In the next pass, read the incoming radiance info for bounce lighting
 	
 	//Visibility function reconstruction
-	u_sh.rgba = texture(SrcColor, UV) * (clamp(dot(v_sh.rgba, P_z(cos(PI * 0.6f))), 0, 0.8) + 0.2 );
-	
+	float fac = float(PI * 0.25f + rand(UV) * 0.015f >= wmax) * 0.8f;
+	//u_sh.rgba = texture(SrcColor, UV) * (clamp(dot(v_sh.rgba, P_z(cos(PI * 0.5f))), 0, 0.8) + 0.2 );
+	u_sh.rgba = texture(SrcColor, UV) * (fac + 0.2f) ;
 	
 	//Lighting function reconstruction
-	//u_sh.rgba = texture(SrcColor, UV) * (clamp(dot(u_sh.rgba, P_z(cos(PI * 0.5f))), 0, 1));
+	//u_sh.rgba = vec4(clamp(dot(u_sh.rgba, P_z(cos(PI * 1.0f))), 0, 1));// * (clamp(dot(v_sh.rgba, P_z(cos(PI * 0.6f))), 0, 0.8) + 0.2 );
 }

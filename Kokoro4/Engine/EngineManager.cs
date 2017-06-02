@@ -199,7 +199,7 @@ namespace Kokoro.Engine
                     var tmp = NextFrameTasks;
                     NextFrameTasks = BackgroundTasks;
                     BackgroundTasks = tmp;
-                }
+                } 
                 GraphicsDevice.SwapBuffers();
             }
 
