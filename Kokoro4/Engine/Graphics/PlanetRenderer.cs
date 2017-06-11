@@ -14,7 +14,7 @@ namespace Kokoro.Engine.Graphics
         {
             private float radius;
 
-            public PlanetTerrainSide(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, float radius) : base(side, grp, fbuf, xindex, zindex, yOff, "Graphics/OpenGL/Shaders/PlanetRenderer/vertex.glsl", "Graphics/OpenGL/Shaders/PlanetRenderer/fragment.glsl")
+            public PlanetTerrainSide(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, float radius) : base(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/PlanetRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/PlanetRenderer/fragment.glsl"))
             {
                 this.radius = radius;
             }

@@ -22,13 +22,18 @@ namespace Kokoro.Engine.Graphics
         {
             return new ShaderSource(sType, File.ReadAllText(file));
         }
+
+        public static ShaderSource Load(ShaderType sType, string file, string libraryName)
+        {
+            return new ShaderSource(sType, File.ReadAllText(file), libraryName);
+        }
         #endregion
 
         internal IntShaderSource shader_src;
 
-        public ShaderSource(ShaderType sType, string src)
+        public ShaderSource(ShaderType sType, string src, string libraryName = null)
         {
-            shader_src = new IntShaderSource(sType, src);
+            shader_src = new IntShaderSource(sType, src, libraryName);
         }
 
         #region IDisposable Support

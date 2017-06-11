@@ -33,7 +33,7 @@ namespace Kokoro.Engine.Graphics
         public float YOff { get; private set; }
         public Vector3 Normal { get; private set; }
 
-        protected TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, string vshader, string fshader)
+        protected TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, ShaderSource vshader, ShaderSource fshader)
         {
             XIndex = xindex;
             ZIndex = zindex;
@@ -71,7 +71,7 @@ namespace Kokoro.Engine.Graphics
                 }
             }
 
-            State = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, vshader), ShaderSource.Load(ShaderType.FragmentShader, fshader)), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
+            State = new RenderState(fbuf, new ShaderProgram(vshader, fshader), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
             State.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
             State.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
 
@@ -86,7 +86,7 @@ namespace Kokoro.Engine.Graphics
 
         }
 
-        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff) : this(side, grp, fbuf, xindex, zindex, yOff, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl", "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl")
+        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl"))
         {
 
         }

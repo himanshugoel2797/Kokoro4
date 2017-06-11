@@ -9,7 +9,7 @@ namespace Kokoro.Physics
 {
     public class PhysicsObject
     {
-        public BoundingBox Bounds { get; set; }
+        public virtual BoundingBox Bounds { get; set; }
         public IPhysicsData DetailedData { get; set; }
 
         public double Mass { get; set; }
@@ -32,5 +32,8 @@ namespace Kokoro.Physics
             Velocity += (LastAcceleration + accel) / 2.0d * timestep;
             LastAcceleration = accel;
         }
+
+        //For starters, only need plane, aabb, obb, sphere, compound object, ray collision detection
+        //Implement cone, triangle, cylinder, triangle mesh, terrain collisions as needed.
     }
 }

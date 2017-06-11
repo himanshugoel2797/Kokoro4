@@ -14,33 +14,38 @@ namespace Kokoro.Graphics.OpenGL
         internal int id;
         internal ShaderType sType;
 
-        public IntShaderSource(Kokoro.Engine.Graphics.ShaderType sType, string src)
+        public IntShaderSource(Kokoro.Engine.Graphics.ShaderType sType, string src, string libraryName = null)
         {
-            src = $"#version 450 core\n#extension GL_ARB_bindless_texture : require\n #extension GL_ARB_shader_draw_parameters : require\n #define MAX_DRAWS_UBO {GraphicsDevice.MaxIndirectDrawsUBO}\n #define MAX_DRAWS_SSBO {GraphicsDevice.MaxIndirectDrawsSSBO}\n #define PI {System.Math.PI}\n" + src;
+            string preamble = $"#version 450 core\n#extension GL_ARB_bindless_texture : require\n #extension GL_ARB_shader_draw_parameters : require\n #define MAX_DRAWS_UBO {GraphicsDevice.MaxIndirectDrawsUBO}\n #define MAX_DRAWS_SSBO {GraphicsDevice.MaxIndirectDrawsSSBO}\n #define PI {System.Math.PI}\n";
+
+            List<string> shaderSrcs = new List<string>();
+            shaderSrcs.Add(preamble);
+            if (libraryName != null) shaderSrcs.AddRange(Engine.Graphics.ShaderLibrary.GetLibrary(libraryName).Sources);
+            shaderSrcs.Add(src);
 
             id = GL.CreateShader((OpenTK.Graphics.OpenGL.ShaderType)sType);
-            GL.ShaderSource(id, src);
+            GL.ShaderSource(id, shaderSrcs.Count, shaderSrcs.ToArray(), (int[])null);
             GL.CompileShader(id);
 
             this.sType = (OpenTK.Graphics.OpenGL.ShaderType)sType;
-             
+
             int result = 0;
             GL.GetShader(id, ShaderParameter.CompileStatus, out result);
             if (result == 0)
-            {     
+            {
                 //Fetch the error log
                 string errorLog = "";
                 GL.GetShaderInfoLog(id, out errorLog);
-                
+
                 GL.DeleteShader(id);
-                 
+
                 Console.WriteLine(errorLog);
                 throw new Exception("Shader Compilation Exception : " + errorLog);
-            }    
+            }
             GraphicsDevice.Cleanup.Add(Dispose);
         }
 
-         
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
@@ -79,4 +84,3 @@ namespace Kokoro.Graphics.OpenGL
         #endregion
     }
 }
- 

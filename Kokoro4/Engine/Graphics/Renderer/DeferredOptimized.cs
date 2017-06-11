@@ -19,11 +19,15 @@ namespace Kokoro.Engine.Graphics.Renderer
         //blend the results together
 
         private Framebuffer gbuffer;
+        private Texture depth, uv, mat;
         private int tile_x_cnt, tile_y_cnt, w, h;
         const int MaxLightCount = 10;
 
-        public ShaderProgram DeferredOptimizedShader { get; set; }
-        private Texture depth, uv, mat;
+        public ShaderSource DeferredFragmentShader { get; set; }
+        public Framebuffer DeferredFramebuffer { get { return gbuffer; } }
+        public Texture Depth { get { return depth; } }
+        public Texture UV { get { return uv; } }
+        public Texture Material { get { return mat; } }
 
         public DeferredOptimized(int tile_x_cnt, int tile_y_cnt, int w, int h)
         {
@@ -57,7 +61,7 @@ namespace Kokoro.Engine.Graphics.Renderer
             gbuffer[FramebufferAttachment.ColorAttachment0] = uv;
             gbuffer[FramebufferAttachment.ColorAttachment1] = mat;
 
-            DeferredOptimizedShader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/DeferredOpt/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/DeferredOpt/fragment.glsl"));
+            DeferredFragmentShader = ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Deferred/fragment.glsl");
         }
 
         private void BucketTask(Light[] lights, out Light[][][] buckets)
@@ -76,7 +80,7 @@ namespace Kokoro.Engine.Graphics.Renderer
                     buckets[x][y] = new Light[MaxLightCount];
 
                     //TODO actually implement this, dummy implementation for testing
-                    if(lights.Length > i)
+                    if (lights.Length > i)
                         buckets[x][y][i] = lights[i];
 
                 }
