@@ -156,6 +156,7 @@
     <Compile Include="Engine\Cameras\FirstPersonCamera.cs" />
     <Compile Include="Engine\Graphics\CubeMapTextureSource.cs" />
     <Compile Include="Engine\Graphics\DepthTextureSource.cs" />
+    <Compile Include="Engine\Graphics\BufferTextureSource.cs" />
     <Compile Include="Graphics\OpenGL\CullFaceMode.cs" />
     <Compile Include="Graphics\OpenGL\DepthFunc.cs" />
     <Compile Include="Graphics\OpenGL\Fence.cs" />

@@ -74,16 +74,10 @@ namespace Kokoro.Graphics.OpenGL
             if (loc >= 0) GL.Arb.ProgramUniformHandle(id, loc, handle);
         }
 
-        public void SetImageTexture(string name, Texture tex, int binding, int level, bool read, bool write)
+        public void Set(string name, ImageHandle handle)
         {
-            TextureAccess acc = TextureAccess.ReadOnly;
-            if (read && write)
-                acc = TextureAccess.ReadWrite;
-            else if (!read && write)
-                acc = TextureAccess.WriteOnly;
-
             int loc = GetLoc(name);
-            if (loc >= 0) GL.BindImageTexture(binding, tex.id, level, false, 0, acc, (SizedInternalFormat)tex.internalformat);
+            if (loc >= 0) GL.Arb.ProgramUniformHandle(id, loc, handle);
         }
 
         public void Set(string name, UniformBuffer ubo)

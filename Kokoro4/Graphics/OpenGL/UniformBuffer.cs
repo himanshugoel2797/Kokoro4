@@ -25,7 +25,6 @@ namespace Kokoro.Engine.Graphics
 
 
         private const int UniformBufferSize = 16 * 1024;
-        public const int UniformBufferMaxSize = (UniformBufferSize / rungs);
 
         static UniformBuffer()
         {
@@ -37,6 +36,7 @@ namespace Kokoro.Engine.Graphics
         internal int bindPoint = 0;
         internal int curRung = 0;
         internal Fence[] readyFence;
+        internal bool dynamic;
 
         public bool IsReady
         {
@@ -46,13 +46,22 @@ namespace Kokoro.Engine.Graphics
             }
         }
 
-        public UniformBuffer()
+        public int Size
         {
+            get
+            {
+                return dynamic ? UniformBufferSize / rungs : UniformBufferSize;
+            }
+        }
+
+        public UniformBuffer(bool dynamic)
+        {
+            this.dynamic = dynamic;
             buf = new GPUBuffer(BufferTarget.UniformBuffer, UniformBufferSize, false);
             bindPoint = getFreeBindPoint();
 
-            readyFence = new Fence[rungs];
-            for (int i = 0; i < rungs; i++)
+            readyFence = new Fence[dynamic ? rungs : 1];
+            for (int i = 0; i < readyFence.Length; i++)
             {
                 readyFence[i] = new Fence();
                 readyFence[i].PlaceFence();
@@ -62,13 +71,13 @@ namespace Kokoro.Engine.Graphics
         internal int GetReadyOffset()
         {
             int idx = curRung;
-            for (int i = 0; i < rungs; i++)
+            for (int i = 0; i < readyFence.Length; i++)
             {
                 if (readyFence[idx].Raised(1))
-                    return idx * UniformBufferMaxSize;
+                    return idx * Size;
 
                 if (idx == 0)
-                    idx = rungs - 1;
+                    idx = readyFence.Length - 1;
                 else
                     idx--;
             }
@@ -78,14 +87,14 @@ namespace Kokoro.Engine.Graphics
 
         public unsafe byte* Update()
         {
-            curRung = (curRung + 1) % rungs;
+            if (dynamic) curRung = (curRung + 1) % rungs;
             while (!readyFence[curRung].Raised(0)) ;
-            return (byte*)buf.GetPtr() + curRung * UniformBufferMaxSize; ;
+            return (byte*)buf.GetPtr() + curRung * Size; ;
         }
 
         public void UpdateDone()
         {
-            buf.FlushBuffer(curRung * UniformBufferMaxSize, UniformBufferMaxSize);
+            buf.FlushBuffer(curRung * Size, Size);
             readyFence[curRung].PlaceFence();
         }
 

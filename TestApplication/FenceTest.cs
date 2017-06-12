@@ -56,7 +56,7 @@ namespace TestApplication
 
                 h = tex.GetHandle(TextureSampler.Default);
                 h.SetResidency(Residency.Resident);
-                buf = new UniformBuffer();
+                buf = new UniformBuffer(false);
 
 
                 unsafe

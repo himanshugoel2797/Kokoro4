@@ -18,7 +18,7 @@ namespace Kokoro.Engine.Graphics
         Resident
     }
 
-    public enum ImageAccessMode
+    public enum AccessMode
     {
         Read = All.ReadOnly,
         Write = All.WriteOnly,
@@ -36,7 +36,7 @@ namespace Kokoro.Engine.Graphics
             this.parent = parent;
         }
 
-        public void SetResidency(Residency residency, ImageAccessMode m)
+        public void SetResidency(Residency residency, AccessMode m)
         {
             if (residency == Residency.Resident) GL.Arb.MakeImageHandleResident(hndl, (ArbBindlessTexture)m);
             else GL.Arb.MakeImageHandleNonResident(hndl);
@@ -181,7 +181,7 @@ namespace Kokoro.Engine.Graphics
             return handles[sampler.id];
         }
 
-        public ImageHandle GetImageHandle(int level, int layer, SizedInternalFormat iFormat)
+        public ImageHandle GetImageHandle(int level, int layer, Kokoro.Engine.Graphics.PixelInternalFormat iFormat)
         {
             return new ImageHandle(GL.Arb.GetImageHandle(id, level, layer == -1, layer, (ArbBindlessTexture)iFormat), this);
         }

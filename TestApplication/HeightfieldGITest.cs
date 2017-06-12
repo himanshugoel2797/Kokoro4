@@ -72,7 +72,7 @@ namespace TestApplication
 
 
                 //Precompute 256 values of v_dash
-                v_dash = new UniformBuffer();
+                v_dash = new UniformBuffer(false);
                 unsafe
                 {
                     Vector4 P_i(double angle)

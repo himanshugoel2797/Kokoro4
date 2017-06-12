@@ -554,7 +554,7 @@ namespace Kokoro.Graphics.OpenGL
             int rd_rung = buf.curRung - 1;
             if (rd_rung < 0) rd_rung = 3;
 
-            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)UniformBuffer.UniformBufferMaxSize);
+            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.Size);
         }
 
         #endregion

@@ -1,4 +1,5 @@
 ﻿using Kokoro.Engine.Graphics;
+using Kokoro.Graphics.OpenGL;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,11 @@ namespace Kokoro.Engine.Graphics
 
         bool dirty = false;
         bool stream = false;
+
+        public int Size
+        {
+            get { return size; }
+        }
 
         public ShaderStorageBuffer(GPUBuffer buf, bool stream)
         {

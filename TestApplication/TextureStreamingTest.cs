@@ -54,7 +54,7 @@ namespace TestApplication
                 BitmapTextureSource bitmapSrc = new BitmapTextureSource("test.png", 10);
                 stream = tStreamer.UploadTexture(bitmapSrc);
                 tex = stream.TargetTexture;
-                ubo = new UniformBuffer();
+                ubo = new UniformBuffer(false);
 
                 handle = tex.GetHandle(TextureSampler.Default);
 
