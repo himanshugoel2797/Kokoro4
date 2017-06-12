@@ -55,7 +55,7 @@ namespace TestApplication
                 tex.SetData(src, 0);
 
                 h = tex.GetHandle(TextureSampler.Default);
-                h.SetResidency(TextureResidency.Resident);
+                h.SetResidency(Residency.Resident);
                 buf = new UniformBuffer();
 
 

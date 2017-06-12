@@ -70,7 +70,7 @@ namespace TestApplication
                 tex.SetData(bitmapSrc, 0);
 
                 handle = tex.GetHandle(TextureSampler.Default);
-                handle.SetResidency(TextureResidency.Resident);
+                handle.SetResidency(Residency.Resident);
 
                 //GraphicsDevice.Wireframe = true;
 

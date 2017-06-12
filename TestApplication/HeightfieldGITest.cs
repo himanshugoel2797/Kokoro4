@@ -55,13 +55,13 @@ namespace TestApplication
                 srcMap.SetData(srcMapSrc, 0);
                 srcMap.SetTileMode(false, false);
                 TextureHandle srcMapH = srcMap.GetHandle(TextureSampler.Default);
-                srcMapH.SetResidency(TextureResidency.Resident);
+                srcMapH.SetResidency(Residency.Resident);
 
                 Texture srcColorMap = new Texture();
                 BitmapTextureSource srcColorMapSrc = new BitmapTextureSource("colormap.png", 1);
                 srcColorMap.SetData(srcColorMapSrc, 0);
                 TextureHandle srcColorMapH = srcColorMap.GetHandle(TextureSampler.Default);
-                srcColorMapH.SetResidency(TextureResidency.Resident);
+                srcColorMapH.SetResidency(Residency.Resident);
 
                 Framebuffer[] fbufs = new Framebuffer[net / step];
                 v_sh = new Texture[net / step];  
@@ -168,7 +168,7 @@ namespace TestApplication
             //idx = 52;  
             //idx = 0; 
             TextureHandle h = u_sh[(idx++ / 30) % (net / step)].GetHandle(TextureSampler.Default);
-            h.SetResidency(TextureResidency.Resident);
+            h.SetResidency(Residency.Resident);
             stateF.ShaderProgram.Set("AlbedoMap", h);
             queueF.Submit();
 

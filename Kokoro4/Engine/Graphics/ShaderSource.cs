@@ -23,7 +23,7 @@ namespace Kokoro.Engine.Graphics
             return new ShaderSource(sType, File.ReadAllText(file));
         }
 
-        public static ShaderSource Load(ShaderType sType, string file, string libraryName)
+        public static ShaderSource Load(ShaderType sType, string file, params string[] libraryName)
         {
             return new ShaderSource(sType, File.ReadAllText(file), libraryName);
         }
@@ -31,7 +31,7 @@ namespace Kokoro.Engine.Graphics
 
         internal IntShaderSource shader_src;
 
-        public ShaderSource(ShaderType sType, string src, string libraryName = null)
+        public ShaderSource(ShaderType sType, string src, params string[] libraryName)
         {
             shader_src = new IntShaderSource(sType, src, libraryName);
         }

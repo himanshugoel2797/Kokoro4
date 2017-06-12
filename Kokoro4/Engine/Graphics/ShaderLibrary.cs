@@ -32,6 +32,14 @@ namespace Kokoro.Engine.Graphics
             return libraries[libraryName];
         }
 
+        public static ShaderLibrary[] GetLibraries(string[] libraryName)
+        {
+            List<ShaderLibrary> libs = new List<ShaderLibrary>();
+            for (int i = 0; i < libraryName.Length; i++)
+                libs.Add(GetLibrary(libraryName[i]));
+            return libs.ToArray();
+        }
+
 
         private ShaderLibrary(string libraryName)
         {

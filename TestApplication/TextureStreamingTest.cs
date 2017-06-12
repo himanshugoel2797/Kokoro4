@@ -90,10 +90,10 @@ namespace TestApplication
 
             if (stream != null)
             {
-                handle?.SetResidency(TextureResidency.NonResident);
+                handle?.SetResidency(Residency.NonResident);
                 TextureSampler sampler = stream.TargetSampler;
                 handle = tex.GetHandle(sampler);
-                handle.SetResidency(TextureResidency.Resident);
+                handle.SetResidency(Residency.Resident);
 
                 GC.Collect();
 

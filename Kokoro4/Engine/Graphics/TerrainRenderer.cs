@@ -56,7 +56,7 @@ namespace Kokoro.Engine.Graphics
             TextureBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
 
             TextureHandle h = Texture.Default.GetHandle(TextureSampler.Default);
-            h.SetResidency(TextureResidency.Resident);
+            h.SetResidency(Residency.Resident);
 
             unsafe
             {
@@ -86,7 +86,7 @@ namespace Kokoro.Engine.Graphics
 
         }
 
-        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl"))
+        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, params string[] libraries) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl", libraries), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl", libraries))
         {
 
         }

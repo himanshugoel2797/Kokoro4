@@ -5,16 +5,47 @@ using Kokoro.Graphics.OpenGL;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Kokoro.Engine.Graphics
 {
-    public enum TextureResidency
+    public enum Residency
     {
         NonResident,
         Resident
+    }
+
+    public enum ImageAccessMode
+    {
+        Read = All.ReadOnly,
+        Write = All.WriteOnly,
+        ReadWrite = All.ReadWrite,
+    }
+
+    public class ImageHandle
+    {
+        internal long hndl = 0;
+        internal Texture parent;
+        
+        internal ImageHandle(long hndl, Texture parent)
+        {
+            this.hndl = hndl;
+            this.parent = parent;
+        }
+
+        public void SetResidency(Residency residency, ImageAccessMode m)
+        {
+            if (residency == Residency.Resident) GL.Arb.MakeImageHandleResident(hndl, (ArbBindlessTexture)m);
+            else GL.Arb.MakeImageHandleNonResident(hndl);
+        }
+
+        public static implicit operator long(ImageHandle handle)
+        {
+            return handle.hndl;
+        }
     }
 
     public class TextureHandle
@@ -55,9 +86,9 @@ namespace Kokoro.Engine.Graphics
             this.Sampler = sampler;
         }
 
-        public void SetResidency(TextureResidency residency)
+        public void SetResidency(Residency residency)
         {
-            if (residency == TextureResidency.Resident) GL.Arb.MakeTextureHandleResident(hndl);
+            if (residency == Residency.Resident) GL.Arb.MakeTextureHandleResident(hndl);
             else GL.Arb.MakeTextureHandleNonResident(hndl);
         }
 
@@ -150,6 +181,11 @@ namespace Kokoro.Engine.Graphics
             return handles[sampler.id];
         }
 
+        public ImageHandle GetImageHandle(int level, int layer, SizedInternalFormat iFormat)
+        {
+            return new ImageHandle(GL.Arb.GetImageHandle(id, level, layer == -1, layer, (ArbBindlessTexture)iFormat), this);
+        }
+
         public virtual void SetData(ITextureSource src, int level)
         {
             bool inited = false;
@@ -159,21 +195,25 @@ namespace Kokoro.Engine.Graphics
                 inited = true;
             }
 
-            //TODO: setup a system to stream textures using PBOs, uploading the lowest mipmap normally, and setting the mipmap sampling limits appropriately.
-            switch (src.GetDimensions())
+            if (src.GetTextureTarget() != TextureTarget.TextureBuffer)
+                switch (src.GetDimensions())
+                {
+                    case 1:
+                        if (inited) GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
+                        GL.TextureSubImage1D(id, level, 0, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        break;
+                    case 2:
+                        if (inited) GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
+                        GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        break;
+                    case 3:
+                        if (inited) GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
+                        GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        break;
+                }
+            else
             {
-                case 1:
-                    if (inited) GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
-                    GL.TextureSubImage1D(id, level, 0, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
-                    break;
-                case 2:
-                    if (inited) GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
-                    GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
-                    break;
-                case 3:
-                    if (inited) GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
-                    GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
-                    break;
+                GL.TextureBuffer(id, (SizedInternalFormat)src.GetInternalFormat(), (int)src.GetPixelData(level));
             }
 
             this.Width = src.GetWidth();
@@ -185,7 +225,7 @@ namespace Kokoro.Engine.Graphics
             this.internalformat = src.GetInternalFormat();
             this.texTarget = src.GetTextureTarget();
 
-            if(GenerateMipmaps)
+            if (GenerateMipmaps)
             {
                 GL.GenerateTextureMipmap(id);
             }
@@ -193,6 +233,7 @@ namespace Kokoro.Engine.Graphics
 
         public void SetTileMode(bool tileX, bool tileY)
         {
+            if (texTarget == TextureTarget.TextureBuffer) return;
             if (handles.ContainsKey(0)) handles.Remove(0); //Force regeneration of the handle next time it's accessed
             GL.TextureParameter(id, TextureParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
             GL.TextureParameter(id, TextureParameterName.TextureWrapT, tileY ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
@@ -200,6 +241,7 @@ namespace Kokoro.Engine.Graphics
 
         public void SetEnableLinearFilter(bool linear)
         {
+            if (texTarget == TextureTarget.TextureBuffer) return;
             if (handles.ContainsKey(0)) handles.Remove(0); //Force regeneration of the handle next time it's accessed
             GL.TextureParameter(id, TextureParameterName.TextureMagFilter, linear ? (int)TextureMagFilter.Linear : (int)TextureMagFilter.Nearest);
             GL.TextureParameter(id, TextureParameterName.TextureMinFilter, linear ? (int)TextureMinFilter.Linear : (int)TextureMinFilter.Nearest);
@@ -207,6 +249,7 @@ namespace Kokoro.Engine.Graphics
 
         public void SetAnisotropicFilter(float taps)
         {
+            if (texTarget == TextureTarget.TextureBuffer) return;
             if (handles.ContainsKey(0)) handles.Remove(0); //Force regeneration of the handle next time it's accessed
             GL.TextureParameter(id, (TextureParameterName)All.TextureMaxAnisotropyExt, taps);
         }
