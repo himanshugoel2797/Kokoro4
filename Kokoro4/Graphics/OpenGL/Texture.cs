@@ -200,20 +200,20 @@ namespace Kokoro.Engine.Graphics
                 {
                     case 1:
                         if (inited) GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
-                        GL.TextureSubImage1D(id, level, 0, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        GL.TextureSubImage1D(id, level, src.GetBaseWidth() >> level, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                         break;
                     case 2:
                         if (inited) GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
-                        GL.TextureSubImage2D(id, level, 0, 0, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        GL.TextureSubImage2D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                         break;
                     case 3:
                         if (inited) GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
-                        GL.TextureSubImage3D(id, level, 0, 0, 0, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        GL.TextureSubImage3D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetBaseDepth() >> level, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                         break;
                 }
             else
             {
-                GL.TextureBuffer(id, (SizedInternalFormat)src.GetInternalFormat(), (int)src.GetPixelData(level));
+                GL.TextureBufferRange(id, (SizedInternalFormat)src.GetInternalFormat(), (int)src.GetPixelData(level), (IntPtr)src.GetBaseWidth(), src.GetWidth());
             }
 
             this.Width = src.GetWidth();

@@ -25,7 +25,7 @@ namespace Kokoro.Engine.Graphics
         ShaderStorageBuffer WorldBuffer, TextureBuffer;
         const int quadSide = 25;
         protected int maxLevels = 40;
-        protected int len = 2048;
+        protected int len = 400;
 
         public int XIndex { get; private set; }
         public int YIndex { get; private set; }
@@ -35,6 +35,10 @@ namespace Kokoro.Engine.Graphics
 
         protected TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, ShaderSource vshader, ShaderSource fshader)
         {
+            //TODO: setup a separate system for providing the textured tiles, going with a 1536 tile buffer of 64x64 heightmap tiles. Need a way to allocate tiles.
+            //Generate the tiles in compute. Can't generate all tiles in one go, so allocation can be moved to CPU. We can either render a lot of tiles in a single compute pass, or spend more time on each tile.
+            //The buffer size can be made a variable to tune between memory usage and compute usage. Terrain renderer instances can request from the same texture source, which is how they share their caches.
+
             XIndex = xindex;
             ZIndex = zindex;
             YOff = yOff;
@@ -214,6 +218,8 @@ namespace Kokoro.Engine.Graphics
 
             if (positions.Count > len)
                 throw new Exception();
+
+            Console.WriteLine(positions.Count);
 
             unsafe
             {

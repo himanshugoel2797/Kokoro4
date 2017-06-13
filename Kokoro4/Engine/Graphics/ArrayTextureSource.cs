@@ -87,5 +87,20 @@ namespace Kokoro.Engine.Graphics
         {
             return type;
         }
+
+        public int GetBaseWidth()
+        {
+            return 0;
+        }
+
+        public int GetBaseHeight()
+        {
+            return 0;
+        }
+
+        public int GetBaseDepth()
+        {
+            return curLayer - 1;
+        }
     }
 }

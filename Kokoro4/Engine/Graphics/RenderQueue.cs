@@ -36,7 +36,7 @@ namespace Kokoro.Engine.Graphics
             public uint offset;
         }
 
-        private Dictionary<Tuple<MeshGroup, RenderState>, Bucket> buckets;
+        private Dictionary<RenderState, Bucket> buckets;
         private List<RenderState> RenderStates;
         private Dictionary<RenderState, List<MeshGroup>> MeshGroups;
 
@@ -52,7 +52,7 @@ namespace Kokoro.Engine.Graphics
         public RenderQueue(int MaxDrawCount, bool transient)
         {
             this.transient = transient;
-            buckets = new Dictionary<Tuple<MeshGroup, RenderState>, Bucket>();
+            buckets = new Dictionary<RenderState, Bucket>();
             RenderStates = new List<RenderState>();
             MeshGroups = new Dictionary<RenderState, List<MeshGroup>>();
 
@@ -66,7 +66,7 @@ namespace Kokoro.Engine.Graphics
 
         public void UpdateDrawParams(MeshGroup grp, RenderState state, MeshData data)
         {
-            Bucket b = buckets[new Tuple<MeshGroup, RenderState>(grp, state)];
+            Bucket b = buckets[state];
 
             int j = 0;
             for (int i = 0; i < b.meshes.Count; i++)
@@ -115,18 +115,18 @@ namespace Kokoro.Engine.Graphics
 
         public void RecordDraw(DrawData draw)
         {
-            //Group the meshes by state changes and mesh groups
+            //Group the meshes by state changes
+            //Mesh groups can be switched on the fly now, so no need to group them, instead submit them to a compute shader for further culling.
             for (int i = 0; i < draw.Meshes.Length; i++)
             {
                 var meshGrp = draw.Meshes[i].Mesh.Parent;
                 var renderState = draw.State;
-                var tuple_RndrState_meshGrp = new Tuple<MeshGroup, RenderState>(meshGrp, renderState);
-
+                
                 var mesh = draw.Meshes[i];
 
-                if (!buckets.ContainsKey(tuple_RndrState_meshGrp))
+                if (!buckets.ContainsKey(renderState))
                 {
-                    buckets[tuple_RndrState_meshGrp] = new Bucket()
+                    buckets[renderState] = new Bucket()
                     {
                         State = renderState,
                         meshes = new List<MeshData>()
@@ -144,7 +144,7 @@ namespace Kokoro.Engine.Graphics
                     }
                 }
 
-                buckets[tuple_RndrState_meshGrp].meshes.Add(mesh);
+                buckets[renderState].meshes.Add(mesh);
             }
         }
 
@@ -213,7 +213,7 @@ namespace Kokoro.Engine.Graphics
 
                 for (int j = 0; j < MeshGroups[RenderStates[i]].Count; j++)
                 {
-                    var bkt = buckets[new Tuple<MeshGroup, RenderState>(MeshGroups[RenderStates[i]][j], RenderStates[i])];
+                    var bkt = buckets[RenderStates[i]];
 
                     EngineManager.SetRenderState(bkt.State); //State has been already set if ClearFramebufferBeforeSubmit is true.
 

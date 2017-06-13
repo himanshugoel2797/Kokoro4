@@ -138,6 +138,7 @@
     <Compile Include="Engine\Graphics\ShaderProgram.cs" />
     <Compile Include="Engine\Graphics\ShaderSource.cs" />
     <Compile Include="Engine\Graphics\TerrainRenderer.cs" />
+    <Compile Include="Engine\Graphics\TextureCache.cs" />
     <Compile Include="Engine\Light.cs" />
     <Compile Include="Engine\MeshGroup.cs" />
     <Compile Include="Engine\UI\UIControl.cs" />

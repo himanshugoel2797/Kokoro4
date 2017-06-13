@@ -21,6 +21,11 @@ namespace Kokoro.Engine.Graphics
         int GetWidth();
         int GetHeight();
         int GetDepth();
+
+        int GetBaseWidth();
+        int GetBaseHeight();
+        int GetBaseDepth();
+
         int GetLevels();
         PixelInternalFormat GetInternalFormat();
         PixelFormat GetFormat();

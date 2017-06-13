@@ -462,6 +462,7 @@ namespace Kokoro.Graphics.OpenGL
             game.TargetRenderFrequency = 0;
             game.TargetUpdateFrequency = 0;
 
+            //Verify opengl functionality, check for required extensions
             int major_v = GL.GetInteger(GetPName.MajorVersion);
             int minor_v = GL.GetInteger(GetPName.MinorVersion);
             if (major_v < 4 | (major_v == 4 && minor_v < 5))
@@ -469,6 +470,8 @@ namespace Kokoro.Graphics.OpenGL
                 throw new Exception($"Unsupported OpenGL version ({major_v}.{minor_v}), minimum OpenGL 4.5 required.");
             }
 
+
+            //Initialize opencl async compute.
             ComputePlatform plat = null;
 
             string vendorName = GL.GetString(StringName.Vendor);
@@ -494,6 +497,12 @@ namespace Kokoro.Graphics.OpenGL
             _comp_ctxt = new ComputeContext(ComputeDeviceTypes.Gpu, props, null, IntPtr.Zero);
             _comp_queue = new ComputeCommandQueue(_comp_ctxt, _comp_ctxt.Devices[0], ComputeCommandQueueFlags.OutOfOrderExecution);
             _comp_events = new ComputeEventList();
+
+#if DEBUG
+            Console.WriteLine("Available Compute Devices:");
+            for (int i = 0; i < _comp_ctxt.Devices.Count; i++)
+                Console.WriteLine("\t" + _comp_ctxt.Devices[i].Name);
+#endif
 
             CleanupStrong += () =>
             {
