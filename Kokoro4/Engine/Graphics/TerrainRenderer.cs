@@ -78,10 +78,15 @@ namespace Kokoro.Engine.Graphics
             quad = QuadFactory.Create(grp, quadSide, quadSide, Normal, new Vector3(XIndex, YIndex, ZIndex));
             Data = new QuadTree<TerrainData>(new Math.Vector2(side * -0.5f, side * -0.5f), new Math.Vector2(side * 0.5f, side * 0.5f), 0);
 
-            WorldBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
+            WorldBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true); 
             TextureBuffer = new UniformBuffer(true);
 
-            TextureHandle h = Texture.Default.GetHandle(TextureSampler.Default);
+            TextureSampler sampler = new TextureSampler();
+            sampler.SetEnableLinearFilter(true);
+            sampler.SetAnisotropicFilter(Texture.MaxAnisotropy);
+            sampler.SetTileMode(false, false);
+
+            TextureHandle h = Texture.Default.GetHandle(sampler);
             h.SetResidency(Residency.Resident);
 
             unsafe
@@ -110,11 +115,11 @@ namespace Kokoro.Engine.Graphics
             });
             Queue.EndRecording();
 
-        }
+        } 
 
         public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, ShaderSource computeShader, TextureCache cache, params string[] libraries) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl", libraries), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl", libraries), computeShader, cache)
         {
-
+            
         }
 
         //Update SSBO to reduce size and add offset data for texturing corrections. scale, location, texture handle
@@ -172,7 +177,7 @@ namespace Kokoro.Engine.Graphics
             {
                 d.Split();
             }
-
+             
             if (min_dist <= dist_side * dist_side)
             {
                 if (min_dist <= dist_side * dist_side / 4)
@@ -205,7 +210,7 @@ namespace Kokoro.Engine.Graphics
                 pos_f[XIndex] = tData.Min.X;
                 pos_f[YIndex] = YOff;
                 pos_f[ZIndex] = tData.Min.Y;
-
+                 
                 positions.Add(new Vector3(pos_f));
                 scales.Add(side / (1 << level) * 1.0f / quadSide);
 
@@ -216,20 +221,20 @@ namespace Kokoro.Engine.Graphics
                 {
                     //Allocate and fill the new layer
                     tData.Value.idx = Cache.Allocate(tData.Value.tag);
-
+                    
                     float[] tl_f = new float[3];
                     tl_f[XIndex] = tData.Min.X;
                     tl_f[YIndex] = YOff;
                     tl_f[ZIndex] = tData.Max.Y;
 
-                    ComputeProgram.Set("top_left_corner", new Vector3(tl_f));
-                    ComputeProgram.Set("side", side / (1 << level));
+                    ComputeProgram.Set("top_left_corner", new Vector3(pos_f));
+                    ComputeProgram.Set("side", side / (1 << level));  
                     ComputeProgram.Set("layer", tData.Value.idx);
                      
-                    EngineManager.DispatchSyncComputeJob(ComputeProgram, 64, 64, 1);
-                    Cache.Use(tData.Value.idx, tData.Value.tag);
+                    EngineManager.DispatchSyncComputeJob(ComputeProgram, 64, 64, 1); 
+                    Cache.Use(tData.Value.idx, tData.Value.tag); 
 
-                    Console.WriteLine("New Allocation:" + tData.Value.idx);
+                    Console.WriteLine("New Allocation:" + tData.Value.idx); 
                 }
 
                 textures.Add(tData.Value.idx);
@@ -270,8 +275,6 @@ namespace Kokoro.Engine.Graphics
             if (positions.Count > len)
                 throw new Exception();
 
-            Console.WriteLine(positions.Count);
-
             unsafe
             {
                 float* f = (float*)WorldBuffer.Update();
@@ -286,7 +289,7 @@ namespace Kokoro.Engine.Graphics
                         f[i * 4 + j] = p[j];
                     }
                     f[i * 4 + 3] = s;
-                    l[i] = textures[i];
+                    l[i] = textures[i]; 
                 }
                 TextureBuffer.UpdateDone();
                 WorldBuffer.UpdateDone();

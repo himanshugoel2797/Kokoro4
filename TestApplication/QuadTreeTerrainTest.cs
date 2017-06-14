@@ -28,6 +28,7 @@ namespace TestApplication
         private Vector3 camPos;
 
         private Keyboard keybd;
+        private bool updateCamPos;
 
         public void Enter(IState prev)
         {
@@ -60,6 +61,8 @@ namespace TestApplication
             if (!inited)
             {
                 keybd = new Keyboard();
+                keybd.KeyMap["ToggleCamera"] = Key.Z;
+
                 camera = new FirstPersonCamera(keybd, Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
                 EngineManager.AddCamera(camera);
@@ -76,16 +79,22 @@ namespace TestApplication
 
                 //GraphicsDevice.Wireframe = true;
 
-                cache = new TextureCache(1024, 64, 64, 5, PixelFormat.Rgba, PixelInternalFormat.Rgba8, PixelType.Byte);
+                cache = new TextureCache(1024, 64, 64, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba8, PixelType.Byte);
                 terrainRenderer = new TerrainRenderer(5000, grp, Framebuffer.Default, 0, 2, 0, ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/TerrainSource/compute.glsl", Noise.Name), cache);
 
                 inited = true;
             }
 
 
-            if (camPos != camera.Position)
+            if (keybd.IsKeyReleased("ToggleCamera"))
+            {
+                updateCamPos = !updateCamPos;
+            }
+
+            if (updateCamPos && camPos != camera.Position)
             {
                 camPos = camera.Position;
+
                 terrainRenderer.Update(camPos, camera.Direction);
             }
             terrainRenderer.Draw(camera.View, camera.Projection);

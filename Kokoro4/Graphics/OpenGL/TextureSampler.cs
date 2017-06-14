@@ -72,7 +72,7 @@ namespace Kokoro.Engine.Graphics
             GL.SamplerParameter(id, (SamplerParameterName)All.TextureMaxAnisotropyExt, taps);
         }
 
-        #region IDisposable Support
+        #region IDisposable Support 
         private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)

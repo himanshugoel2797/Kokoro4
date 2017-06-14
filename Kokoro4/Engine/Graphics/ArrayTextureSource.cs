@@ -25,7 +25,7 @@ namespace Kokoro.Engine.Graphics
             this.type = type;
         }
 
-        bool inited = false;
+        bool inited = false; 
         public int GetDepth()
         {
             if (!inited)

@@ -11,7 +11,7 @@ layout (bindless_sampler) uniform sampler2DArray Cache;
 
 layout (std140) uniform heightmaps
 {
-	vec4 HeightMaps[MAX_DRAWS_UBO];
+	ivec4 HeightMaps[MAX_DRAWS_UBO];
 } HeightMapData;
 
 

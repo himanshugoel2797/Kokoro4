@@ -21,9 +21,8 @@ layout (bindless_sampler) uniform sampler2DArray Cache;
 
 layout (std140) uniform heightmaps
 {
-	vec4 HeightMaps[MAX_DRAWS_UBO];
+	ivec4 HeightMaps[MAX_DRAWS_UBO];
 } HeightMapData;
-
 
 
 void main(){
@@ -39,7 +38,7 @@ void main(){
 	vnorm.z = cos(n.y);
 
 	vec3 vpos = vs_pos * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].xyz;
-	vpos += vnorm * texture(Cache, vec3(UV.x, UV.y, HeightMapData.HeightMaps[gl_InstanceID / 4][gl_InstanceID % 4])).x;
+	vpos += vec3(0, 1, 0) * texelFetch(Cache, ivec3(vs_uv.x * 63, vs_uv.y * 63, HeightMapData.HeightMaps[gl_InstanceID / 4][gl_InstanceID % 4]), 0).x;
 
 	gl_Position =  MVP * vec4(vpos.x, vpos.y, vpos.z, 1);
 
