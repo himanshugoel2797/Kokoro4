@@ -12,9 +12,17 @@ namespace Kokoro.Engine.Graphics
 {
     public class TerrainRenderer
     {
-        protected struct TerrainData
+        protected class TerrainData
         {
+            static int tag_cntr = 0;
+            public int tag;
+            public int idx;
 
+            public TerrainData()
+            {
+                tag = tag_cntr++;
+                idx = -1;
+            }
         }
 
         QuadTree<TerrainData> Data;
@@ -22,18 +30,23 @@ namespace Kokoro.Engine.Graphics
         float side;
         public RenderQueue Queue { get; private set; }
         public RenderState State { get; private set; }
-        ShaderStorageBuffer WorldBuffer, TextureBuffer;
+        ShaderStorageBuffer WorldBuffer;
+        UniformBuffer TextureBuffer;
         const int quadSide = 25;
         protected int maxLevels = 40;
         protected int len = 400;
+
+        private TextureHandle CacheHandle;
 
         public int XIndex { get; private set; }
         public int YIndex { get; private set; }
         public int ZIndex { get; private set; }
         public float YOff { get; private set; }
         public Vector3 Normal { get; private set; }
+        public TextureCache Cache { get; private set; }
+        public ShaderProgram ComputeProgram { get; private set; }
 
-        protected TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, ShaderSource vshader, ShaderSource fshader)
+        protected TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, ShaderSource vshader, ShaderSource fshader, ShaderSource computeShader, TextureCache cache)
         {
             //TODO: setup a separate system for providing the textured tiles, going with a 1536 tile buffer of 64x64 heightmap tiles. Need a way to allocate tiles.
             //Generate the tiles in compute. Can't generate all tiles in one go, so allocation can be moved to CPU. We can either render a lot of tiles in a single compute pass, or spend more time on each tile.
@@ -46,6 +59,15 @@ namespace Kokoro.Engine.Graphics
                 if (YIndex != XIndex && YIndex != ZIndex)
                     break;
 
+            Cache = cache;
+            CacheHandle = Cache.Cache.GetHandle(TextureSampler.Default);
+            CacheHandle.SetResidency(Residency.Resident);
+
+            ComputeProgram = new ShaderProgram(computeShader);
+            var hndl = Cache.Cache.GetImageHandle(0, -1, PixelInternalFormat.Rgba8);
+            hndl.SetResidency(Residency.Resident, AccessMode.Write);
+            ComputeProgram.Set("terrain_fragment", hndl);
+
             float[] norm_f = new float[3];
             norm_f[XIndex] = 0;
             norm_f[YIndex] = System.Math.Sign(yOff);
@@ -57,7 +79,7 @@ namespace Kokoro.Engine.Graphics
             Data = new QuadTree<TerrainData>(new Math.Vector2(side * -0.5f, side * -0.5f), new Math.Vector2(side * 0.5f, side * 0.5f), 0);
 
             WorldBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
-            TextureBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true);
+            TextureBuffer = new UniformBuffer(true);
 
             TextureHandle h = Texture.Default.GetHandle(TextureSampler.Default);
             h.SetResidency(Residency.Resident);
@@ -66,18 +88,18 @@ namespace Kokoro.Engine.Graphics
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    long* l = (long*)TextureBuffer.Update();
+                    int* l = (int*)TextureBuffer.Update();
                     for (int j = 0; j < len; j++)
                     {
-                        l[j * 2] = h;
+                        l[j] = 0;
                     }
                     TextureBuffer.UpdateDone();
                 }
             }
 
-            State = new RenderState(fbuf, new ShaderProgram(vshader, fshader), new ShaderStorageBuffer[] { WorldBuffer, TextureBuffer }, null, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
+            State = new RenderState(fbuf, new ShaderProgram(vshader, fshader), new ShaderStorageBuffer[] { WorldBuffer }, new UniformBuffer[] { TextureBuffer }, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
             State.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
-            State.ShaderProgram.SetShaderStorageBufferMapping("heightmaps", 1);
+            State.ShaderProgram.SetUniformBufferMapping("heightmaps", 0);
 
             Queue = new RenderQueue(len, true);
             Queue.ClearAndBeginRecording();
@@ -90,7 +112,7 @@ namespace Kokoro.Engine.Graphics
 
         }
 
-        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, params string[] libraries) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl", libraries), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl", libraries))
+        public TerrainRenderer(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, ShaderSource computeShader, TextureCache cache, params string[] libraries) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl", libraries), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl", libraries), computeShader, cache)
         {
 
         }
@@ -165,6 +187,8 @@ namespace Kokoro.Engine.Graphics
 
         private List<Vector3> positions = new List<Vector3>();
         private List<float> scales = new List<float>();
+        private List<int> textures = new List<int>();
+
         private void Traverse(QuadTree<TerrainData> tData, int level, Vector3 pos, Vector3 dir, DistanceState parentState)
         {
             if (tData == null)
@@ -184,6 +208,32 @@ namespace Kokoro.Engine.Graphics
 
                 positions.Add(new Vector3(pos_f));
                 scales.Add(side / (1 << level) * 1.0f / quadSide);
+
+                if (tData.Value == null)
+                    tData.Value = new TerrainData();
+
+                if(tData.Value.idx == -1 | !Cache.Use(tData.Value.idx, tData.Value.tag))
+                {
+                    //Allocate and fill the new layer
+                    tData.Value.idx = Cache.Allocate(tData.Value.tag);
+
+                    float[] tl_f = new float[3];
+                    tl_f[XIndex] = tData.Min.X;
+                    tl_f[YIndex] = YOff;
+                    tl_f[ZIndex] = tData.Max.Y;
+
+                    ComputeProgram.Set("top_left_corner", new Vector3(tl_f));
+                    ComputeProgram.Set("side", side / (1 << level));
+                    ComputeProgram.Set("layer", tData.Value.idx);
+                     
+                    EngineManager.DispatchSyncComputeJob(ComputeProgram, 64, 64, 1);
+                    Cache.Use(tData.Value.idx, tData.Value.tag);
+
+                    Console.WriteLine("New Allocation:" + tData.Value.idx);
+                }
+
+                textures.Add(tData.Value.idx);
+
                 return;
             }
 
@@ -214,6 +264,7 @@ namespace Kokoro.Engine.Graphics
         {
             positions.Clear();
             scales.Clear();
+            textures.Clear();
             Traverse(Data, 0, pos, dir, DistanceState.Visible);
 
             if (positions.Count > len)
@@ -224,6 +275,8 @@ namespace Kokoro.Engine.Graphics
             unsafe
             {
                 float* f = (float*)WorldBuffer.Update();
+                int* l = (int*)TextureBuffer.Update();
+
                 for (int i = 0; i < positions.Count; i++)
                 {
                     float[] p = (float[])(positions[i]);// - pos); 
@@ -233,14 +286,10 @@ namespace Kokoro.Engine.Graphics
                         f[i * 4 + j] = p[j];
                     }
                     f[i * 4 + 3] = s;
+                    l[i] = textures[i];
                 }
+                TextureBuffer.UpdateDone();
                 WorldBuffer.UpdateDone();
-
-                //long* l = (long*)TextureBuffer.Update();
-                //for (int i = 0; i < positions.Count; i++)
-                //l[i * 2] = testTex;
-
-                //TextureBuffer.UpdateDone();
             }
 
             Queue.UpdateDrawParams(quad.Parent, State, new RenderQueue.MeshData()
@@ -255,6 +304,7 @@ namespace Kokoro.Engine.Graphics
         {
             State.ShaderProgram.Set("View", view);
             State.ShaderProgram.Set("Projection", proj);
+            State.ShaderProgram.Set("Cache", CacheHandle);
             Queue.Submit();
         }
     }

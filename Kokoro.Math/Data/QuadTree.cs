@@ -15,6 +15,7 @@ namespace Kokoro.Math.Data
 
         public Vector2 Min { get; private set; }
         public Vector2 Max { get; private set; }
+        public T Value { get; set; }
 
         public int Level { get; private set; }
 

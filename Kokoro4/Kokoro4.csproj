@@ -181,6 +181,7 @@
     <Compile Include="Graphics\OpenGL\PixelInternalFormat.cs" />
     <Compile Include="Graphics\OpenGL\PixelType.cs" />
     <Compile Include="Graphics\OpenGL\PrimitiveType.cs" />
+    <Compile Include="Graphics\OpenGL\ShaderLibraries\Noise.cs" />
     <Compile Include="Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Graphics\OpenGL\ShaderSource.cs" />
     <Compile Include="Engine\Graphics\SimplexNoise.cs" />
@@ -205,6 +206,9 @@
     <Compile Include="StateMachine\StateManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Graphics\OpenGL\ShaderLibraries\Noise\snoise3d.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Graphics\OpenGL\Shaders\Atmosphere\fragment.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -428,6 +432,9 @@
     <Content Include="Graphics\OpenGL\Shaders\PlanetRenderer\vertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Graphics\OpenGL\Shaders\TerrainSource\compute.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Graphics\OpenGL\Shaders\TiledDeferred\compute.glsl" />
     <None Include="packages.config" />
   </ItemGroup>

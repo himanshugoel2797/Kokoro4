@@ -320,7 +320,7 @@ namespace Kokoro.Graphics.OpenGL
             set
             {
                 curProg = value;
-                GL.UseProgram(curProg.prog.id);
+                if(curProg != null)GL.UseProgram(curProg.prog.id);
             }
         }
 
@@ -593,7 +593,10 @@ namespace Kokoro.Graphics.OpenGL
         #region Compute Jobs
         public static void DispatchSyncComputeJob(ShaderProgram prog, int x, int y, int z)
         {
+            var tmp = ShaderProgram;
+            ShaderProgram = prog;
             GL.DispatchCompute(x, y, z);
+            ShaderProgram = tmp;
         }
 
         public static void DispatchAsyncComputeJob(AsyncComputeProgram prog, int xoff, int yoff, int zoff, int x, int y, int z)

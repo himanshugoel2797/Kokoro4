@@ -75,5 +75,20 @@ namespace Kokoro.Engine.Graphics
         {
             return PixelType.Float;
         }
+
+        public int GetBaseWidth()
+        {
+            return 0;
+        }
+
+        public int GetBaseHeight()
+        {
+            return 0;
+        }
+
+        public int GetBaseDepth()
+        {
+            return 0;
+        }
     }
 }

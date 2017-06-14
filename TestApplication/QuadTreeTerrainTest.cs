@@ -3,6 +3,7 @@ using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
 using Kokoro.Engine.Input;
 using Kokoro.Graphics.OpenGL;
+using Kokoro.Graphics.OpenGL.ShaderLibraries;
 using Kokoro.Graphics.Prefabs;
 using Kokoro.Math;
 using Kokoro.StateMachine;
@@ -22,6 +23,7 @@ namespace TestApplication
         private TerrainRenderer terrainRenderer;
         private Texture tex;
         private TextureHandle handle;
+        private TextureCache cache;
 
         private Vector3 camPos;
 
@@ -74,7 +76,8 @@ namespace TestApplication
 
                 //GraphicsDevice.Wireframe = true;
 
-                terrainRenderer = new TerrainRenderer(5000, grp, Framebuffer.Default, 0, 2, 0);
+                cache = new TextureCache(1024, 64, 64, 5, PixelFormat.Rgba, PixelInternalFormat.Rgba8, PixelType.Byte);
+                terrainRenderer = new TerrainRenderer(5000, grp, Framebuffer.Default, 0, 2, 0, ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/TerrainSource/compute.glsl", Noise.Name), cache);
 
                 inited = true;
             }

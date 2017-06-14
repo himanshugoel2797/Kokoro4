@@ -171,6 +171,11 @@ namespace Kokoro.Engine
 
         }
 
+        public static void DispatchSyncComputeJob(ShaderProgram task, int x, int y, int z)
+        {
+            GraphicsDevice.DispatchSyncComputeJob(task, x, y, z);
+        }
+
         public static void Exit()
         {
             GraphicsDevice.CleanupStrong();

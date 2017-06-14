@@ -17,9 +17,11 @@ layout (std140) buffer transforms
   vec4 XYZPosition_WScale[MAX_DRAWS_UBO];
 } Transforms;
 
-layout (std140) buffer heightmaps
+layout (bindless_sampler) uniform sampler2DArray Cache;
+
+layout (std140) uniform heightmaps
 {
-	uvec4 HeightMaps[MAX_DRAWS_UBO];
+	vec4 HeightMaps[MAX_DRAWS_UBO];
 } HeightMapData;
 
 
@@ -37,7 +39,7 @@ void main(){
 	vnorm.z = cos(n.y);
 
 	vec3 vpos = vs_pos * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].xyz;
-	vpos += vnorm * texture(sampler2D(HeightMapData.HeightMaps[gl_InstanceID].xy), vs_uv).x;
+	vpos += vnorm * texture(Cache, vec3(UV.x, UV.y, HeightMapData.HeightMaps[gl_InstanceID / 4][gl_InstanceID % 4])).x;
 
 	gl_Position =  MVP * vec4(vpos.x, vpos.y, vpos.z, 1);
 

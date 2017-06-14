@@ -11,12 +11,9 @@ namespace Kokoro.Engine.Graphics
         public int CacheSize { get; private set; }
         public Texture Cache { get; private set; }
         
-        //Use the LRU allocation scheme for allocation.
         Dictionary<int, int> TextureAges;
         Dictionary<int, int> TextureTags;
         IOrderedEnumerable<KeyValuePair<int, int>> sortedDictionary;
-
-        //TODO write a shader library for procedural generation functions.
 
         public TextureCache(int cacheSize, int w, int h, int levels, PixelFormat fmt, PixelInternalFormat iFmt, PixelType t)
         {
@@ -49,6 +46,9 @@ namespace Kokoro.Engine.Graphics
 
         public bool Use(int idx, int tag)
         {
+            if (idx < 0)
+                return false;
+
             if (TextureTags[idx] != tag)
                 return false;
 
@@ -59,6 +59,7 @@ namespace Kokoro.Engine.Graphics
         
         public int Allocate(int tag)
         {
+            if (sortedDictionary == null) sortedDictionary = TextureAges.OrderBy(kvp => kvp.Value);
             int idx = sortedDictionary.First().Key;
             TextureTags[idx] = tag;
             return idx;

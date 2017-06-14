@@ -25,9 +25,18 @@ namespace Kokoro.Engine.Graphics
             this.type = type;
         }
 
+        bool inited = false;
         public int GetDepth()
         {
-            return layers;
+            if (!inited)
+            {
+                inited = true;
+                return layers;
+            }
+            else
+            {
+                return 1;
+            }
         }
 
         public int GetDimensions()
@@ -47,7 +56,7 @@ namespace Kokoro.Engine.Graphics
 
         public PixelInternalFormat GetInternalFormat()
         {
-            return src[curLayer - 1].GetInternalFormat();
+            return src[curLayer].GetInternalFormat();
         }
 
         public int GetLevels()
@@ -57,16 +66,13 @@ namespace Kokoro.Engine.Graphics
 
         public void SetCurrentLayerIndex(int layer)
         {
-            curLayer = layer + 1;
+            curLayer = layer;
         }
 
         public IntPtr GetPixelData(int level)
         {
-            if (curLayer > src.Length) curLayer = 0;
-
-            if (curLayer == 0)
+            if (curLayer > src.Length)
             {
-                curLayer++;
                 return IntPtr.Zero;
             }
 
@@ -100,7 +106,7 @@ namespace Kokoro.Engine.Graphics
 
         public int GetBaseDepth()
         {
-            return curLayer - 1;
+            return curLayer;
         }
     }
 }

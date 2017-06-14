@@ -19,7 +19,7 @@ namespace Kokoro.Engine.Graphics
 
         public static ShaderLibrary Create(string libraryName)
         {
-            if (!libraries.ContainsKey(libraryName))
+            if (libraries.ContainsKey(libraryName))
                 throw new ArgumentException("Library name must be unique");
 
             var s = new ShaderLibrary(libraryName);

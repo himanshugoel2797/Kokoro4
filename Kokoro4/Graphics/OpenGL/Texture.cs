@@ -29,10 +29,10 @@ namespace Kokoro.Engine.Graphics
     {
         internal long hndl = 0;
         internal Texture parent;
-        
+
         internal ImageHandle(long hndl, Texture parent)
         {
-            this.hndl = hndl;
+            this.hndl = hndl; 
             this.parent = parent;
         }
 
@@ -183,7 +183,7 @@ namespace Kokoro.Engine.Graphics
 
         public ImageHandle GetImageHandle(int level, int layer, Kokoro.Engine.Graphics.PixelInternalFormat iFormat)
         {
-            return new ImageHandle(GL.Arb.GetImageHandle(id, level, layer == -1, layer, (ArbBindlessTexture)iFormat), this);
+            return new ImageHandle(GL.Arb.GetImageHandle(id, level, layer == -1, layer == -1 ? 0 : layer, (ArbBindlessTexture)iFormat), this);
         }
 
         public virtual void SetData(ITextureSource src, int level)
@@ -193,21 +193,30 @@ namespace Kokoro.Engine.Graphics
             {
                 GL.CreateTextures((OpenTK.Graphics.OpenGL.TextureTarget)src.GetTextureTarget(), 1, out id);
                 inited = true;
+
+                this.Width = src.GetWidth();
+                this.Height = src.GetHeight();
+                this.Depth = src.GetDepth();
+                this.LevelCount = src.GetLevels();
+
+                this.format = src.GetFormat();
+                this.internalformat = src.GetInternalFormat();
+                this.texTarget = src.GetTextureTarget();
             }
 
             if (src.GetTextureTarget() != TextureTarget.TextureBuffer)
                 switch (src.GetDimensions())
                 {
                     case 1:
-                        if (inited) GL.TextureStorage1D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth());
+                        if (inited) GL.TextureStorage1D(id, LevelCount, (SizedInternalFormat)internalformat, Width);
                         GL.TextureSubImage1D(id, level, src.GetBaseWidth() >> level, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                         break;
                     case 2:
-                        if (inited) GL.TextureStorage2D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight());
+                        if (inited) GL.TextureStorage2D(id, LevelCount, (SizedInternalFormat)internalformat, Width, Height);
                         GL.TextureSubImage2D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                         break;
                     case 3:
-                        if (inited) GL.TextureStorage3D(id, src.GetLevels(), (SizedInternalFormat)src.GetInternalFormat(), src.GetWidth(), src.GetHeight(), src.GetDepth());
+                        if (inited) GL.TextureStorage3D(id, LevelCount, (SizedInternalFormat)internalformat, Width, Height, Depth);
                         GL.TextureSubImage3D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetBaseDepth() >> level, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
                         break;
                 }
@@ -216,14 +225,6 @@ namespace Kokoro.Engine.Graphics
                 GL.TextureBufferRange(id, (SizedInternalFormat)src.GetInternalFormat(), (int)src.GetPixelData(level), (IntPtr)src.GetBaseWidth(), src.GetWidth());
             }
 
-            this.Width = src.GetWidth();
-            this.Height = src.GetHeight();
-            this.Depth = src.GetDepth();
-            this.LevelCount = src.GetLevels();
-
-            this.format = src.GetFormat();
-            this.internalformat = src.GetInternalFormat();
-            this.texTarget = src.GetTextureTarget();
 
             if (GenerateMipmaps)
             {
