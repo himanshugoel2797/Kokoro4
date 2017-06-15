@@ -59,8 +59,12 @@ namespace Kokoro.Engine.Graphics
                 if (YIndex != XIndex && YIndex != ZIndex)
                     break;
 
+            TextureSampler sampler = new TextureSampler();
+            sampler.SetEnableLinearFilter(true);
+            sampler.SetTileMode(false, false);
+
             Cache = cache;
-            CacheHandle = Cache.Cache.GetHandle(TextureSampler.Default);
+            CacheHandle = Cache.Cache.GetHandle(sampler);
             CacheHandle.SetResidency(Residency.Resident);
 
             ComputeProgram = new ShaderProgram(computeShader);
@@ -81,10 +85,6 @@ namespace Kokoro.Engine.Graphics
             WorldBuffer = new ShaderStorageBuffer(len * 4 * sizeof(float), true); 
             TextureBuffer = new UniformBuffer(true);
 
-            TextureSampler sampler = new TextureSampler();
-            sampler.SetEnableLinearFilter(true);
-            sampler.SetAnisotropicFilter(Texture.MaxAnisotropy);
-            sampler.SetTileMode(false, false);
 
             TextureHandle h = Texture.Default.GetHandle(sampler);
             h.SetResidency(Residency.Resident);
@@ -94,7 +94,7 @@ namespace Kokoro.Engine.Graphics
                 for (int i = 0; i < 3; i++)
                 {
                     int* l = (int*)TextureBuffer.Update();
-                    for (int j = 0; j < len; j++)
+                    for (int j = 0; j < len; j++) 
                     {
                         l[j] = 0;
                     }

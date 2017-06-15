@@ -57,7 +57,7 @@ namespace Kokoro.Engine.Graphics
 
         public void SetTileMode(bool tileX, bool tileY)
         {
-            GL.SamplerParameter(id, SamplerParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
+            GL.SamplerParameter(id, SamplerParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge); 
             GL.SamplerParameter(id, SamplerParameterName.TextureWrapT, tileY ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
         }
 
@@ -80,7 +80,7 @@ namespace Kokoro.Engine.Graphics
             if (!disposedValue)
             {
                 if (disposing)
-                {
+                { 
                     // TODO: dispose managed state (managed objects).
                 }
 

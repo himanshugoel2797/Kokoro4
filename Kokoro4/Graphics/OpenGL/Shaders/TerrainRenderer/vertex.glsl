@@ -38,7 +38,7 @@ void main(){
 	vnorm.z = cos(n.y);
 
 	vec3 vpos = vs_pos * Transforms.XYZPosition_WScale[gl_InstanceID].w + Transforms.XYZPosition_WScale[gl_InstanceID].xyz;
-	vpos += vec3(0, 1, 0) * texelFetch(Cache, ivec3(vs_uv.x * 63, vs_uv.y * 63, HeightMapData.HeightMaps[gl_InstanceID / 4][gl_InstanceID % 4]), 0).x;
+	vpos += vec3(0, 1, 0) * textureLod(Cache, vec3(vs_uv.x, vs_uv.y, HeightMapData.HeightMaps[gl_InstanceID / 4][gl_InstanceID % 4]), 0).x;
 
 	gl_Position =  MVP * vec4(vpos.x, vpos.y, vpos.z, 1);
 
