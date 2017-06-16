@@ -647,6 +647,7 @@ namespace Kokoro.Graphics.OpenGL
 
         public static void MultiDrawIndirectCount(Engine.Graphics.PrimitiveType type, uint byteOffset, uint countOffset, int maxCount, bool indexed)
         {
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
             if (indexed)
                 GL.Arb.MultiDrawElementsIndirectCount((ArbIndirectParameters)type, (ArbIndirectParameters)DrawElementsType.UnsignedShort, (IntPtr)byteOffset, (IntPtr)countOffset, maxCount, 0);
             else
@@ -684,6 +685,7 @@ namespace Kokoro.Graphics.OpenGL
         public static void SaveTexture(Texture t, string file)
         {
 #if DEBUG
+            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             Bitmap bmp = new Bitmap(t.Width, t.Height);
             System.Drawing.Imaging.BitmapData bmpData;
 

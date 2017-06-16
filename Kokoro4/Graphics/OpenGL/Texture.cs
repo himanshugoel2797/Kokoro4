@@ -183,7 +183,12 @@ namespace Kokoro.Engine.Graphics
 
         public ImageHandle GetImageHandle(int level, int layer, Kokoro.Engine.Graphics.PixelInternalFormat iFormat)
         {
-            return new ImageHandle(GL.Arb.GetImageHandle(id, level, layer == -1, layer == -1 ? 0 : layer, (ArbBindlessTexture)iFormat), this);
+            long hndl = 0;
+            if (layer < 0)
+                hndl = GL.Arb.GetImageHandle(id, level, true, 0, (ArbBindlessTexture)iFormat);
+            else
+                hndl = GL.Arb.GetImageHandle(id, level, false, layer, (ArbBindlessTexture)iFormat);
+            return new ImageHandle(hndl, this);
         }
 
         public virtual void SetData(ITextureSource src, int level)

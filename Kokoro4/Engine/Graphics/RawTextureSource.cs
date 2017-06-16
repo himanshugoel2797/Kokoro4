@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Engine.Graphics
 {
-    public abstract class RawTextureSource : ITextureSource
+    public class RawTextureSource : ITextureSource
     {
         public int Width { get; private set; }
         public int Height { get; private set; }
@@ -64,7 +64,10 @@ namespace Kokoro.Engine.Graphics
             return Levels;
         }
 
-        public abstract IntPtr GetPixelData(int level);
+        public virtual IntPtr GetPixelData(int level)
+        {
+            return IntPtr.Zero;
+        }
 
         public TextureTarget GetTextureTarget()
         {

@@ -34,7 +34,7 @@ namespace Kokoro.Engine.Graphics
         UniformBuffer TextureBuffer;
         const int quadSide = 25;
         protected int maxLevels = 40;
-        protected int len = 400;
+        protected int len = 500;
 
         private TextureHandle CacheHandle;
 
@@ -71,6 +71,8 @@ namespace Kokoro.Engine.Graphics
             var hndl = Cache.Cache.GetImageHandle(0, -1, PixelInternalFormat.Rgba8);
             hndl.SetResidency(Residency.Resident, AccessMode.Write);
             ComputeProgram.Set("terrain_fragment", hndl);
+            ComputeProgram.Set("XSide", XIndex); 
+            ComputeProgram.Set("ZSide", ZIndex);
 
             float[] norm_f = new float[3];
             norm_f[XIndex] = 0;

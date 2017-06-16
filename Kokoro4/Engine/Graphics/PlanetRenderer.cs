@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Kokoro.Math;
 using Kokoro.Math.Data;
+using Kokoro.Graphics.OpenGL.ShaderLibraries;
 
 namespace Kokoro.Engine.Graphics
 {
@@ -14,7 +15,7 @@ namespace Kokoro.Engine.Graphics
         {
             private float radius;
 
-            public PlanetTerrainSide(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, float radius, TextureCache cache, params string[] libs) : base(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/PlanetRenderer/vertex.glsl", libs), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/PlanetRenderer/fragment.glsl", libs), ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/TerrainSource/compute.glsl", "Noise"), cache)
+            public PlanetTerrainSide(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, float radius, TextureCache cache, params string[] libs) : base(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/PlanetRenderer/vertex.glsl", libs), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/PlanetRenderer/fragment.glsl", libs), ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/TerrainSource/compute.glsl", Noise.Name), cache)
             {
                 this.radius = radius;
             }
@@ -107,7 +108,7 @@ namespace Kokoro.Engine.Graphics
             float side = radius * 2;
             float off = radius;
 
-            cache = new TextureCache(1024, 64, 64, 5, PixelFormat.Rgba, PixelInternalFormat.Rgba8, PixelType.Byte);
+            cache = new TextureCache(1024 * 2, 64, 64, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba8, PixelType.Byte);
 
             sides = new PlanetTerrainSide[]
             {
@@ -124,7 +125,7 @@ namespace Kokoro.Engine.Graphics
                 r.State.ShaderProgram.Set("Radius", radius);
             }
         }
-
+         
         public void Update(Vector3 pos, Vector3 dir)
         {
             foreach (PlanetTerrainSide r in sides)

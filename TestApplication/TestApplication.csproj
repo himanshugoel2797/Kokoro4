@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AtmosphereTest.cs" />
     <Compile Include="CubeTerrainTest.cs" />
     <Compile Include="FenceTest.cs" />
     <Compile Include="HeightfieldGITest.cs" />

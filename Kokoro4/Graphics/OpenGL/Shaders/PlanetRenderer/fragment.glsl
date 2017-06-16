@@ -7,13 +7,15 @@ in flat int inst;
 layout(location = 0) out vec4 color;
 // Values that stay constant for the whole mesh.
 
-layout (std140) buffer heightmaps
+layout (bindless_sampler) uniform sampler2DArray Cache;
+
+layout (std140) uniform heightmaps
 {
-	uvec4 HeightMaps[MAX_DRAWS_UBO];
+	ivec4 HeightMaps[MAX_DRAWS_UBO];
 } HeightMapData;
 
 
 void main(){
-	color = texture(sampler2D(HeightMapData.HeightMaps[inst].xy), UV);
+	color = texture(Cache, vec3(UV.x, UV.y, HeightMapData.HeightMaps[inst / 4][inst % 4]));
 	color.a = 1;
 }
