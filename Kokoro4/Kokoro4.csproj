@@ -210,7 +210,10 @@
     <None Include="Graphics\OpenGL\ShaderLibraries\Noise\snoise3d.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Graphics\OpenGL\Shaders\Atmosphere\compute.glsl">
+    <None Include="Graphics\OpenGL\Shaders\Atmosphere\single_scatter.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Graphics\OpenGL\Shaders\Atmosphere\transmittance.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Graphics\OpenGL\Shaders\Atmosphere\fragment.glsl">
