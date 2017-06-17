@@ -30,7 +30,9 @@ namespace Kokoro.Engine.Graphics
             this.gnd = gnd;
             this.atmos = atmos;
 
-            int side = 64;
+            int sideX = 32;
+            int sideY = 32;
+            int sideZ = 128;
 
             //populate Transmitance in a compute shader 
             transmitance_cache = new Texture();
@@ -41,8 +43,11 @@ namespace Kokoro.Engine.Graphics
             TransmitanceHandle = transmitance_cache.GetImageHandle(0, 0, PixelInternalFormat.Rgba16f);
             TransmitanceHandle.SetResidency(Residency.Resident, AccessMode.ReadWrite);
 
+            var TransmitanceSamplerHandle = transmitance_cache.GetHandle(TextureSampler.Default);
+            TransmitanceSamplerHandle.SetResidency(Residency.Resident);
+
             single_scattering_cache = new Texture();
-            RawTextureSource single_scatterCacheSrc = new RawTextureSource(3, side, side, side, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba16f, TextureTarget.Texture3D, PixelType.Float);
+            RawTextureSource single_scatterCacheSrc = new RawTextureSource(3, sideX, sideY, sideZ, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba16f, TextureTarget.Texture3D, PixelType.Float);
             single_scattering_cache.SetData(single_scatterCacheSrc, 0);
             single_scattering_cache.SetEnableLinearFilter(true);
             single_scattering_cache.SetTileMode(false, false);
@@ -72,7 +77,7 @@ namespace Kokoro.Engine.Graphics
             SingleScatter_Precalc = new ShaderProgram(single_scatter_compute);
 
             SingleScatter_Precalc.Set("ScatterCache", SingleScatterHandle); 
-            SingleScatter_Precalc.Set("TransCache", TransmitanceHandle);
+            SingleScatter_Precalc.Set("TransCache", TransmitanceSamplerHandle);
             SingleScatter_Precalc.Set("Rayleigh", rayleigh);
             SingleScatter_Precalc.Set("Mie", mie);
             SingleScatter_Precalc.Set("RayleighScaleHeight", rayleighScale);
@@ -80,7 +85,7 @@ namespace Kokoro.Engine.Graphics
             SingleScatter_Precalc.Set("Rt", atmos);
             SingleScatter_Precalc.Set("Rg", gnd);
 
-            EngineManager.DispatchSyncComputeJob(SingleScatter_Precalc, side, side, side);
+            EngineManager.DispatchSyncComputeJob(SingleScatter_Precalc, sideX, sideY, sideZ);
             #endregion
         }
 

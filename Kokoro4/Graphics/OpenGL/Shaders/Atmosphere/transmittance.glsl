@@ -25,8 +25,8 @@ bool sphere_dist(in float r, in vec3 pos, in vec3 dir, in float tmax, in float m
 
 void main(){
     
-    float theta = float(gl_WorkGroupID.x) / float(gl_NumWorkGroups.x - 1);
-    float height = float(gl_WorkGroupID.y) / float(gl_NumWorkGroups.y - 1);
+    float theta = float(gl_GlobalInvocationID.x) / float(gl_NumWorkGroups.x - 1);
+    float height = float(gl_GlobalInvocationID.y) / float(gl_NumWorkGroups.y - 1);
 
     theta = acos(theta * 2 - 1);
     height = Rg + height * (Rt - Rg);
@@ -63,8 +63,8 @@ void main(){
     val.rgb = Rayleigh * rayleigh_rhoSum;
     val.a =  Mie * mie_rhoSum;
     
-    if(g_intersect && g_rayLen >= 0)
-        val *= 0;
+    //if(g_intersect && g_rayLen >= 0)
+        //val *= 0;
 
-    imageStore(TransCache, ivec2(gl_WorkGroupID.xy), val);
+    imageStore(TransCache, ivec2(gl_GlobalInvocationID.xy), val);
 }

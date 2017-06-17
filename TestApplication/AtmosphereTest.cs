@@ -25,7 +25,7 @@ namespace TestApplication
         public void Render(double interval)
         {
             if (renderer == null)
-                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 8, 4e-3f / 0.9f, 1.2f, 6360, 6420); 
+                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 8, 2.1f * 1.1f, 1.2f, 6360, 6420); 
 
             renderer.Render();
         }
