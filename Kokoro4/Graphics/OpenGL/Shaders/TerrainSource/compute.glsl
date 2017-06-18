@@ -1,7 +1,7 @@
 ﻿layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba8, bindless_image) uniform writeonly image2DArray terrain_fragment;
 
-#define MULTER 25.0f
+#define MULTER 5.0f
 
 uniform vec3 top_left_corner;
 uniform float side;

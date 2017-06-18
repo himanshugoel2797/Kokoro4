@@ -30,16 +30,23 @@ vec4 T(float h, float CosTheta) {
 
 void main(){
 
-    float height = float(gl_GlobalInvocationID.x) / float(gl_NumWorkGroups.x - 1);
-    float theta = float(gl_GlobalInvocationID.z) / float(gl_NumWorkGroups.z - 1);
-    float delta = float(gl_GlobalInvocationID.y) / float(gl_NumWorkGroups.y - 1);
 
-    theta = theta * PI;
-    delta = delta * PI;
+    float height = float(gl_GlobalInvocationID.x) / float(gl_NumWorkGroups.x - 1);
+    float delta = float(gl_GlobalInvocationID.y) / float(gl_NumWorkGroups.y - 1);
+    float theta = float(gl_GlobalInvocationID.z) / float(gl_NumWorkGroups.z - 1);
+
     height = Rg + height * (Rt - Rg);
 
-    //Calculate the light scattering intergral
+    //Calculate the maximum angle before intersecting the ground at the given height, use as maximum range for delta and theta, maximizing precision
     vec3 Pos = vec3(0, height, 0);
+    vec3 GndTan = vec3(Rg, 0, 0);
+    vec3 GndTanDir = normalize(GndTan - Pos);
+    float MaxAngle = dot(vec3(0, 1, 0), GndTanDir);
+    
+    theta = mix(theta, 0, MaxAngle);
+    delta = mix(delta, 0, MaxAngle);
+    
+    //Calculate the light scattering intergral
     vec3 Dir = vec3(sin(theta), cos(theta), 0);
     
     vec3 SunDir = vec3(sin(delta), cos(delta), 0);
@@ -53,8 +60,6 @@ void main(){
     float g_rayLen = 0;
     bool g_intersect = sphere_dist(Rg, Pos, SunDir, Rg * 4, -1, g_rayLen);
 
-    //Apply shadowing if the ground is blocking the sun.
-
     float stepLen = rayLen / SAMPLE_COUNT;
 
     //Integrate along the length of the View ray, calculating the scattering at each point
@@ -65,9 +70,6 @@ void main(){
         float curHeight = length(curPos);
 
         //Calculate the sun's direction relative to the current point.
-        //vec3 curSunDir = normalize(curPos - SunPos);
-        //float curSunCosDelta = dot(curSunDir, vec3(0, 1, 0));
-
         vec4 T_L = T(curHeight, cos(delta));
         vec4 T_V = T(curHeight, cos(theta));
 
@@ -87,18 +89,11 @@ void main(){
 
 
 
-    val.rgb = Mie * 0.9f * mie_radiance;
+    val.rgb = Mie / 1.1f * mie_radiance;
     val.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
 
-    //val.rgb += radiance;
-
+    val.rgb += radiance;
     val.a = 1;
-
-    //In shadow, no single scattering
-    //if(g_intersect && g_rayLen > 0)
-    //    val.rgb = vec3(0);
-
-    //val.rgb = Rayleigh * radiance * vec3(3.0f / (16.0f * PI) * (1 + mu * mu));
 
     imageStore(ScatterCache, ivec3(gl_GlobalInvocationID.xyz), val);
 }

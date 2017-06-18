@@ -30,8 +30,8 @@ namespace Kokoro.Engine.Graphics
             this.gnd = gnd;
             this.atmos = atmos;
 
-            int sideX = 32;
-            int sideY = 32;
+            int sideX = 64;
+            int sideY = 64;
             int sideZ = 128;
 
             //populate Transmitance in a compute shader 
