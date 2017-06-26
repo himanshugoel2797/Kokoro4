@@ -49,7 +49,7 @@ namespace Kokoro.Engine.Cameras
             View = Matrix4.LookAt(new Vector3(-1, 0, 0), Vector3.Zero, Vector3.UnitY);
             Position = -Vector3.UnitX;
             PostProcessingEffects = new List<RenderPass>();
-            SetProjection((float)(114.0f/360.0f * System.Math.PI), 16f / 9f, 0.01f);  //FOV = 90
+            SetProjection((float)(90.0f/360.0f * System.Math.PI), 16f / 9f, 0.01f);  //FOV = 90
             this.Name = name;
         }
 

@@ -119,7 +119,7 @@ namespace Kokoro.Engine.Graphics
             //Mesh groups can be switched on the fly now, so no need to group them, instead submit them to a compute shader for further culling.
             for (int i = 0; i < draw.Meshes.Length; i++)
             {
-                var meshGrp = draw.Meshes[i].Mesh.Parent;
+                var meshGrp = draw.Meshes[i].Mesh?.Parent;
                 var renderState = draw.State;
                 
                 var mesh = draw.Meshes[i];
@@ -138,7 +138,7 @@ namespace Kokoro.Engine.Graphics
                         MeshGroups[renderState] = new List<MeshGroup>();
                     }
 
-                    if (!MeshGroups[renderState].Contains(meshGrp))
+                    if (!MeshGroups[renderState].Contains(meshGrp) && meshGrp != null)
                     {
                         MeshGroups[renderState].Add(meshGrp);
                     }
@@ -179,6 +179,9 @@ namespace Kokoro.Engine.Graphics
                     {
                         var mesh = bkt.meshes[j];
 
+                        if(mesh.Mesh == null)
+                            continue;
+
                         data_ui[(j * 5) + 1] = (uint)mesh.Mesh.IndexCount;   //count
                         data_ui[(j * 5) + 2] = (uint)mesh.InstanceCount;   //instanceCount
                         data_ui[(j * 5) + 3] = (uint)mesh.Mesh.StartOffset;   //first
@@ -202,6 +205,7 @@ namespace Kokoro.Engine.Graphics
             if (!transient)
                 while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating  
              
+
             //Submit the multidraw calls
             for (int i = 0; i < RenderStates.Count; i++)
             {
@@ -214,6 +218,8 @@ namespace Kokoro.Engine.Graphics
                 for (int j = 0; j < MeshGroups[RenderStates[i]].Count; j++)
                 {
                     var bkt = buckets[RenderStates[i]];
+                    if (bkt.meshes[0].Mesh == null)
+                        continue;
 
                     EngineManager.SetRenderState(bkt.State); //State has been already set if ClearFramebufferBeforeSubmit is true.
 

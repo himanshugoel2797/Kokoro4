@@ -10,14 +10,13 @@ namespace Kokoro.Graphics.Prefabs
 {
     public class SphereFactory
     {
-        public static Mesh Create(MeshGroup group)
+        public static Mesh Create(MeshGroup group, float step = 36)
         {
             List<float> verts = new List<float>();
             List<float> uvs = new List<float>();
             List<uint> normals = new List<uint>();
             List<ushort> indices = new List<ushort>();
-
-            float step = 36;
+            
             float radius = 1;
 
             float angleStep = 360f / (float)step;

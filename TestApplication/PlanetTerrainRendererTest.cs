@@ -2,6 +2,7 @@
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
 using Kokoro.Engine.Input;
+using Kokoro.Graphics.OpenGL;
 using Kokoro.Math;
 using Kokoro.StateMachine;
 using System;
@@ -41,6 +42,7 @@ namespace TestApplication
             {
                 keybd = new Keyboard();
                 keybd.KeyMap["ToggleCamera"] = Key.Z;
+                keybd.KeyMap["ToggleWireframe"] = Key.W;
 
                 camera = new FirstPersonCamera(keybd, Vector3.UnitX, Vector3.UnitY, "FPV");
                 camera.Enabled = true;
@@ -62,7 +64,7 @@ namespace TestApplication
                 float off = side * 0.5f;
                 Framebuffer fbuf = Framebuffer.Default;
 
-                planetRenderer = new PlanetRenderer(grp, Framebuffer.Default, 500);
+                planetRenderer = new PlanetRenderer(grp, Framebuffer.Default, 6360, null);
 
                 inited = true;
             }
@@ -70,6 +72,11 @@ namespace TestApplication
             if (keybd.IsKeyReleased("ToggleCamera"))
             {
                 updateCamPos = !updateCamPos;
+            }
+
+            if (keybd.IsKeyReleased("ToggleWireframe"))
+            {
+                GraphicsDevice.Wireframe = !GraphicsDevice.Wireframe;
             }
 
             if (updateCamPos && camPos != camera.Position)

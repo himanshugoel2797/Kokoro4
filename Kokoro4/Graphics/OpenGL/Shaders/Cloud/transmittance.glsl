@@ -58,8 +58,8 @@ void main(){
 
     //Multiply the sums with the scattering coefficients
     vec4 val = vec4(0);
-    val.rgb = Rayleigh * rayleigh_rhoSum;
-    val.a =  Mie * mie_rhoSum;
+    val.rgb = Rayleigh * max(rayleigh_rhoSum, 0);
+    val.a =  Mie * max(mie_rhoSum, 0);
 
     if(g_intersect && g_rayLen > 0)
         val = vec4(0);

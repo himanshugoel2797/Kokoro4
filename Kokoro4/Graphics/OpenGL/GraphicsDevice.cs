@@ -524,7 +524,6 @@ namespace Kokoro.Graphics.OpenGL
         private static void Game_Load(object sender, EventArgs e)
         {
             curFramebuffer = Framebuffer.Default;
-            //GL.Enable(EnableCap.DepthClamp);
             GL.Enable(EnableCap.TextureCubeMapSeamless);
             GL.Enable(EnableCap.DepthTest);
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
@@ -534,6 +533,7 @@ namespace Kokoro.Graphics.OpenGL
         private static void Window_Resize(object sender, EventArgs e)
         {
             GPUStateMachine.SetViewport(0, 0, game.ClientSize.Width, game.ClientSize.Height);
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             Input.LowLevel.InputLL.SetWinXY(game.Location.X, game.Location.Y, game.ClientSize.Width, game.ClientSize.Height);
             Framebuffer.RecreateDefaultFramebuffer();
         }
@@ -661,7 +661,7 @@ namespace Kokoro.Graphics.OpenGL
         {
             _far = far;
             _near = near;
-            GL.DepthRange(near, far);
+            //GL.NV.DepthRange(near, far);
         }
 
         public static void GetDepthRange(out double near, out double far)

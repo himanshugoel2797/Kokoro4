@@ -102,11 +102,14 @@ namespace Kokoro.Engine.Graphics
 
         private PlanetTerrainSide[] sides;
         private TextureCache cache;
+        private AtmosphereRenderer atmosphere;
 
-        public PlanetRenderer(MeshGroup grp, Framebuffer fbuf, float radius, params string[] libraries)
+        public PlanetRenderer(MeshGroup grp, Framebuffer fbuf, float radius, AtmosphereRenderer atmos, params string[] libraries)
         {
             float side = radius * 2;
             float off = radius;
+
+            atmosphere = atmos;
 
             cache = new TextureCache(1024 * 2, 64, 64, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba8, PixelType.Byte);
 
@@ -123,13 +126,22 @@ namespace Kokoro.Engine.Graphics
             foreach (PlanetTerrainSide r in sides)
             {
                 r.State.ShaderProgram.Set("Radius", radius);
+                r.State.ShaderProgram.Set("Rt", atmosphere.Rt);
+                r.State.ShaderProgram.Set("Rg", atmosphere.Rg);
+                r.State.ShaderProgram.Set("TransCache", atmosphere.TransmitanceSamplerHandle);
+                r.State.ShaderProgram.Set("ScatterCache", atmosphere.SingleScatterSamplerHandle);
+                r.State.ShaderProgram.Set("MieScatterCache", atmosphere.MieSingleScatterSamplerHandle);
             }
         }
          
         public void Update(Vector3 pos, Vector3 dir)
         {
             foreach (PlanetTerrainSide r in sides)
+            {
+                r.State.ShaderProgram.Set("EyePosition", pos);
+                r.State.ShaderProgram.Set("SunDir", atmosphere.SunDir);
                 r.Update(pos, dir);
+            }
         }
 
 

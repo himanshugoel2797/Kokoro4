@@ -43,7 +43,7 @@ namespace Kokoro.Graphics.OpenGL
                 //Fetch the error log
                 string errorLog = "";
                 GL.GetShaderInfoLog(id, out errorLog);
-
+                 
                 GL.DeleteShader(id);
 
                 Console.WriteLine(errorLog);

@@ -13,7 +13,7 @@ namespace Kokoro.Engine.Graphics.Renderer
         //TODO add a flag to meshes to allow them to request the depth prepass testing.
         //setup a background task to start clustering lights into a clustered frustum -> 16 * 16 * 16 region with logarithmic depth
         //Draw the entire scene to just depth buffer, first static stuff, then dynamic
-        //Set depth test to equal, light the scene into an hdr buffer, render out a normal and specular map as well
+        //Set depth test to equal, light the scene into an hdr buffer, render out a normal map as well
         //calculate screen space reflections using the previous frame's hdr buffer
         //render the ui
         //blend the results together
@@ -47,7 +47,7 @@ namespace Kokoro.Engine.Graphics.Renderer
             uv = new Texture();
             uv.SetData(new FramebufferTextureSource(w, h, 1)
             {
-                InternalFormat = PixelInternalFormat.Rg16f,
+                InternalFormat = PixelInternalFormat.Rgba16f,
                 PixelType = PixelType.HalfFloat
             }, 0);
 

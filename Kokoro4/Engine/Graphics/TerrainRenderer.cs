@@ -32,9 +32,9 @@ namespace Kokoro.Engine.Graphics
         public RenderState State { get; private set; }
         ShaderStorageBuffer WorldBuffer;
         UniformBuffer TextureBuffer;
-        const int quadSide = 25;
+        const int quadSide = 32;
         protected int maxLevels = 40;
-        protected int len = 500;
+        protected int len = 1024;
 
         private TextureHandle CacheHandle;
 
@@ -102,9 +102,9 @@ namespace Kokoro.Engine.Graphics
                     }
                     TextureBuffer.UpdateDone();
                 }
-            }
+            } 
 
-            State = new RenderState(fbuf, new ShaderProgram(vshader, fshader), new ShaderStorageBuffer[] { WorldBuffer }, new UniformBuffer[] { TextureBuffer }, true, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
+            State = new RenderState(fbuf, new ShaderProgram(vshader, fshader), new ShaderStorageBuffer[] { WorldBuffer }, new UniformBuffer[] { TextureBuffer }, true, DepthFunc.LEqual, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
             State.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
             State.ShaderProgram.SetUniformBufferMapping("heightmaps", 0);
 
