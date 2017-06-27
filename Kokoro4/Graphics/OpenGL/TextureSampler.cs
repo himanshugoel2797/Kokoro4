@@ -55,10 +55,22 @@ namespace Kokoro.Engine.Graphics
             return GL.Arb.GetTextureSamplerHandle(tex, id);
         }
 
+        public void SetTileMode(bool tileX)
+        {
+            GL.SamplerParameter(id, SamplerParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
+        }
+
         public void SetTileMode(bool tileX, bool tileY)
         {
             GL.SamplerParameter(id, SamplerParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge); 
             GL.SamplerParameter(id, SamplerParameterName.TextureWrapT, tileY ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
+        }
+
+        public void SetTileMode(bool tileX, bool tileY, bool tileZ)
+        {
+            GL.SamplerParameter(id, SamplerParameterName.TextureWrapS, tileX ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
+            GL.SamplerParameter(id, SamplerParameterName.TextureWrapT, tileY ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
+            GL.SamplerParameter(id, SamplerParameterName.TextureWrapR, tileZ ? (int)TextureWrapMode.Repeat : (int)TextureWrapMode.ClampToEdge);
         }
 
         public void SetEnableLinearFilter(bool linear)

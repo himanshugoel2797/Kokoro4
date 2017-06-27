@@ -316,7 +316,7 @@ namespace Kokoro.Graphics.OpenGL
             get
             {
                 return curProg;
-            }
+            } 
             set
             {
                 curProg = value;
@@ -593,6 +593,7 @@ namespace Kokoro.Graphics.OpenGL
         #region Compute Jobs
         public static void DispatchSyncComputeJob(ShaderProgram prog, int x, int y, int z)
         {
+            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             var tmp = ShaderProgram;
             ShaderProgram = prog;
             GL.DispatchCompute(x, y, z);

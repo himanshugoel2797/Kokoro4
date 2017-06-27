@@ -40,8 +40,8 @@ void Scatter(float height, float sunAngle, float eyeAngle, vec3 sunDir, vec3 eye
 
     float mu = dot(sunDir, eyeDir);
     float g = 0.76f;
-	Ray.rgb *= 3.0f / (16.0f * PI) * (1 + mu * mu);
-	Mie.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
+	//Ray.rgb *= 3.0f / (16.0f * PI) * (1 + mu * mu);
+	//Mie.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
 }
 
 void WithoutHeightField(float h, out vec4 Ray, out vec4 Mie) {
@@ -103,5 +103,6 @@ void main(){
 	WithHeightField(h, off_r_data, off_m_data);
 
 	color.rgb = ((r_data.rgb) + (m_data.rgb)) * 20;
+	color.rgb = r_data.rgb;
 	color.a = 1;
 }

@@ -37,32 +37,29 @@ void main(){
     //Calculate the ray length to the atmosphere
     float rayLen = 0;
     sphere_dist(Rt, Pos, Dir, Rt * 4, +1, rayLen);
-    float stepLen = rayLen / SAMPLE_COUNT;
 
     float g_rayLen = 0;
     bool g_intersect = sphere_dist(Rg, Pos, Dir, Rt * 4, -1, g_rayLen);
+    if(g_intersect && g_rayLen > 0)
+        rayLen = g_rayLen;
 
+    float stepLen = abs(rayLen) / SAMPLE_COUNT;
     //Analytical integration over the ray length
     float rayleigh_rhoSum = 0;
     float mie_rhoSum = 0;
-    float aboveGnd = 1;
     for(float i = 0; i < SAMPLE_COUNT; ++i){
         vec3 curPos = Pos + Dir * i * stepLen; 
         float curHeight = length(curPos) - Rg;
 
-        aboveGnd = float(curHeight >= 0 && aboveGnd == 1);
-
-        rayleigh_rhoSum += exp(- curHeight / RayleighScaleHeight) * stepLen * aboveGnd;
-        mie_rhoSum += exp(- curHeight / MieScaleHeight) * stepLen * aboveGnd;
+        rayleigh_rhoSum += exp(- curHeight / RayleighScaleHeight) * stepLen;
+        mie_rhoSum += exp(- curHeight / MieScaleHeight) * stepLen;
     }
 
     //Multiply the sums with the scattering coefficients
     vec4 val = vec4(0);
-    val.rgb = Rayleigh * max(rayleigh_rhoSum, 0);
-    val.a =  Mie * max(mie_rhoSum, 0);
+    val.rgb = Rayleigh * rayleigh_rhoSum;
+    val.a =  Mie * mie_rhoSum;
 
-    if(g_intersect && g_rayLen > 0)
-        val = vec4(0);
 
     imageStore(TransCache, ivec2(gl_GlobalInvocationID.xy), val);
 }

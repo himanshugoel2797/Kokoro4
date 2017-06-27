@@ -45,9 +45,13 @@ namespace Kokoro.Engine.Graphics
             this.gnd = gnd;
             this.atmos = atmos;
 
-            int sideX = 64;
-            int sideY = 64;
-            int sideZ = 64;
+            int sideX = 128;
+            int sideY = 128;
+            int sideZ = 128;
+
+            TextureSampler sampler = new TextureSampler();
+            sampler.SetEnableLinearFilter(true); 
+            sampler.SetTileMode(false, false, false);
 
             //populate Transmitance in a compute shader 
             transmitance_cache = new Texture();
@@ -58,7 +62,7 @@ namespace Kokoro.Engine.Graphics
             TransmitanceHandle = transmitance_cache.GetImageHandle(0, 0, PixelInternalFormat.Rgba16f);
             TransmitanceHandle.SetResidency(Residency.Resident, AccessMode.ReadWrite);
 
-            TransmitanceSamplerHandle = transmitance_cache.GetHandle(TextureSampler.Default);
+            TransmitanceSamplerHandle = transmitance_cache.GetHandle(sampler);
             TransmitanceSamplerHandle.SetResidency(Residency.Resident);
 
             single_scattering_cache = new Texture();
@@ -69,7 +73,7 @@ namespace Kokoro.Engine.Graphics
             SingleScatterHandle = single_scattering_cache.GetImageHandle(0, -1, PixelInternalFormat.Rgba16f);
             SingleScatterHandle.SetResidency(Residency.Resident, AccessMode.Write);
 
-            SingleScatterSamplerHandle = single_scattering_cache.GetHandle(TextureSampler.Default);
+            SingleScatterSamplerHandle = single_scattering_cache.GetHandle(sampler);
             SingleScatterSamplerHandle.SetResidency(Residency.Resident);
 
             mie_single_scattering_cache = new Texture();
@@ -80,7 +84,7 @@ namespace Kokoro.Engine.Graphics
             mie_SingleScatterHandle = mie_single_scattering_cache.GetImageHandle(0, -1, PixelInternalFormat.Rgba16f);
             mie_SingleScatterHandle.SetResidency(Residency.Resident, AccessMode.Write);
 
-            MieSingleScatterSamplerHandle = mie_single_scattering_cache.GetHandle(TextureSampler.Default);
+            MieSingleScatterSamplerHandle = mie_single_scattering_cache.GetHandle(sampler);
             MieSingleScatterSamplerHandle.SetResidency(Residency.Resident);
 
             #region Calculate Transmittance
@@ -113,8 +117,21 @@ namespace Kokoro.Engine.Graphics
             SingleScatter_Precalc.Set("MieScaleHeight", mieScale);
             SingleScatter_Precalc.Set("Rt", atmos);
             SingleScatter_Precalc.Set("Rg", gnd);
+            SingleScatter_Precalc.Set("Count", sideZ);
+            SingleScatter_Precalc.Set("YLen", sideY);
 
-            EngineManager.DispatchSyncComputeJob(SingleScatter_Precalc, sideX, sideY, sideZ);
+            int YWorkSize = 4;
+
+            for (int i = 0; i < sideZ; i++)
+            {
+                SingleScatter_Precalc.Set("Layer", i);
+
+                for (int j = 0; j < sideY; j += YWorkSize)
+                {
+                    SingleScatter_Precalc.Set("YOff", j);
+                    EngineManager.DispatchSyncComputeJob(SingleScatter_Precalc, sideX, YWorkSize, 1);
+                }
+            }
             #endregion
 
 

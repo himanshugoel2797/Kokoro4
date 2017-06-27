@@ -62,5 +62,6 @@ void main(){
 	Scatter(height, sunAngle, eyeAngle, SunDir, eD, r_data, m_data);
 
 	color.rgb = (r_data.rgb + m_data.rgb) * 20;
+	//color.rgb = r_data.rgb * 20;
 	color.a = 1;
 }

@@ -113,7 +113,6 @@ namespace TestApplication
 
             renderer.Draw(camera.View, camera.Projection, camPos, new Vector3(0, 1, 0));
             planetRenderer.Draw(camera.View, camera.Projection);
-
         }
 
         public void Update(double interval)
