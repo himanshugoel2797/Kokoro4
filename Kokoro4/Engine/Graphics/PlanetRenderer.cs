@@ -139,7 +139,6 @@ namespace Kokoro.Engine.Graphics
             foreach (PlanetTerrainSide r in sides)
             {
                 r.State.ShaderProgram.Set("EyePosition", pos);
-                r.State.ShaderProgram.Set("SunDir", atmosphere.SunDir);
                 r.Update(pos, dir);
             }
         }
@@ -148,7 +147,10 @@ namespace Kokoro.Engine.Graphics
         public void Draw(Matrix4 view, Matrix4 proj)
         {
             foreach (PlanetTerrainSide r in sides)
+            {
+                r.State.ShaderProgram.Set("SunDir", atmosphere.SunDir);
                 r.Draw(view, proj);
+            }
         }
     }
 }

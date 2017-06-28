@@ -46,7 +46,7 @@ namespace Kokoro.Graphics.OpenGL
                  
                 GL.DeleteShader(id);
 
-                Console.WriteLine(errorLog);
+                Console.WriteLine(errorLog); 
                 throw new Exception("Shader Compilation Exception : " + errorLog);
             }
             GraphicsDevice.Cleanup.Add(Dispose);

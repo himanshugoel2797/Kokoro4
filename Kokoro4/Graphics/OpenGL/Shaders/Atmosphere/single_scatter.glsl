@@ -61,7 +61,7 @@ void main(){
 
     float sunRayLen = 0;
     bool sun_intersect = sphere_dist(Rg, Pos, SunDir, Rg * 4, -1, sunRayLen);
-    bool doOp = true;//!(sun_intersect && sunRayLen >= 0);
+    bool doOp = !(sun_intersect && sunRayLen >= 0);
         
     //Integrate along the length of the View ray, calculating the scattering at each point
     vec3 radiance = vec3(0);
@@ -92,7 +92,7 @@ void main(){
         vec4 T_L = T(curHeight, cos(delta));
 
         //Attenuation
-        vec3 tau = (T_L.xyz + T_V.xyz) * Rayleigh + (T_L.www + T_V.www) * Mie;
+        vec3 tau = (T_L.xyz + T_V.xyz) * Rayleigh + (T_L.www + T_V.www) * Mie * 1.1f;
         tau = exp(-tau);
 
         radiance += hr * tau;
@@ -100,12 +100,9 @@ void main(){
     }
 
     vec4 val = vec4(1);
-
     val.rgb = Rayleigh * radiance;
-    
-
     imageStore(ScatterCache, ivec3(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + YOff, Layer), val);
     
-    val.rgb = Mie / 1.1f * mie_radiance;
+    val.rgb = Mie * mie_radiance;
     imageStore(MieScatterCache, ivec3(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + YOff, Layer), val);
 }

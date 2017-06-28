@@ -57,8 +57,8 @@ void main(){
 
     //Multiply the sums with the scattering coefficients
     vec4 val = vec4(0);
-    val.rgb = Rayleigh * rayleigh_rhoSum;
-    val.a =  Mie * mie_rhoSum;
+    val.rgb = vec3(rayleigh_rhoSum);
+    val.a =  mie_rhoSum;
 
 
     imageStore(TransCache, ivec2(gl_GlobalInvocationID.xy), val);

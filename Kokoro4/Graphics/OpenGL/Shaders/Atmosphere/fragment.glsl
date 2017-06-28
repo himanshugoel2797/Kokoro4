@@ -35,6 +35,12 @@ void Scatter(float height, float sunAngle, float eyeAngle, vec3 sunDir, vec3 eye
     float g = 0.76f;
 	Ray.rgb *= 3.0f / (16.0f * PI) * (1 + mu * mu);
 	Mie.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
+	
+	float nDL = dot(normalize(EyeDir), sunDir);
+	Ray.rgb *= nDL;
+	Mie.rgb *= nDL;
+	Ray.a = nDL;
+	Mie.a = nDL;
 }
 
 void main(){
