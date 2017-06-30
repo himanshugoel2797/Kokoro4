@@ -21,6 +21,7 @@ namespace Kokoro.Engine.Graphics
         public UniformBuffer[] UniformBufferBindings { get; private set; }
 
         public bool DepthWrite { get; private set; }
+        public bool ColorWrite { get; private set; }
         public DepthFunc DepthTest { get; private set; }
         public BlendFactor Src { get; private set; }
         public BlendFactor Dst { get; private set; }
@@ -30,23 +31,25 @@ namespace Kokoro.Engine.Graphics
         public float NearPlane { get; private set; }
         public CullFaceMode CullMode { get; private set; }
 
-        public RenderState(Framebuffer fbuf, 
-                           ShaderProgram prog, 
-                           ShaderStorageBuffer[] ssboBindings, 
-                           UniformBuffer[] uboBindings, 
-                           bool dWrite, 
-                           DepthFunc dTest, 
-                           float far, 
-                           float near, 
-                           BlendFactor src, 
-                           BlendFactor dst, 
-                           Vector4 ClearColor, 
-                           float ClearDepth, 
+        public RenderState(Framebuffer fbuf,
+                           ShaderProgram prog,
+                           ShaderStorageBuffer[] ssboBindings,
+                           UniformBuffer[] uboBindings,
+                           bool dWrite,
+                           bool colorWrite,
+                           DepthFunc dTest,
+                           float far,
+                           float near,
+                           BlendFactor src,
+                           BlendFactor dst,
+                           Vector4 ClearColor,
+                           float ClearDepth,
                            CullFaceMode cullMode)
         {
             Framebuffer = fbuf;
             ShaderProgram = prog;
             DepthWrite = dWrite;
+            ColorWrite = colorWrite;
             DepthTest = dTest;
             FarPlane = far;
             NearPlane = near;

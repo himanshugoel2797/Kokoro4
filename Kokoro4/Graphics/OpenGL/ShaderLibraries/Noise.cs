@@ -18,6 +18,7 @@ namespace Kokoro.Graphics.OpenGL.ShaderLibraries
         {
             Library = ShaderLibrary.Create(nameof(Noise));
             Library.AddSourceFile("Graphics/OpenGL/ShaderLibraries/Noise/snoise3d.glsl");
+            Library.AddSourceFile("Graphics/OpenGL/ShaderLibraries/Noise/valnoise3d.glsl");
         }
     }
 }

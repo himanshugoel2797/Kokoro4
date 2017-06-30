@@ -143,8 +143,11 @@ namespace Kokoro.Graphics.OpenGL
         {
             set
             {
-                wframe = value;
-                GL.PolygonMode(MaterialFace.FrontAndBack, value ? PolygonMode.Line : PolygonMode.Fill);
+                if (wframe != value)
+                {
+                    wframe = value;
+                    GL.PolygonMode(MaterialFace.FrontAndBack, value ? PolygonMode.Line : PolygonMode.Fill);
+                }
             }
             get
             {
@@ -161,15 +164,18 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                aEnabled = value;
-                if (aEnabled)
+                if (aEnabled != value)
                 {
-                    GL.Enable(EnableCap.Blend);
-                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                }
-                else
-                {
-                    GL.Disable(EnableCap.Blend);
+                    aEnabled = value;
+                    if (aEnabled)
+                    {
+                        GL.Enable(EnableCap.Blend);
+                        GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                    }
+                    else
+                    {
+                        GL.Disable(EnableCap.Blend);
+                    }
                 }
             }
         }
@@ -294,8 +300,28 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                depthWrite = value;
-                GL.DepthMask(depthWrite);
+                if (depthWrite != value)
+                {
+                    depthWrite = value;
+                    GL.DepthMask(depthWrite);
+                }
+            }
+        }
+
+        static bool colorWrite = false;
+        public static bool ColorWriteEnabled
+        {
+            get
+            {
+                return colorWrite;
+            }
+            set
+            {
+                if(colorWrite != value)
+                {
+                    colorWrite = value;
+                    GL.ColorMask(colorWrite, colorWrite, colorWrite, colorWrite);
+                }
             }
         }
 

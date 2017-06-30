@@ -22,6 +22,7 @@ namespace TestApplication
         private Texture tex;
         private TextureHandle handle;
         private RenderQueue clearQueue;
+        private Framebuffer fbuf;
 
         private Vector3 camPos;
         private bool updateCamPos = true;
@@ -56,6 +57,27 @@ namespace TestApplication
 
                 grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 300000, 300000);
 
+                fbuf = new Framebuffer(1280, 720);
+
+                Texture depthTexture = new Texture();
+                DepthTextureSource depthBuffer = new DepthTextureSource(fbuf.Width, fbuf.Height)
+                {
+                    InternalFormat = PixelInternalFormat.DepthComponent32f
+                };
+                depthTexture.SetData(depthBuffer, 0);
+
+                Texture colorTexture = new Texture();
+                FramebufferTextureSource color = new FramebufferTextureSource(fbuf.Width, fbuf.Height, 1)
+                {
+                    InternalFormat = PixelInternalFormat.Rgba8,
+                    PixelType = PixelType.UnsignedByte
+                };
+                colorTexture.SetData(color, 0);
+
+                fbuf[FramebufferAttachment.DepthAttachment] = depthTexture;
+                fbuf[FramebufferAttachment.ColorAttachment0] = colorTexture;
+                
+
                 BitmapTextureSource bitmapSrc = new BitmapTextureSource("heightmap.png", 1);
                 tex = new Texture();
                 tex.SetData(bitmapSrc, 0);
@@ -67,9 +89,8 @@ namespace TestApplication
 
                 float side = 500;
                 float off = side * 0.5f;
-                Framebuffer fbuf = Framebuffer.Default;
-
-                var RenderState = new RenderState(fbuf, null, null, null, true, DepthFunc.LEqual, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 1, CullFaceMode.Front);
+                
+                var RenderState = new RenderState(fbuf, null, null, null, true, DepthFunc.Greater, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.One, 0, CullFaceMode.Front);
                 clearQueue = new RenderQueue(1, false);
                 clearQueue.BeginRecording();
                 clearQueue.ClearFramebufferBeforeSubmit = true;
@@ -86,8 +107,8 @@ namespace TestApplication
                 });
                 clearQueue.EndRecording();
 
-                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 8, 20e-3f, 1.2f, 6360, 6420, grp, Framebuffer.Default);
-                planetRenderer = new PlanetRenderer(grp, Framebuffer.Default, 6360, renderer);
+                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 8, 20e-3f, 1.2f, 6360, 6420, grp, fbuf);
+                planetRenderer = new PlanetRenderer(grp, fbuf, 6360, renderer);
 
                 inited = true;
             }

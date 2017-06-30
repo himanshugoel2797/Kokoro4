@@ -108,6 +108,10 @@ void main(){
 	vec4 off_m_data = vec4(0);
 	WithHeightField(h, off_r_data, off_m_data);
 
-	color.rgb = ((r_data.rgb) + (m_data.rgb)) * 20;
+	color.rgb = ((r_data.rgb - off_r_data.rgb) + (m_data.rgb - off_m_data.rgb)) * 20;
+
+	float nDL = dot(normalize(normal), SunDir);
+	color.rgb = mix(color.rgb, mix(vec3(0.2f, 0.8f, 0.2f), vec3(0.9f, 0.9f, 0.9f), smoothstep(0.85f, 1.0f, h)) * nDL , step(0.7f, h));// + vec3(1.0f, 1.0f, 1.0f) * smoothstep(0.88f, 1.0f, h);
+
 	color.a = 1;
 }

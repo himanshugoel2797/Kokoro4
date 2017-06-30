@@ -104,7 +104,7 @@ namespace Kokoro.Engine.Graphics
                 }
             } 
 
-            State = new RenderState(fbuf, new ShaderProgram(vshader, fshader), new ShaderStorageBuffer[] { WorldBuffer }, new UniformBuffer[] { TextureBuffer }, true, DepthFunc.LEqual, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 1, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
+            State = new RenderState(fbuf, new ShaderProgram(vshader, fshader), new ShaderStorageBuffer[] { WorldBuffer }, new UniformBuffer[] { TextureBuffer }, true, DepthFunc.Greater, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, (YOff < 0 && YIndex != 1) || (YOff >= 0 && YIndex == 1) ? CullFaceMode.Back : CullFaceMode.Front);
             State.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
             State.ShaderProgram.SetUniformBufferMapping("heightmaps", 0);
 

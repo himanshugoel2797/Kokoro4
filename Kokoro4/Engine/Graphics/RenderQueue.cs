@@ -19,7 +19,6 @@ namespace Kokoro.Engine.Graphics
         public struct DrawData
         {
             public MeshData[] Meshes;
-            public RenderState State;
         }
 
         public struct MeshData
@@ -31,14 +30,12 @@ namespace Kokoro.Engine.Graphics
 
         private class Bucket
         {
-            public RenderState State;
+            public MeshGroup Group;
             public List<MeshData> meshes;
             public uint offset;
         }
 
-        private Dictionary<RenderState, Bucket> buckets;
-        private List<RenderState> RenderStates;
-        private Dictionary<RenderState, List<MeshGroup>> MeshGroups;
+        private Dictionary<MeshGroup, Bucket> buckets;
 
         private ShaderStorageBuffer multiDrawParams;
         private bool isRecording = false;
@@ -52,10 +49,7 @@ namespace Kokoro.Engine.Graphics
         public RenderQueue(int MaxDrawCount, bool transient)
         {
             this.transient = transient;
-            buckets = new Dictionary<RenderState, Bucket>();
-            RenderStates = new List<RenderState>();
-            MeshGroups = new Dictionary<RenderState, List<MeshGroup>>();
-
+            buckets = new Dictionary<MeshGroup, Bucket>();
 
             if (MaxDrawCount < 4096)
                 MaxDrawCount = 4096;
@@ -64,9 +58,9 @@ namespace Kokoro.Engine.Graphics
             multiDrawParams = new ShaderStorageBuffer(MaxDrawCount * 5 * sizeof(uint), false);
         }
 
-        public void UpdateDrawParams(MeshGroup grp, RenderState state, MeshData data)
+        public void UpdateDrawParams(MeshGroup grp, MeshData data)
         {
-            Bucket b = buckets[state];
+            Bucket b = buckets[grp];
 
             int j = 0;
             for (int i = 0; i < b.meshes.Count; i++)
@@ -94,10 +88,6 @@ namespace Kokoro.Engine.Graphics
             //Clear the buffer
             buckets.Clear();
 
-            //Clear the render state and mesh group lists
-            RenderStates.Clear();
-            MeshGroups.Clear();
-
             isRecording = true;
         }
 
@@ -120,31 +110,19 @@ namespace Kokoro.Engine.Graphics
             for (int i = 0; i < draw.Meshes.Length; i++)
             {
                 var meshGrp = draw.Meshes[i].Mesh?.Parent;
-                var renderState = draw.State;
-                
+
                 var mesh = draw.Meshes[i];
 
-                if (!buckets.ContainsKey(renderState))
+                if (!buckets.ContainsKey(meshGrp))
                 {
-                    buckets[renderState] = new Bucket()
+                    buckets[meshGrp] = new Bucket()
                     {
-                        State = renderState,
+                        Group = meshGrp,
                         meshes = new List<MeshData>()
                     };
-
-                    if (!RenderStates.Contains(renderState)) RenderStates.Add(renderState);
-                    if (!MeshGroups.ContainsKey(renderState))
-                    {
-                        MeshGroups[renderState] = new List<MeshGroup>();
-                    }
-
-                    if (!MeshGroups[renderState].Contains(meshGrp) && meshGrp != null)
-                    {
-                        MeshGroups[renderState].Add(meshGrp);
-                    }
                 }
 
-                buckets[renderState].meshes.Add(mesh);
+                buckets[meshGrp].meshes.Add(mesh);
             }
         }
 
@@ -179,18 +157,28 @@ namespace Kokoro.Engine.Graphics
                     {
                         var mesh = bkt.meshes[j];
 
-                        if(mesh.Mesh == null)
+                        if (mesh.Mesh == null)
                             continue;
 
-                        data_ui[(j * 5) + 1] = (uint)mesh.Mesh.IndexCount;   //count
-                        data_ui[(j * 5) + 2] = (uint)mesh.InstanceCount;   //instanceCount
-                        data_ui[(j * 5) + 3] = (uint)mesh.Mesh.StartOffset;   //first
-                        data_ui[(j * 5) + 4] = (uint)mesh.Mesh.StartOffset;   //baseVertex
-                        data_ui[(j * 5) + 5] = (uint)mesh.BaseInstance;   //baseInstance
+                        if (bkt.Group.IndexCount == 0)
+                        {
+                            data_ui[(j * 4) + 1] = (uint)mesh.Mesh.IndexCount;   //count
+                            data_ui[(j * 4) + 2] = (uint)mesh.InstanceCount;   //instanceCount
+                            data_ui[(j * 4) + 3] = (uint)mesh.Mesh.StartOffset;   //first
+                            data_ui[(j * 4) + 4] = (uint)mesh.BaseInstance;   //baseInstance
+                        }
+                        else
+                        {
+                            data_ui[(j * 5) + 1] = (uint)mesh.Mesh.IndexCount;   //count
+                            data_ui[(j * 5) + 2] = (uint)mesh.InstanceCount;   //instanceCount
+                            data_ui[(j * 5) + 3] = (uint)mesh.Mesh.StartOffset;   //first
+                            data_ui[(j * 5) + 4] = (uint)mesh.Mesh.StartOffset;   //baseVertex
+                            data_ui[(j * 5) + 5] = (uint)mesh.BaseInstance;   //baseInstance
+                        }
                     }
 
                     //Move the data pointer forward
-                    data_ui += (1 + bkt.meshes.Count);
+                    data_ui += (1 + bkt.meshes.Count * ((bkt.Group.IndexCount == 0) ? 4 : 5));
                 }
             }
 
@@ -199,49 +187,22 @@ namespace Kokoro.Engine.Graphics
 
             isRecording = false;
         }
-         
+
         public void Submit()
         {
             if (!transient)
                 while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating  
-             
 
-            //Submit the multidraw calls
-            for (int i = 0; i < RenderStates.Count; i++)
+            GraphicsDevice.SetMultiDrawParameterBuffer(multiDrawParams);
+            GraphicsDevice.SetParameterBuffer(multiDrawParams);
+
+            var bucketVals = buckets.Values.ToArray();
+            for (int i = 0; i < bucketVals.Length; i++)
             {
-                if (ClearFramebufferBeforeSubmit)
-                {
-                    EngineManager.SetRenderState(RenderStates[i]);
-                    GraphicsDevice.Clear();
-                }
+                var bkt = bucketVals[i];
 
-                for (int j = 0; j < MeshGroups[RenderStates[i]].Count; j++)
-                {
-                    var bkt = buckets[RenderStates[i]];
-                    if (bkt.meshes[0].Mesh == null)
-                        continue;
-
-                    EngineManager.SetRenderState(bkt.State); //State has been already set if ClearFramebufferBeforeSubmit is true.
-
-                    EngineManager.SetCurrentMeshGroup(bkt.meshes[0].Mesh.Parent);
-
-                    GraphicsDevice.SetMultiDrawParameterBuffer(multiDrawParams);
-                    GraphicsDevice.SetParameterBuffer(multiDrawParams);
-
-                    GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, bkt.offset + sizeof(uint), bkt.offset, maxDrawCount, true);
-
-                    //Ensure the buffers aren't in use before next update
-                    RenderState state = bkt.State;
-
-                    for (int k = 0; state.ShaderStorageBufferBindings != null && k < state.ShaderStorageBufferBindings.Length; k++)
-                    {
-                        state.ShaderStorageBufferBindings[k].UpdateDone();
-                    }
-                    for (int k = 0; state.UniformBufferBindings != null && k < state.UniformBufferBindings.Length; k++)
-                    {
-                        state.UniformBufferBindings[k].UpdateDone();
-                    }
-                }
+                EngineManager.SetCurrentMeshGroup(bkt.Group);
+                GraphicsDevice.MultiDrawIndirectCount(PrimitiveType.Triangles, bkt.offset + sizeof(uint), bkt.offset, maxDrawCount, (bkt.Group.IndexCount != 0));
             }
         }
 

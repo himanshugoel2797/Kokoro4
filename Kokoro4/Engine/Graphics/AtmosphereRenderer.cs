@@ -67,7 +67,7 @@ namespace Kokoro.Engine.Graphics
 
             single_scattering_cache = new Texture();
             RawTextureSource single_scatterCacheSrc = new RawTextureSource(3, sideX, sideY, sideZ, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba16f, TextureTarget.Texture3D, PixelType.Float);
-            single_scattering_cache.SetData(single_scatterCacheSrc, 0);
+            single_scattering_cache.SetData(single_scatterCacheSrc, 0); 
             single_scattering_cache.SetEnableLinearFilter(true);
             single_scattering_cache.SetTileMode(false, false);
             SingleScatterHandle = single_scattering_cache.GetImageHandle(0, -1, PixelInternalFormat.Rgba16f);
@@ -140,7 +140,7 @@ namespace Kokoro.Engine.Graphics
             AtmosphereShader.Set("ScatterCache", SingleScatterSamplerHandle);
             AtmosphereShader.Set("MieScatterCache", MieSingleScatterSamplerHandle);
 
-            AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, DepthFunc.LEqual, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 1, CullFaceMode.Front);
+            AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, DepthFunc.Greater, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, CullFaceMode.Front);
             AtmosphereRender = new RenderQueue(1, false);
 
             AtmoSphere = SphereFactory.Create(grp, 180);

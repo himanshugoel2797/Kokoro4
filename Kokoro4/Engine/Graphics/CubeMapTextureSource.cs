@@ -44,6 +44,27 @@ namespace Kokoro.Engine.Graphics
             return t;
         }
 
+        public static Texture CreateCubemap(ITextureSource src)
+        {
+            Texture t = new Texture();
+
+            CubeMapTextureSource c0 = new CubeMapTextureSource(CubeMapFace.PositiveX, src),
+                                 c1 = new CubeMapTextureSource(CubeMapFace.PositiveY, src),
+                                 c2 = new CubeMapTextureSource(CubeMapFace.PositiveZ, src),
+                                 c3 = new CubeMapTextureSource(CubeMapFace.NegativeX, src),
+                                 c4 = new CubeMapTextureSource(CubeMapFace.NegativeY, src),
+                                 c5 = new CubeMapTextureSource(CubeMapFace.NegativeZ, src);
+
+            t.SetData(c0, 0);
+            t.SetData(c1, 0);
+            t.SetData(c2, 0);
+            t.SetData(c3, 0);
+            t.SetData(c4, 0);
+            t.SetData(c5, 0);
+
+            return t;
+        }
+
         public enum CubeMapFace{
             PositiveX, PositiveY, PositiveZ,
             NegativeX, NegativeY, NegativeZ

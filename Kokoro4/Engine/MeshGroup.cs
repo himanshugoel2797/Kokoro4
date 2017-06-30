@@ -33,6 +33,22 @@ namespace Kokoro.Engine
         private int vertex_comp_cnt = 0;
         private int vertex_size = 0;
 
+        public int VertexCount
+        {
+            get
+            {
+                return vertex_cnt;
+            }
+        }
+
+        public int IndexCount
+        {
+            get
+            {
+                return index_cnt;
+            }
+        }
+
         public bool IsReady
         {
             get
@@ -49,7 +65,7 @@ namespace Kokoro.Engine
             Normal = 3
         }
 
-        public MeshGroup(MeshGroupVertexFormat vFormat, int vertex_cnt, int index_cnt)
+        public MeshGroup(MeshGroupVertexFormat vFormat, int vertex_cnt, int index_cnt = 0)
         {
             OpenTK.Graphics.OpenGL.VertexAttribPointerType vAttribPtrType = 0;
             switch (vFormat)
@@ -70,23 +86,23 @@ namespace Kokoro.Engine
             vertices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * vertex_size, false);
             uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(float), false);
             normals = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * sizeof(uint), false);
-            indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer, index_cnt * sizeof(ushort), false);
+            if(index_cnt != 0) indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer, index_cnt * sizeof(ushort), false);
 
             verticeF = new Fence();
             uvF = new Fence();
             normalF = new Fence();
-            indiceF = new Fence();
+            if (index_cnt != 0) indiceF = new Fence();
 
             verticeF.PlaceFence();
             uvF.PlaceFence();
             normalF.PlaceFence();
-            indiceF.PlaceFence();
+            if (index_cnt != 0) indiceF.PlaceFence();
 
             varray = new VertexArray();
             varray.SetBufferObject(0, vertices, vertex_comp_cnt, vAttribPtrType, false);
             varray.SetBufferObject(1, uvs, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Float, false);
             varray.SetBufferObject(2, normals, 2, OpenTK.Graphics.OpenGL.VertexAttribPointerType.Short, false);
-            varray.SetElementBufferObject(indices);
+            if (index_cnt != 0) varray.SetElementBufferObject(indices);
 
             offset = 0;
             this.vertex_cnt = vertex_cnt;
@@ -105,7 +121,7 @@ namespace Kokoro.Engine
             this.offset += cnt;
 
             IntPtr[] result = new IntPtr[4];
-            result[(int)IntPtrIndex.Index] = indices.GetPtr() + (offset * sizeof(ushort));
+            if (index_cnt != 0) result[(int)IntPtrIndex.Index] = indices.GetPtr() + (offset * sizeof(ushort));
             result[(int)IntPtrIndex.Vertex] = vertices.GetPtr() + (offset * vertex_size);
             result[(int)IntPtrIndex.UV] = uvs.GetPtr() + (offset * 2 * sizeof(float));
             result[(int)IntPtrIndex.Normal] = normals.GetPtr() + (offset * sizeof(uint));
@@ -118,8 +134,11 @@ namespace Kokoro.Engine
             switch (idx)
             {
                 case IntPtrIndex.Index:
-                    indices.FlushBuffer((offset * sizeof(ushort)), size * sizeof(ushort));
-                    indiceF.PlaceFence();
+                    if (index_cnt != 0)
+                    {
+                        indices.FlushBuffer((offset * sizeof(ushort)), size * sizeof(ushort));
+                        indiceF.PlaceFence();
+                    }
                     break;
                 case IntPtrIndex.Normal:
                     normals.FlushBuffer((offset * sizeof(uint)), size * sizeof(uint));
