@@ -126,11 +126,15 @@ namespace Kokoro.Engine.Graphics
             foreach (PlanetTerrainSide r in sides)
             {
                 r.State.ShaderProgram.Set("Radius", radius);
-                r.State.ShaderProgram.Set("Rt", atmosphere.Rt);
-                r.State.ShaderProgram.Set("Rg", atmosphere.Rg);
-                r.State.ShaderProgram.Set("TransCache", atmosphere.TransmitanceSamplerHandle);
-                r.State.ShaderProgram.Set("ScatterCache", atmosphere.SingleScatterSamplerHandle);
-                r.State.ShaderProgram.Set("MieScatterCache", atmosphere.MieSingleScatterSamplerHandle);
+
+                if (atmosphere != null)
+                {
+                    r.State.ShaderProgram.Set("Rt", atmosphere.Rt);
+                    r.State.ShaderProgram.Set("Rg", atmosphere.Rg);
+                    r.State.ShaderProgram.Set("TransCache", atmosphere.TransmitanceSamplerHandle);
+                    r.State.ShaderProgram.Set("ScatterCache", atmosphere.SingleScatterSamplerHandle);
+                    r.State.ShaderProgram.Set("MieScatterCache", atmosphere.MieSingleScatterSamplerHandle);
+                }
             }
         }
          
@@ -148,7 +152,7 @@ namespace Kokoro.Engine.Graphics
         {
             foreach (PlanetTerrainSide r in sides)
             {
-                r.State.ShaderProgram.Set("SunDir", atmosphere.SunDir);
+                if(atmosphere != null)r.State.ShaderProgram.Set("SunDir", atmosphere.SunDir);
                 r.Draw(view, proj);
             }
         }

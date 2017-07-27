@@ -1,4 +1,4 @@
-﻿using Assimp;
+﻿using FbxSharp;
 using Kokoro.Math;
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace Kokoro4.ContentProcessor.Mesh
             //Convert cartesian to spherical
             double theta = System.Math.Atan2(y, x) * 180.0d / System.Math.PI;
             double phi = System.Math.Acos(z) * 180.0d / System.Math.PI;
-            
+
             unchecked
             {
                 const int scale = 100;
@@ -53,93 +53,95 @@ namespace Kokoro4.ContentProcessor.Mesh
             result |= (uint)(((z >= 0 ? 0 : 2) | (x >= 0 ? 0 : 1)) /*Allows application of the sign in a shader using (1 - z)*/// << 30);
 
 
-         //   return result;
-         //   return (uint)((x_i & 1023) | ((y >= 0 ? 0 : 2) << 10) | ((z_i & 1023) << 20) | (((z >= 0 ? 0 : 2) | (x >= 0 ? 0 : 1)) /*Allows application of the sign in a shader using (1 - z)*/ << 30));
-       // }
+        //   return result;
+        //   return (uint)((x_i & 1023) | ((y >= 0 ? 0 : 2) << 10) | ((z_i & 1023) << 20) | (((z >= 0 ? 0 : 2) | (x >= 0 ? 0 : 1)) /*Allows application of the sign in a shader using (1 - z)*/ << 30));
+        // }
 
-        public static void Preprocess(string[] args)
+        private static void ProcessMesh(FbxSharp.Mesh m, bool isStatic, string outputFile)
         {
-            float scale = 1;
-            bool isStatic = false;
-            string inputFile = "";
-            string outputFile = "";
+            var Vertices = m.GetControlPoints();
 
-            for (int i = 0; i < args.Length; i++)
+            int texCoordLayer = 0;
+            int normalLayer = 0;
+
+            for (int i = 0; i < m.GetLayerCount(); i++)
             {
-                switch (args[i])
-                {
-                    case "-f":
-                    case "-file":
-                        //File name
-                        if (i + 1 >= args.Length) throw new Exception();
-                        inputFile = args[++i];
-                        break;
-                    case "-st":
-                    case "-static":
-                        //Mesh is static
-                        isStatic = true;
-                        //This enables mesh slicing
-                        break;
-                    case "-sc":
-                    case "-scale":
-                        //Scale the mesh by this value to convert it to world scale
-                        if (i + 1 >= args.Length) throw new Exception();
-                        scale = float.Parse(args[++i]);
-                        break;
-                    case "-o":
-                    case "-out":
-                        //Output file
-                        if (i + 1 >= args.Length) throw new Exception();
-                        outputFile = args[++i];
-                        break;
-                }
+                var Layer = m.GetLayer(i);
+                if (Layer.GetUVs() != null)
+                    texCoordLayer = i;
+
+                if (Layer.GetNormals() != null)
+                    normalLayer = i;
+
             }
+            var TexCoords = m.GetLayer(texCoordLayer).GetUVs();
+            var Norms = m.GetLayer(texCoordLayer).GetNormals();
 
-            if (scale == 0) scale = 1;
-            if (inputFile == "") throw new Exception();
-            if (outputFile == "") outputFile = Path.ChangeExtension(inputFile, isStatic ? "k4_stmesh" : "k4_dymesh");
-
-            Assimp.AssimpContext ctxt = new AssimpContext();
-            Assimp.Scene sc = ctxt.ImportFile(inputFile);
-            Assimp.Mesh mesh = sc.Meshes[0];
-            
-
-            //Convert the data to a format we can work with easily
             List<float> vertices = new List<float>();
             List<float> uvs = new List<float>();
             List<float> normals = new List<float>();
             List<ushort> indices = new List<ushort>();
-            
 
-            for (int i = 0; i < mesh.VertexCount; i++)
+
+            for (int i = 0; i < Vertices.Length; i++)
             {
-                vertices.Add(mesh.Vertices[i].X);
-                vertices.Add(mesh.Vertices[i].Y);
-                vertices.Add(mesh.Vertices[i].Z);
+                vertices.Add((float)Vertices[i].X);
+                vertices.Add((float)Vertices[i].Y);
+                vertices.Add((float)Vertices[i].Z);
             }
 
-            for (int i = 0; i < mesh.TextureCoordinateChannels[0].Count; i++)
+
+            if (TexCoords.GetMappingMode() != LayerElement.EMappingMode.ByControlPoint)
+                throw new Exception("UV Data unreadable.");
+
+            var TC = TexCoords.GetDirectArray();
+            var IndexData = TexCoords.GetIndexArray();
+            var RefMode = TexCoords.GetReferenceMode();
+
+            for (int i = 0; i < Vertices.Length; i++)
             {
-                uvs.Add(mesh.TextureCoordinateChannels[0][i].X);
-                uvs.Add(mesh.TextureCoordinateChannels[0][i].Y);
+                if (RefMode == LayerElement.EReferenceMode.Direct)
+                {
+                    uvs.Add((float)TC[i].X);
+                    uvs.Add((float)TC[i].Y);
+                }
+                else if (RefMode == LayerElement.EReferenceMode.Index)
+                {
+                    uvs.Add((float)TC[IndexData[i]].X);
+                    uvs.Add((float)TC[IndexData[i]].Y);
+                }
             }
 
-            for (int i = 0; i < mesh.Normals.Count; i++)
+            var NC = Norms.GetDirectArray();
+            IndexData = Norms.GetIndexArray();
+            RefMode = Norms.GetReferenceMode();
+
+            for (int i = 0; i < Vertices.Length; i++)
             {
-                normals.Add(mesh.Normals[i].X);
-                normals.Add(mesh.Normals[i].Y);
-                normals.Add(mesh.Normals[i].Z);
+                if (RefMode == LayerElement.EReferenceMode.Direct)
+                {
+                    normals.Add((float)NC[i].X);
+                    normals.Add((float)NC[i].Y);
+                    normals.Add((float)NC[i].Z);
+                }
+                else if (RefMode == LayerElement.EReferenceMode.Index)
+                {
+                    normals.Add((float)NC[IndexData[i]].X);
+                    normals.Add((float)NC[IndexData[i]].Y);
+                    normals.Add((float)NC[IndexData[i]].Z);
+                }
             }
 
-            int[] indices_d = mesh.GetIndices();
+            int[] indices_d = null;
             if (indices_d == null)
             {
-                for(int i = 0; i < mesh.VertexCount; i++)
+                for (int i = 0; i < Vertices.Length; i++)
                 {
                     indices.Add((ushort)i);
                 }
             }
-            else {
+            else
+            {
                 for (int i = 0; i < indices_d.Length; i++)
                 {
                     indices.Add((ushort)indices_d[i]);
@@ -177,7 +179,7 @@ namespace Kokoro4.ContentProcessor.Mesh
             }
 
             //TODO optimize all meshes for vertex cache performance and reduced overdraw using AMD's Tootle
-            
+
             //Write the compressed data to the file
             if (isStatic)
             {
@@ -221,6 +223,53 @@ namespace Kokoro4.ContentProcessor.Mesh
                     w.Close();
                 }
             }
+        }
+
+        private static void ProcessNode(Node r, bool isStatic, string outputFile)
+        {
+            for (int i = 0; i < r.ChildNodes.Count; i++)
+            {
+                Node n = r.ChildNodes[i];
+                NodeAttribute attr = n.GetNodeAttribute();
+
+                switch (attr.AttributeType)
+                {
+                    case NodeAttribute.EAttributeType.Mesh:
+                        {
+                            ProcessMesh((FbxSharp.Mesh)attr, isStatic, outputFile);
+                        }
+                        break;
+                    case NodeAttribute.EAttributeType.Light:
+                        {
+                            Light l = (Light)attr;
+                            //l.
+                        }
+                        break;
+                    case NodeAttribute.EAttributeType.Camera:
+                        {
+                            Camera c = (Camera)attr;
+                        }
+                        break;
+                }
+
+            }
+        }
+
+        public static void Preprocess(string inputFile, float scale, string outputFile)
+        {
+            bool isStatic = false;
+            
+            if (scale == 0) scale = 1;
+            if (inputFile == "") throw new Exception();
+            if (outputFile == "") outputFile = Path.ChangeExtension(inputFile, isStatic ? "k4_stmesh" : "k4_dymesh");
+
+            Importer imp = new Importer();
+            Scene scene = imp.Import(inputFile);
+
+            ProcessNode(scene.RootNode, isStatic, outputFile);
+
+            //Convert the data to a format we can work with easily
+
         }
     }
 }

@@ -80,6 +80,7 @@ namespace Kokoro.Engine
             GraphicsDevice.ClearColor = state.ClearColor;
             GraphicsDevice.DepthTest = state.DepthTest;
             GraphicsDevice.DepthWriteEnabled = state.DepthWrite;
+            GraphicsDevice.ColorWriteEnabled = state.ColorWrite;
             GraphicsDevice.ClearDepth = state.ClearDepth;
             GraphicsDevice.AlphaSrc = state.Src;
             GraphicsDevice.AlphaDst = state.Dst;

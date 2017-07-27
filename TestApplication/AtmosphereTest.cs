@@ -90,7 +90,7 @@ namespace TestApplication
                 float side = 500;
                 float off = side * 0.5f;
                 
-                var RenderState = new RenderState(fbuf, null, null, null, true, DepthFunc.Greater, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.One, 0, CullFaceMode.Front);
+                var RenderState = new RenderState(fbuf, null, null, null, true, true, DepthFunc.Greater, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.One, 0, CullFaceMode.Front);
                 clearQueue = new RenderQueue(1, false);
                 clearQueue.BeginRecording();
                 clearQueue.ClearFramebufferBeforeSubmit = true;

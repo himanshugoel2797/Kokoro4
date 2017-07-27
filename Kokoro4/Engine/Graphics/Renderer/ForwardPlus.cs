@@ -73,7 +73,7 @@ namespace Kokoro.Engine.Graphics.Renderer
             gbuffer[FramebufferAttachment.ColorAttachment0] = albedo;
         }
 
-        public void SubmitDraw(RendererSubmission submission)
+        public void SubmitDraw(RenderQueue submission)
         {
 
         }

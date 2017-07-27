@@ -27,10 +27,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro.Physics", "Kokoro.Ph
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro4.Editor", "Kokoro4.Editor\Kokoro4.Editor.csproj", "{D117B06A-0A4D-48F2-8AA2-C0F624C833E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro4.ProjectManager", "Kokoro4.ProjectManager\Kokoro4.ProjectManager.csproj", "{222A3B26-F050-47A2-AFF6-7F70EA019117}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -134,9 +133,24 @@ Global
 		{D117B06A-0A4D-48F2-8AA2-C0F624C833E7}.Release|x64.Build.0 = Release|Any CPU
 		{D117B06A-0A4D-48F2-8AA2-C0F624C833E7}.Release|x86.ActiveCfg = Release|Any CPU
 		{D117B06A-0A4D-48F2-8AA2-C0F624C833E7}.Release|x86.Build.0 = Release|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x64.Build.0 = Debug|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x86.Build.0 = Debug|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Release|Any CPU.Build.0 = Release|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Release|x64.ActiveCfg = Release|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Release|x64.Build.0 = Release|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Release|x86.ActiveCfg = Release|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

@@ -49,13 +49,13 @@ namespace Kokoro4.ContentPipeline
             switch (pType)
             {
                 case ProcessType.Mesh:
-                    MeshProcessor.Preprocess(args);
+                    MeshProcessor.Preprocess("", 1, "");
                     break;
                 case ProcessType.Scene:
 
                     break;
                 case ProcessType.Material:
-                    MaterialProcessor.Preprocess(args);
+                    MaterialProcessor.Preprocess("", "", "");
                     break;
                 case ProcessType.Texture:
                     TextureProcessor.Preprocess(args);
