@@ -53,6 +53,7 @@ namespace Kokoro.Engine.Graphics
         internal long hndl = 0;
         internal Texture parent;
         private ComputeImage computeTex;
+        private bool isResident = false;
 
         public TextureSampler Sampler { get; private set; }
 
@@ -88,8 +89,16 @@ namespace Kokoro.Engine.Graphics
 
         public void SetResidency(Residency residency)
         {
-            if (residency == Residency.Resident) GL.Arb.MakeTextureHandleResident(hndl);
-            else GL.Arb.MakeTextureHandleNonResident(hndl);
+            if (residency == Residency.Resident && !isResident)
+            {
+                GL.Arb.MakeTextureHandleResident(hndl);
+                isResident = true;
+            }
+            else if(residency == Residency.NonResident && isResident)
+            {
+                GL.Arb.MakeTextureHandleNonResident(hndl);
+                isResident = false;
+            }
         }
 
         public static implicit operator long(TextureHandle handle)
@@ -210,21 +219,24 @@ namespace Kokoro.Engine.Graphics
             }
 
             if (src.GetTextureTarget() != TextureTarget.TextureBuffer)
+            {
+                IntPtr ptr = src.GetPixelData(level);
                 switch (src.GetDimensions())
                 {
                     case 1:
                         if (inited) GL.TextureStorage1D(id, LevelCount, (SizedInternalFormat)internalformat, Width);
-                        GL.TextureSubImage1D(id, level, src.GetBaseWidth() >> level, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        if (ptr != IntPtr.Zero) GL.TextureSubImage1D(id, level, src.GetBaseWidth() >> level, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
                         break;
                     case 2:
                         if (inited) GL.TextureStorage2D(id, LevelCount, (SizedInternalFormat)internalformat, Width, Height);
-                        GL.TextureSubImage2D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        if (ptr != IntPtr.Zero) GL.TextureSubImage2D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
                         break;
                     case 3:
                         if (inited) GL.TextureStorage3D(id, LevelCount, (SizedInternalFormat)internalformat, Width, Height, Depth);
-                        GL.TextureSubImage3D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetBaseDepth() >> level, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), src.GetPixelData(level));
+                        if (ptr != IntPtr.Zero)GL.TextureSubImage3D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetBaseDepth() >> level, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
                         break;
                 }
+            }
             else
             {
                 GL.TextureBufferRange(id, (SizedInternalFormat)src.GetInternalFormat(), (int)src.GetPixelData(level), (IntPtr)src.GetBaseWidth(), src.GetWidth());

@@ -31,6 +31,7 @@ namespace TestApplication
             EngineManager.StateManager.AddState(nameof(AtmosphereTest), new AtmosphereTest());
             EngineManager.StateManager.AddState(nameof(CloudRenderingTest), new CloudRenderingTest());
             EngineManager.StateManager.AddState(nameof(HeightfieldGITest), new HeightfieldGITest());
+            EngineManager.StateManager.AddState(nameof(ForwardPlusTest), new ForwardPlusTest());
 
             //EngineManager.StateManager.SetActiveState(nameof(HeightfieldGITest));
             //EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
@@ -38,8 +39,9 @@ namespace TestApplication
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest)); 
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));
             EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
+            //EngineManager.StateManager.SetActiveState(nameof(ForwardPlusTest));
             //EngineManager.StateManager.SetActiveState(nameof(CloudRenderingTest));
-
+            
             EngineManager.Run(60, 60);
             EngineManager.Exit();
         }

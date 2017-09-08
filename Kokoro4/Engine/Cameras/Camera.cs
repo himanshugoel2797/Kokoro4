@@ -77,7 +77,7 @@ namespace Kokoro.Engine.Cameras
 
         public void SetProjection(float fov, float aspectRatio, float nearClip)
         {
-            Projection = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearClip);//, 10000000000);
+            Projection = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearClip);//, 1000);
         }
 
         public override void Dispose()

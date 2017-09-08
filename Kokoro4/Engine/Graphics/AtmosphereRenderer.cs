@@ -140,7 +140,7 @@ namespace Kokoro.Engine.Graphics
             AtmosphereShader.Set("ScatterCache", SingleScatterSamplerHandle);
             AtmosphereShader.Set("MieScatterCache", MieSingleScatterSamplerHandle);
 
-            AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, true, DepthFunc.Greater, 1, -1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, CullFaceMode.Front);
+            AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, true, DepthFunc.Greater, 0, 1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, CullFaceMode.Front);
             AtmosphereRender = new RenderQueue(1, false);
 
             AtmoSphere = SphereFactory.Create(grp, 180);

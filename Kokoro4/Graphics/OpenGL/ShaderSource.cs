@@ -25,7 +25,7 @@ namespace Kokoro.Graphics.OpenGL
                 var libs = Engine.Graphics.ShaderLibrary.GetLibraries(libraryName);
                 for (int i = 0; i < libs.Length; i++)
                     for (int j = 0; j < libs[i].Sources.Count; j++)
-                        shaderSrc += libs[i].Sources[j];
+                        shaderSrc += libs[i].Sources[j] + "\n";
 
             }
             shaderSrc += src;

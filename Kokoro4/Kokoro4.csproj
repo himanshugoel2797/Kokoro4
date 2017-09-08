@@ -130,6 +130,7 @@
     <Compile Include="Engine\Graphics\MaterialParameters.cs" />
     <Compile Include="Engine\Graphics\ParameterInterface.cs" />
     <Compile Include="Engine\Graphics\PlanetRenderer.cs" />
+    <Compile Include="Engine\Graphics\Prefabs\FullScreenTriangleFactory.cs" />
     <Compile Include="Engine\Graphics\Prefabs\QuadFactory.cs" />
     <Compile Include="Engine\Graphics\ProcessedArrayTextureSource.cs" />
     <Compile Include="Engine\Graphics\RawTextureSource.cs" />
@@ -278,6 +279,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\OpenGL\Shaders\TextureRectangle\fragment.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\OpenGL\Shaders\FrameBufferTriangle\fragment.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\OpenGL\Shaders\FrameBufferTriangle\vertex.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Graphics\OpenGL\Shaders\FrameBufferToG\fragment.glsl">

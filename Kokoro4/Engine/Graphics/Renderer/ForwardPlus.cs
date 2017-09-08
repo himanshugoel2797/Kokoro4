@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Kokoro.Graphics.Prefabs;
+using OpenTK.Graphics.OpenGL;
 
 namespace Kokoro.Engine.Graphics.Renderer
 {
@@ -17,8 +19,11 @@ namespace Kokoro.Engine.Graphics.Renderer
         //render the ui
         //blend the results together
 
-        private Framebuffer gbuffer;
+        private Framebuffer gbuffer, destBuffer;
+        private Mesh mesh;
         private Texture depth, albedo;
+        private RenderState s;
+        private RenderQueue q;
         private int tile_x_cnt, tile_y_cnt, w, h;
         const int MaxLightCount = 10;
 
@@ -31,20 +36,23 @@ namespace Kokoro.Engine.Graphics.Renderer
         public float FarClip { get { return 1; } }
         public float ClearDepth { get { return 0; } }
 
+        public const int OutputColorAttachment = 0;
         //TODO: make all resources accesses use functions to retrieve things, thus allowing control of resource access through libraries.
 
         static ForwardPlus()
         {
-            var lib = ShaderLibrary.Create(Library);
-            lib.AddSourceFile("Graphics/Shaders/Deferred/library.glsl");
+            //var lib = ShaderLibrary.Create(Library);
+            //lib.AddSourceFile("Graphics/Shaders/Deferred/library.glsl");
         }
 
-        public ForwardPlus(int tile_x_cnt, int tile_y_cnt, int w, int h)
+        public ForwardPlus(int tile_x_cnt, int tile_y_cnt, int w, int h, MeshGroup grp, Framebuffer destFb = null)
         {
             this.tile_x_cnt = tile_x_cnt;
             this.tile_y_cnt = tile_y_cnt;
             this.w = w;
             this.h = h;
+            this.destBuffer = (destFb == null) ? Framebuffer.Default : destFb;
+            this.mesh = FullScreenTriangleFactory.Create(grp);
 
             depth = new Texture();
             depth.SetData(new DepthTextureSource(w, h)
@@ -69,18 +77,35 @@ namespace Kokoro.Engine.Graphics.Renderer
             //TODO: need to make adjustments to how draws are submitted in order to support the Z-prepass
 
             gbuffer = new Framebuffer(w, h);
-            gbuffer[FramebufferAttachment.DepthAttachment] = depth;
-            gbuffer[FramebufferAttachment.ColorAttachment0] = albedo;
+            gbuffer[FramebufferAttachment.DepthAttachment] = depth; 
+            gbuffer[FramebufferAttachment.ColorAttachment0 + OutputColorAttachment] = albedo;
+
+            
+            s = new RenderState(destBuffer, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/FrameBufferTriangle/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/FrameBufferTriangle/fragment.glsl")), null, null, !true, true, DepthFunc.Always, 1, -1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.Back);
+
+            q = new RenderQueue(10, false);
+
+            q.ClearAndBeginRecording();
+            q.ClearFramebufferBeforeSubmit = false;
+            q.RecordDraw(new RenderQueue.DrawData()
+            {
+                Meshes = new RenderQueue.MeshData[] { new RenderQueue.MeshData() { BaseInstance = 0, InstanceCount = 1, Mesh = mesh } },
+                State = s
+            });
+            q.EndRecording();
         }
 
-        public void SubmitDraw(RenderQueue submission)
+        public void SubmitDraw()
         {
 
+            TextureHandle hndl = albedo.GetHandle(TextureSampler.Default);
+            hndl.SetResidency(Residency.Resident);
+            s.ShaderProgram.Set("AlbedoMap", hndl);
+
+            q.Submit();
+            hndl.SetResidency(Residency.NonResident);
+            //GL.BlitNamedFramebuffer(gbuffer.id, destBuffer.id, 0, 0, w, h, 0, 0, w, h, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
         }
 
-        public void ExecuteDraws()
-        {
-
-        }
     }
 }

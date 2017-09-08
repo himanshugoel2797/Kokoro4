@@ -404,11 +404,15 @@ namespace Kokoro.Graphics.OpenGL
             if (renderer_name == "")
                 renderer_name = GL.GetString(StringName.Renderer);
 
-            game.Title = gameName + $" | {renderer_name}";
+            if (gl_name == "")
+                gl_name = GL.GetString(StringName.Version);
+
+            game.Title = gameName + $" | {renderer_name} | { gl_name }";
 #endif
             game.Run(ups, fps);
         }
 
+        static string gl_name = "";
         static string renderer_name = "";
         public static void SwapBuffers()
         {
@@ -416,7 +420,7 @@ namespace Kokoro.Graphics.OpenGL
             if (renderer_name == "")
                 renderer_name = GL.GetString(StringName.Renderer);
 
-            game.Title = gameName + $" | {renderer_name} | FPS : {game.RenderFrequency:F2}, UPS : {game.UpdateFrequency:F2}";
+            game.Title = gameName + $" | {renderer_name} | {gl_name} | FPS : {game.RenderFrequency:F2}, UPS : {game.UpdateFrequency:F2}";
 #endif
             game.SwapBuffers();
         }
@@ -688,7 +692,7 @@ namespace Kokoro.Graphics.OpenGL
         {
             _far = far;
             _near = near;
-            //GL.NV.DepthRange(near, far);
+            GL.NV.DepthRange(near, far);
         }
 
         public static void GetDepthRange(out double near, out double far)
