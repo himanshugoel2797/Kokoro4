@@ -32,16 +32,20 @@ namespace TestApplication
             EngineManager.StateManager.AddState(nameof(CloudRenderingTest), new CloudRenderingTest());
             EngineManager.StateManager.AddState(nameof(HeightfieldGITest), new HeightfieldGITest());
             EngineManager.StateManager.AddState(nameof(ForwardPlusTest), new ForwardPlusTest());
+            EngineManager.StateManager.AddState(nameof(SubsurfaceMaterialTest), new SubsurfaceMaterialTest());
 
             //EngineManager.StateManager.SetActiveState(nameof(HeightfieldGITest));
             //EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
             //EngineManager.StateManager.SetActiveState(nameof(PlanetTerrainRendererTest));
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest)); 
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));
-            EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
+            //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
             //EngineManager.StateManager.SetActiveState(nameof(ForwardPlusTest));
             //EngineManager.StateManager.SetActiveState(nameof(CloudRenderingTest));
-            
+            EngineManager.StateManager.SetActiveState(nameof(SubsurfaceMaterialTest));
+
+            //Work on ice/snow rendering//
+
             EngineManager.Run(60, 60);
             EngineManager.Exit();
         }

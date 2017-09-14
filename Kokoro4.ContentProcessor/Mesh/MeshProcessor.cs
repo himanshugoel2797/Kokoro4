@@ -257,13 +257,14 @@ namespace Kokoro4.ContentProcessor.Mesh
 
         public static void Preprocess(string inputFile, float scale, string outputFile)
         {
-            bool isStatic = false;
+            bool isStatic = true;
             
             if (scale == 0) scale = 1;
             if (inputFile == "") throw new Exception();
             if (outputFile == "") outputFile = Path.ChangeExtension(inputFile, isStatic ? "k4_stmesh" : "k4_dymesh");
 
             Importer imp = new Importer();
+            Console.WriteLine($"{inputFile}");
             Scene scene = imp.Import(inputFile);
 
             ProcessNode(scene.RootNode, isStatic, outputFile);

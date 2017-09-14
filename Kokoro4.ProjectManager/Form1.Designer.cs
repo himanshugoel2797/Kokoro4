@@ -31,12 +31,13 @@
             this.listView1 = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.openPrjtBtn = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.editorBtn = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.openPrjtBtn = new System.Windows.Forms.Button();
             this.settingBtn = new System.Windows.Forms.Button();
             this.newPrjtBtn = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,15 +74,14 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Project Actions";
             // 
-            // openPrjtBtn
+            // editorBtn
             // 
-            this.openPrjtBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.openPrjtBtn.Location = new System.Drawing.Point(13, 326);
-            this.openPrjtBtn.Name = "openPrjtBtn";
-            this.openPrjtBtn.Size = new System.Drawing.Size(108, 23);
-            this.openPrjtBtn.TabIndex = 3;
-            this.openPrjtBtn.Text = "Open Project";
-            this.openPrjtBtn.UseVisualStyleBackColor = true;
+            this.editorBtn.Location = new System.Drawing.Point(7, 44);
+            this.editorBtn.Name = "editorBtn";
+            this.editorBtn.Size = new System.Drawing.Size(102, 23);
+            this.editorBtn.TabIndex = 1;
+            this.editorBtn.Text = "Editor";
+            this.editorBtn.UseVisualStyleBackColor = true;
             // 
             // checkBox1
             // 
@@ -93,14 +93,16 @@
             this.checkBox1.Text = "Background Content Processor";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
-            // editorBtn
+            // openPrjtBtn
             // 
-            this.editorBtn.Location = new System.Drawing.Point(7, 44);
-            this.editorBtn.Name = "editorBtn";
-            this.editorBtn.Size = new System.Drawing.Size(102, 23);
-            this.editorBtn.TabIndex = 1;
-            this.editorBtn.Text = "Editor";
-            this.editorBtn.UseVisualStyleBackColor = true;
+            this.openPrjtBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.openPrjtBtn.Location = new System.Drawing.Point(13, 326);
+            this.openPrjtBtn.Name = "openPrjtBtn";
+            this.openPrjtBtn.Size = new System.Drawing.Size(108, 23);
+            this.openPrjtBtn.TabIndex = 3;
+            this.openPrjtBtn.Text = "Open Project";
+            this.openPrjtBtn.UseVisualStyleBackColor = true;
+            this.openPrjtBtn.Click += new System.EventHandler(this.openPrjtBtn_Click);
             // 
             // settingBtn
             // 
@@ -119,6 +121,11 @@
             this.newPrjtBtn.TabIndex = 5;
             this.newPrjtBtn.Text = "New Project";
             this.newPrjtBtn.UseVisualStyleBackColor = true;
+            this.newPrjtBtn.Click += new System.EventHandler(this.newPrjtBtn_Click);
+            // 
+            // folderBrowserDialog2
+            // 
+            this.folderBrowserDialog2.ShowNewFolderButton = false;
             // 
             // Form1
             // 
@@ -152,6 +159,7 @@
         private System.Windows.Forms.Button settingBtn;
         private System.Windows.Forms.Button newPrjtBtn;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog2;
     }
 }
 

@@ -16,5 +16,21 @@ namespace Kokoro4.ProjectManager
         {
             InitializeComponent();
         }
+
+        private void newPrjtBtn_Click(object sender, EventArgs e)
+        {
+            if(folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                //show project creation dialog 
+            }
+        }
+
+        private void openPrjtBtn_Click(object sender, EventArgs e)
+        {
+            if(folderBrowserDialog2.ShowDialog() == DialogResult.OK)
+            {
+                //load project and add it to content set
+            }
+        }
     }
 }

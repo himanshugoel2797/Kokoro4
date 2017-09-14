@@ -6,7 +6,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Kokoro.Graphics.Prefabs;
-using OpenTK.Graphics.OpenGL;
+
+#if DEBUG
+using Kokoro.Graphics.OpenGL;
+#endif
 
 namespace Kokoro.Engine.Graphics.Renderer
 {
@@ -97,6 +100,10 @@ namespace Kokoro.Engine.Graphics.Renderer
 
         public void SubmitDraw()
         {
+#if DEBUG
+            bool wframe = GraphicsDevice.Wireframe;
+            GraphicsDevice.Wireframe = false;
+#endif
 
             TextureHandle hndl = albedo.GetHandle(TextureSampler.Default);
             hndl.SetResidency(Residency.Resident);
@@ -105,6 +112,10 @@ namespace Kokoro.Engine.Graphics.Renderer
             q.Submit();
             hndl.SetResidency(Residency.NonResident);
             //GL.BlitNamedFramebuffer(gbuffer.id, destBuffer.id, 0, 0, w, h, 0, 0, w, h, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+
+#if DEBUG
+            GraphicsDevice.Wireframe = wframe;
+#endif
         }
 
     }

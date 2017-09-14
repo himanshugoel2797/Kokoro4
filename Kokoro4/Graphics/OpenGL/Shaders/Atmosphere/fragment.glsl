@@ -25,6 +25,10 @@ bool sphere_dist(in float r, in vec3 pos, in vec3 dir, in float tmax, in float m
     return tmp >= 0.0 && t <= tmax;
 }
 
+vec4 T(float h, float CosTheta) {
+    return textureLod(TransCache, vec2(CosTheta * 0.5f + 0.5f, (h - Rg) / (Rt - Rg)), 0);
+}
+
 void Scatter(float height, float sunAngle, float eyeAngle, vec3 sunDir, vec3 eyeDir, out vec4 Ray, out vec4 Mie) {
 	vec3 GndTanDir = normalize(vec3(Rg, -height, 0));
     
@@ -69,5 +73,10 @@ void main(){
 
 	color.rgb = (r_data.rgb + m_data.rgb) * 20;
 	//color.rgb = r_data.rgb * 20;
+	//color.a = (clamp(exp(-(height - Rg) / (Rt - Rg)), 0, 1));
+	//color.a *= (r_data.a + m_data.a) * 20;
+	//color.a = 1.0f - clamp(exp(-T(height, eyeAngle).r), 0, 1);
+	//color.a *= r_data.a;
+	//color.rgb = vec3(color.a);
 	color.a = 1;
 }
