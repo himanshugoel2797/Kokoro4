@@ -23,7 +23,7 @@ namespace KinectGestureInterface.Kinect
         private MultiSourceFrameReader reader;
         private ushort[] DepthFrameData;
 
-        public const int Size = 128;
+        public const int Size = 256;
 
         public bool IsConnected { get { return kSensor.IsAvailable && kSensor.IsOpen; } }
 
@@ -196,21 +196,23 @@ namespace KinectGestureInterface.Kinect
                         var handCenterDepth = mapper.MapCameraPointToDepthSpace(new CameraSpacePoint() { X = handCenter.X, Y = handCenter.Y, Z = handCenter.Z });
                         var depthTable = mapper.GetDepthFrameToCameraSpaceTable();
 
-                        var tan = (handTipPos - handPos);
+                        var tan = (LeftHandTip - LeftHandPos);
                         tan.Normalize();
-
-                        //Get orthogonal axis to compute normal vector
-                        var cotanPosDepth = new DepthSpacePoint()
+                        
+                        //Get a vector orthogonal to tan to form the hand coordinate space
+                        var cotan = new Vector2(0);
                         {
-                            X = (int)(handCenterDepth.X - 10),
-                            Y = (int)(handCenterDepth.Y)
-                        };
-                        var cotanCamSpace = mapper.MapDepthPointToCameraSpace(cotanPosDepth, DepthFrameData[(int)(cotanPosDepth.Y * Depth.Width + cotanPosDepth.X)]);
-                        var cotan = new Vector3(cotanCamSpace.X - handPos.X, cotanCamSpace.Y - handPos.Y, cotanCamSpace.Z - handPos.Z);
-                        cotan.Normalize();
+                            var cotan_y = (float)Math.Sqrt(1.0f / (1.0f + (tan.Y / tan.X) * (tan.Y / tan.X)));
+                            var cotan_x = - tan.Y / tan.X * cotan_y;
+                            cotan = new Vector2(cotan_x, cotan_y);
+                            cotan.Normalize();
+                        }
 
-                        var normal = Vector3.Cross(tan, cotan);
-                        normal.Normalize();
+                        var handCenterDepth_l = new Vector2(handCenterDepth.X, handCenterDepth.Y);
+
+                        Matrix3 conversion_matrix = new Matrix3(cotan.X, cotan.Y, 0, tan.X, tan.Y, 0, 0, 0, 1);
+                        //var angle = Math.Acos(Vector2.Dot(tan, -Vector2.UnitY));
+                        //Matrix2 conversion_matrix = new Matrix2((float)Math.Cos(angle), (float)Math.Sin(angle), -(float)Math.Sin(angle), (float)Math.Cos(angle));
 
                         //Determine the radius squared in camera space
                         float distsq = (handTipPos - handCenter).LengthSquared;
@@ -224,10 +226,16 @@ namespace KinectGestureInterface.Kinect
                             for (int i = 0; i < DepthFrameData.Length; i++)
                             {
                                 var sample = new Vector3(depthTable[i].X, depthTable[i].Y, 1) * DepthFrameData[i] * 0.001f;
-                                if ((sample - handCenter).LengthSquared <= distsq * 2.75f * 2.75f)
+                                if ((sample - handCenter).LengthSquared <= distsq * 2.25f * 2.25f)
                                 {
                                     //Project these points onto the axis of the hand
-                                    var projSample = sample;// - Vector3.Dot(sample - handCenter, normal) * normal;
+                                    var projSample = sample.Xy;// - Vector3.Dot(sample - handCenter, normal) * normal;
+
+                                    var projP_kinect = mapper.MapCameraPointToDepthSpace(new CameraSpacePoint() { X = sample.X, Y = sample.Y, Z = sample.Z });
+                                    var projP = new Vector2(projP_kinect.X, projP_kinect.Y);
+                                    
+                                    var proj = new Vector3(projP.X - handCenterDepth_l.X, projP.Y - handCenterDepth_l.Y, 1);   //Get the point relative to the hand
+                                    Matrix3.Transform(ref conversion_matrix, ref proj);                                     //Rotate the point around the center
 
                                     //if (pos >= Points.Length) continue;
 
@@ -237,18 +245,46 @@ namespace KinectGestureInterface.Kinect
                                     //Points[pos++] = projSample.Z;
                                     //Points[pos++] = 0;
 
-                                    projSample.Normalize(); //Rescale all vectors into a normalized coordinate space
+                                    //proj.Normalize(); //Rescale all vectors into a normalized coordinate space
 
-                                    int x = (int)((projSample.X * 0.5f + 0.5f) * CurrentHand.Width);
-                                    int y = (int)((projSample.Y * 0.5f + 0.5f) * CurrentHand.Height);
+                                    int x = (int)((proj.X + 150)/300 * CurrentHand.Width);
+                                    int y = (int)((proj.Y + 150)/300 * CurrentHand.Height);
+
+                                    if (tan.X < 0)
+                                        x = CurrentHand.Width - x;
 
                                     CurrentImageData[y * Size + x] = 255;
-                                    CurrentHand.SetPixel(x, y, System.Drawing.Color.Black);
+                                    CurrentHand.SetPixel(x, y, System.Drawing.Color.Red);
                                 }
                             }
                             //PointCount = pos;
 
-                            Matcher.BestMatch(CurrentImageData);
+                            Dictionary<int, float> distsqs = new Dictionary<int, float>();
+
+                            for(int y = 0; y < Size; y+=2)
+                                for(int x = 0; x < Size; x+=2)
+                                {
+                                    if(CurrentImageData[y * Size + x] == 255)
+                                    {
+                                        var dist_sq = new Vector2(x - Size / 2, y - Size / 2).LengthSquared;  //Center is at center of image
+                                        distsqs[y * Size + x] = dist_sq;
+                                    }
+                                }
+
+                            var tips = distsqs.OrderByDescending(a => a.Value).OrderByDescending(a => a.Key / Size).Take(50).ToArray();
+
+                            for (int i = 0; i < tips.Length; i++)
+                                CurrentHand.SetPixel(tips[i].Key % Size, tips[i].Key / Size, System.Drawing.Color.Blue);
+
+                            var tips_X = distsqs.OrderByDescending(a => a.Value).OrderByDescending(a => a.Key % Size).Take(5).ToArray();
+
+                            for (int i = 0; i < tips_X.Length; i++)
+                                CurrentHand.SetPixel(tips_X[i].Key % Size, tips_X[i].Key / Size, System.Drawing.Color.Blue);
+                            //Matcher.BestMatch(CurrentImageData);
+
+                            //Extract blobs from the above
+                            //Consider increasing the number of pixels included per frame until 4 blobs for y, and 1 for x are obtained, and decreasing if more than 5 pixels are in the smallest blob
+
 
                             try
                             {
