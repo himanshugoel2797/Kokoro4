@@ -39,10 +39,10 @@ namespace TestApplication
             //EngineManager.StateManager.SetActiveState(nameof(PlanetTerrainRendererTest));
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest)); 
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));
-            //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
+            EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
             //EngineManager.StateManager.SetActiveState(nameof(ForwardPlusTest));
             //EngineManager.StateManager.SetActiveState(nameof(CloudRenderingTest));
-            EngineManager.StateManager.SetActiveState(nameof(SubsurfaceMaterialTest));
+            //EngineManager.StateManager.SetActiveState(nameof(SubsurfaceMaterialTest));
 
             //Work on ice/snow rendering//
 

@@ -90,5 +90,10 @@ namespace Kokoro.Engine.Graphics
         {
             return 0;
         }
+
+        public int GetBpp()
+        {
+            return 4; //TODO
+        }
     }
 }

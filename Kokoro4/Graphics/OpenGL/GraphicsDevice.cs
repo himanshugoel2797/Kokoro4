@@ -583,7 +583,7 @@ namespace Kokoro.Graphics.OpenGL
         public static void SetShaderStorageBufferBinding(ShaderStorageBuffer buf, int index)
         {
             if (buf == null) return;
-            GPUStateMachine.BindBuffer(BufferTarget.ShaderStorageBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.size);
+            GPUStateMachine.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ShaderStorageBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.size);
         }
 
         public static void SetUniformBufferBinding(UniformBuffer buf, int index)
@@ -593,7 +593,7 @@ namespace Kokoro.Graphics.OpenGL
             int rd_rung = buf.curRung - 1;
             if (rd_rung < 0) rd_rung = 3;
 
-            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.Size);
+            GPUStateMachine.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.Size);
         }
 
         #endregion
@@ -601,7 +601,7 @@ namespace Kokoro.Graphics.OpenGL
         #region Indirect call buffers
         public static void SetMultiDrawParameterBuffer(GPUBuffer buf)
         {
-            GL.BindBuffer(BufferTarget.DrawIndirectBuffer, buf.id);
+            GL.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.DrawIndirectBuffer, buf.id);
         }
 
         public static void SetMultiDrawParameterBuffer(ShaderStorageBuffer buf)
@@ -611,7 +611,7 @@ namespace Kokoro.Graphics.OpenGL
 
         public static void SetParameterBuffer(GPUBuffer buf)
         {
-            GL.BindBuffer((BufferTarget)ArbIndirectParameters.ParameterBufferArb, buf.id);
+            GL.BindBuffer((OpenTK.Graphics.OpenGL.BufferTarget)ArbIndirectParameters.ParameterBufferArb, buf.id);
         }
 
         public static void SetParameterBuffer(ShaderStorageBuffer buf)

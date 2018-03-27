@@ -83,10 +83,10 @@ namespace Kokoro.Engine
             }
 
 
-            vertices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * vertex_size, false);
-            uvs = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(float), false);
-            normals = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ArrayBuffer, vertex_cnt * sizeof(uint), false);
-            if(index_cnt != 0) indices = new GPUBuffer(OpenTK.Graphics.OpenGL.BufferTarget.ElementArrayBuffer, index_cnt * sizeof(ushort), false);
+            vertices = new GPUBuffer(Kokoro.Engine.Graphics.BufferTarget.ArrayBuffer, vertex_cnt * vertex_size, false);
+            uvs = new GPUBuffer(Kokoro.Engine.Graphics.BufferTarget.ArrayBuffer, vertex_cnt * 2 * sizeof(float), false);
+            normals = new GPUBuffer(Kokoro.Engine.Graphics.BufferTarget.ArrayBuffer, vertex_cnt * sizeof(uint), false);
+            if(index_cnt != 0) indices = new GPUBuffer(Kokoro.Engine.Graphics.BufferTarget.ElementArrayBuffer, index_cnt * sizeof(ushort), false);
 
             verticeF = new Fence();
             uvF = new Fence();

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro4", "Kokoro4\Kokoro4.csproj", "{CFAD0F2C-BE42-4482-B032-1D72B9C00B98}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -30,6 +30,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro4.ProjectManager", "Kokoro4.ProjectManager\Kokoro4.ProjectManager.csproj", "{222A3B26-F050-47A2-AFF6-7F70EA019117}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kokoro4.MeshPipeline", "Kokoro4.MeshPipeline\Kokoro4.MeshPipeline.vcxproj", "{2CBB7D8A-C925-4ECF-B28A-C509D4F09752}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SeniorDesign", "SeniorDesign", "{3550445A-767A-4EB3-B695-96731C0D32C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectGestureInterface", "KinectGestureInterface\KinectGestureInterface.csproj", "{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,8 +141,8 @@ Global
 		{D117B06A-0A4D-48F2-8AA2-C0F624C833E7}.Release|x86.Build.0 = Release|Any CPU
 		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x64.Build.0 = Debug|Any CPU
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x64.ActiveCfg = Debug|x64
+		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x64.Build.0 = Debug|x64
 		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Debug|x86.Build.0 = Debug|Any CPU
 		{222A3B26-F050-47A2-AFF6-7F70EA019117}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -157,9 +161,27 @@ Global
 		{2CBB7D8A-C925-4ECF-B28A-C509D4F09752}.Release|x64.Build.0 = Release|x64
 		{2CBB7D8A-C925-4ECF-B28A-C509D4F09752}.Release|x86.ActiveCfg = Release|Win32
 		{2CBB7D8A-C925-4ECF-B28A-C509D4F09752}.Release|x86.Build.0 = Release|Win32
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Debug|x64.ActiveCfg = Debug|x64
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Debug|x64.Build.0 = Debug|x64
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Debug|x86.Build.0 = Debug|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|x64.ActiveCfg = Release|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|x64.Build.0 = Release|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|x86.ActiveCfg = Release|Any CPU
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F} = {3550445A-767A-4EB3-B695-96731C0D32C7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {148D7197-89CC-4FD4-86BA-4C48849781AD}
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

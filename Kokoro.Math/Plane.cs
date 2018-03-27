@@ -164,8 +164,7 @@ namespace Kokoro.Math
 
         public static Plane Normalize(Plane value)
         {
-            Plane ret;
-            Normalize(ref value, out ret);
+            Normalize(ref value, out Plane ret);
             return ret;
         }
 

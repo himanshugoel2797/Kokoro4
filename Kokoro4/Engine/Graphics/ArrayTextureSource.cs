@@ -108,5 +108,10 @@ namespace Kokoro.Engine.Graphics
         {
             return curLayer;
         }
+
+        public int GetBpp()
+        {
+            return 4; //TODO
+        }
     }
 }

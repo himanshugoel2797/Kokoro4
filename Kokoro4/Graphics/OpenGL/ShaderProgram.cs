@@ -82,7 +82,7 @@ namespace Kokoro.Graphics.OpenGL
 
         public void Set(string name, UniformBuffer ubo)
         {
-            GPUStateMachine.BindBuffer(BufferTarget.UniformBuffer, ubo.buf.id, ubo.bindPoint, IntPtr.Zero, IntPtr.Zero);
+            GPUStateMachine.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.UniformBuffer, ubo.buf.id, ubo.bindPoint, IntPtr.Zero, IntPtr.Zero);
             int loc = GL.GetUniformBlockIndex(id, name);
             GL.UniformBlockBinding(id, loc, ubo.bindPoint);
         }

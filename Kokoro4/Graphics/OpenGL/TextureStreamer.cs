@@ -37,8 +37,8 @@ namespace Kokoro.Engine.Graphics
 
             private void Upload()
             {
-                GPUStateMachine.BindBuffer(BufferTarget.PixelUnpackBuffer, pboId);
-                GL.BufferData(BufferTarget.PixelUnpackBuffer, sz >> (int)System.Math.Pow(curLevel, dims), src.GetPixelData(curLevel), BufferUsageHint.StreamDraw);
+                GPUStateMachine.BindBuffer((OpenTK.Graphics.OpenGL.BufferTarget)BufferTarget.PixelUnpackBuffer, pboId);
+                GL.BufferData((OpenTK.Graphics.OpenGL.BufferTarget) BufferTarget.PixelUnpackBuffer, sz >> (int)System.Math.Pow(curLevel, dims), src.GetPixelData(curLevel), BufferUsageHint.StreamDraw);
 
                 switch (dims)
                 {
@@ -52,12 +52,14 @@ namespace Kokoro.Engine.Graphics
                         GL.TextureSubImage3D(TargetTexture.id, curLevel, 0, 0, 0, TargetTexture.Width >> curLevel, TargetTexture.Height >> curLevel, TargetTexture.Depth >> curLevel, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), IntPtr.Zero);
                         break;
                 }
-                GPUStateMachine.UnbindBuffer(BufferTarget.PixelUnpackBuffer);
+                GPUStateMachine.UnbindBuffer((OpenTK.Graphics.OpenGL.BufferTarget)BufferTarget.PixelUnpackBuffer);
                 uploadFence.PlaceFence();
 
-                TargetSampler = new TextureSampler();
-                TargetSampler.MinLOD = curLevel + 1;
-                TargetSampler.MaxLOD = maxLevels;
+                TargetSampler = new TextureSampler
+                {
+                    MinLOD = curLevel + 1,
+                    MaxLOD = maxLevels
+                };
             }
 
             internal void Setup(ITextureSource src)
@@ -71,11 +73,13 @@ namespace Kokoro.Engine.Graphics
                 //Copy the data over, uploading the highest mipmap normally and the others asynchronously
                 TargetTexture = new Texture();
                 TargetTexture.SetData(src, curLevel);
-                TargetSampler = new TextureSampler();
-                TargetSampler.MinLOD = curLevel;
-                TargetSampler.MaxLOD = curLevel;
+                TargetSampler = new TextureSampler
+                {
+                    MinLOD = curLevel,
+                    MaxLOD = curLevel
+                };
 
-                int pixelSize = 4;
+                int pixelSize = src.GetBpp();
 
                 switch (dims)
                 {
@@ -101,9 +105,11 @@ namespace Kokoro.Engine.Graphics
                 else
                 {
                     IsDone = true;
-                    TargetSampler = new TextureSampler();
-                    TargetSampler.MinLOD = 0;
-                    TargetSampler.MaxLOD = maxLevels;
+                    TargetSampler = new TextureSampler
+                    {
+                        MinLOD = 0,
+                        MaxLOD = maxLevels
+                    };
                 }
             }
 
@@ -121,9 +127,11 @@ namespace Kokoro.Engine.Graphics
                     {
                         //Finished and update buffers appropriately
                         IsDone = true;
-                        TargetSampler = new TextureSampler();
-                        TargetSampler.MinLOD = 0;
-                        TargetSampler.MaxLOD = maxLevels;
+                        TargetSampler = new TextureSampler
+                        {
+                            MinLOD = 0,
+                            MaxLOD = maxLevels
+                        };
                     }
                 }
             }

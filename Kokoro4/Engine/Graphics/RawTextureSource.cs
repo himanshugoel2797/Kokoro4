@@ -8,21 +8,22 @@ namespace Kokoro.Engine.Graphics
 {
     public class RawTextureSource : ITextureSource
     {
-        public virtual int Width { get; private set; }
-        public virtual int Height { get; private set; }
-        public virtual int Depth { get; private set; }
-        public virtual int Levels { get; private set; }
-        public virtual int Dimensions { get; private set; }
-        public virtual PixelFormat PixelFormat { get; private set; }
-        public virtual PixelInternalFormat InternalFormat { get; private set; }
-        public virtual TextureTarget Target { get; private set; }
-        public virtual PixelType PixelType { get; private set; }
+        public virtual int Width { get; protected set; }
+        public virtual int Height { get; protected set; }
+        public virtual int Depth { get; protected set; }
+        public virtual int Levels { get; protected set; }
+        public virtual int Dimensions { get; protected set; }
+        public virtual int Bpp { get; protected set; }
+        public virtual PixelFormat PixelFormat { get; protected set; }
+        public virtual PixelInternalFormat InternalFormat { get; protected set; }
+        public virtual TextureTarget Target { get; protected set; }
+        public virtual PixelType PixelType { get; protected set; }
 
         public RawTextureSource(int dim, int width, int height, int depth, int levels, PixelFormat pFormat, PixelInternalFormat iFormat, TextureTarget target, PixelType pType)
         {
             if (levels < 1)
                 throw new ArgumentException("levels must be at least 1!");
-
+            Bpp = 4;
             Dimensions = dim;
             Width = width;
             Height = height;
@@ -97,6 +98,11 @@ namespace Kokoro.Engine.Graphics
         public int GetBaseDepth()
         {
             return 0;
+        }
+
+        public int GetBpp()
+        {
+            return Bpp;
         }
     }
 }

@@ -36,14 +36,12 @@ namespace Kokoro.Graphics.OpenGL
 
             this.sType = (OpenTK.Graphics.OpenGL.ShaderType)sType;
 
-            int result = 0;
-            GL.GetShader(id, ShaderParameter.CompileStatus, out result);
+            GL.GetShader(id, ShaderParameter.CompileStatus, out int result);
             if (result == 0)
             {
                 //Fetch the error log
-                string errorLog = "";
-                GL.GetShaderInfoLog(id, out errorLog);
-                 
+                GL.GetShaderInfoLog(id, out string errorLog);
+
                 GL.DeleteShader(id);
 
                 Console.WriteLine(errorLog); 
