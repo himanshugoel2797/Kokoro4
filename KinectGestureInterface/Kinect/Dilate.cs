@@ -10,6 +10,7 @@ namespace KinectGestureInterface.Kinect
     {
         public static byte[] Apply(byte[] CurrentImageData, int Size, byte val)
         {
+            /*
             byte[] ret = new byte[CurrentImageData.Length];
             for (int y = 1; y < Size - 1; y++)
                 for (int x = 1; x < Size - 1; x++)
@@ -33,6 +34,25 @@ namespace KinectGestureInterface.Kinect
 
                     if (neighbors.Where(a => a).Count() >= 3)
                         ret[y * Size + x] = val;
+                }
+            return ret;
+            */
+            byte[] ret = new byte[CurrentImageData.Length];
+            for (int y = 1; y < Size - 1; y++)
+                for (int x = 1; x < Size - 1; x++)
+                {
+                    if (CurrentImageData[y * Size + x] != 0)
+                    {
+
+                        ret[(y - 1) * Size + x] = val;
+                        ret[(y + 1) * Size + x] = val;
+                        ret[y * Size + (x - 1)] = val;
+                        ret[y * Size + (x + 1)] = val;
+                        ret[(y - 1) * Size + (x - 1)] = val;
+                        ret[(y + 1) * Size + (x + 1)] = val;
+                        ret[(y + 1) * Size + (x - 1)] = val;
+                        ret[(y - 1) * Size + (x + 1)] = val;
+                    }
                 }
             return ret;
         }

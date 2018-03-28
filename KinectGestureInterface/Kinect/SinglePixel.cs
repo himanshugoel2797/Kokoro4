@@ -31,7 +31,7 @@ namespace KinectGestureInterface.Kinect
                     var neighbors = new bool[] { top, btm, lft, rgt };//, btm_lft, btm_rgt, top_lft, top_rgt };
                     var arePresent = neighbors.Where(a => a).ToArray();
 
-                    if (arePresent.Length <= 2 && arePresent.Length > 0)
+                    if (arePresent.Length < 3 && arePresent.Length > 0)
                         ret[y * Size + x] = val;
                 }
             return ret;

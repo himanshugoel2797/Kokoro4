@@ -235,8 +235,8 @@ namespace KinectGestureInterface.Kinect
                                     var proj = new Vector3(projP.X - handCenterDepth_l.X, projP.Y - handCenterDepth_l.Y, 1);   //Get the point relative to the hand
                                     Matrix3.Transform(ref conversion_matrix, ref proj);                                     //Rotate the point around the center
 
-                                    int x = (int)((proj.X + 150) / 300 * CurrentHand.Width);
-                                    int y = (int)((proj.Y + 150) / 300 * CurrentHand.Height);
+                                    int x = (int)((proj.X + 100) / 200 * CurrentHand.Width);
+                                    int y = (int)((proj.Y + 100) / 200 * CurrentHand.Height);
 
                                     if (tan.X < 0)
                                         x = CurrentHand.Width - x;
@@ -253,8 +253,16 @@ namespace KinectGestureInterface.Kinect
                             }
 
                             byte[] res = Dilate.Apply(CurrentImageData, Size, 255);
-                            for (int i = 0; i < 2; i++) res = Erode.Apply(res, Size, 255);
+                            for (int i = 0; i < 5; i++) res = Erode.Apply(res, Size, 255);
                             res = SinglePixel.Apply(res, Size, 255);
+                            for (int i = 0; i < 2; i++)
+                            {
+                                res = Dilate.Apply(res, Size, 255); //Try to exagerate these differences to completely leave out the other edges
+                                //res = Erode.Apply(res, Size, 255);
+                                //res = Dilate.Apply(res, Size, 255);
+                            }
+
+                            //TODO cleanup code and perform matching by comparing density maps
 
                             bool nonzero = !false;
                             CurrentImageData = res;
@@ -267,19 +275,7 @@ namespace KinectGestureInterface.Kinect
                             if (nonzero)
                             {
 
-                                Dictionary<int, float> distsqs = new Dictionary<int, float>();
-
-                                //Determine the radius of the center blob approximately
-                                for (int x = 0; x < Size; x++)
-                                {
-                                    if (CurrentImageData[(Size / 2) * Size + x] == 0)
-                                    {
-                                        var dist_sq = new Vector2(x - Size / 2, 0).LengthSquared;  //Center is at center of image
-                                        distsqs[Size / 2 * Size + x] = dist_sq;
-                                    }
-                                }
-
-                                var circle_tip = distsqs.OrderBy(a => a.Value).ThenByDescending(a => a.Key).First().Value + 9;
+                                int sc = 4;
 
                                 //Clear out the region within this circle, as well as everything with Y less than 30% (to eliminate the arm)
                                 Dictionary<int, Dictionary<int, Vector3>> Blobs = new Dictionary<int, Dictionary<int, Vector3>>();
@@ -287,7 +283,6 @@ namespace KinectGestureInterface.Kinect
                                 Dictionary<int, Vector3> BlobDepthCenters = new Dictionary<int, Vector3>();
                                 Dictionary<int, Vector3> BlobFarthestPoints = new Dictionary<int, Vector3>();
                                 Dictionary<int, float> DistanceMap = new Dictionary<int, float>();
-                                Dictionary<int, float> EdgeDistanceMap = new Dictionary<int, float>();
                                 float avgEdgeDistSq = 0;
 
                                 for (int y = 1; y < Size - 1; y++)
@@ -295,50 +290,8 @@ namespace KinectGestureInterface.Kinect
                                     {
                                         if (CurrentImageData[y * Size + x] == 255)
                                         {
-                                            CurrentHand.SetPixel(x, y, System.Drawing.Color.Red);
+                                            //CurrentHand.SetPixel(x, y, System.Drawing.Color.Red);
                                             DistanceMap[y * Size + x] = new Vector2(x - Size / 2, y - Size / 2).LengthSquared;
-                                        }
-                                        else if (CurrentImageData[y * Size + x] == 0)
-                                        {
-                                            bool top = CurrentImageData[(y - 1) * Size + x] == 255;
-                                            bool btm = CurrentImageData[(y + 1) * Size + x] == 255;
-                                            bool lft = CurrentImageData[y * Size + (x - 1)] == 255;
-                                            bool rgt = CurrentImageData[y * Size + (x + 1)] == 255;
-                                            bool btm_lft = CurrentImageData[(y - 1) * Size + (x - 1)] == 255;
-                                            bool top_rgt = CurrentImageData[(y + 1) * Size + (x + 1)] == 255;
-                                            bool top_lft = CurrentImageData[(y + 1) * Size + (x - 1)] == 255;
-                                            bool btm_rgt = CurrentImageData[(y - 1) * Size + (x + 1)] == 255;
-
-                                            if (top | btm | lft | rgt | btm_lft | btm_rgt | top_lft | top_rgt)
-                                            {
-                                                EdgeDistanceMap[y * Size + x] = new Vector2(x - Size / 2, y - Size / 2).LengthSquared;
-                                                avgEdgeDistSq += EdgeDistanceMap[y * Size + x];
-                                                //CurrentHand.SetPixel(x, y, System.Drawing.Color.Green);
-                                            }
-                                        }
-                                    }
-                                avgEdgeDistSq /= EdgeDistanceMap.Count;
-
-                                //avgEdgeDistSq = 0;
-                                avgEdgeDistSq = EdgeDistanceMap.OrderBy(a => a.Value).First().Value;
-                                EdgeDistanceMap = EdgeDistanceMap.OrderByDescending(a => a.Value).Take(EdgeDistanceMap.Count - 100).ToDictionary(a => a.Key, a => a.Value);
-                                foreach (int key in EdgeDistanceMap.Keys)
-                                {
-                                    //CurrentHand.SetPixel(key % Size, key / Size, System.Drawing.Color.Black);
-                                    //avgEdgeDistSq += EdgeDistanceMap[key];
-                                }
-
-                                for (int y = 1; y < Size - 1; y++)
-                                    for (int x = 1; x < Size - 1; x++)
-                                    {
-                                        if (new Vector2(x - Size / 2, y - Size / 2).LengthSquared <= avgEdgeDistSq)
-                                        {
-                                            if (CurrentImageData[y * Size + x] == 255)
-                                            {
-                                                //CurrentHand.SetPixel(x, y, System.Drawing.Color.Chocolate);
-                                                //CurrentHand.SetPixel(x, y, System.Drawing.Color.Transparent);
-                                                CurrentImageData[y * Size + x] = 0;
-                                            }
                                         }
                                     }
 
@@ -347,14 +300,14 @@ namespace KinectGestureInterface.Kinect
                                 {
                                     CurrentHand.SetPixel(tips[i].Key % Size, tips[i].Key / Size, System.Drawing.Color.Blue);
                                 }
-                                /*
-                                */
 
                                 //Extract blobs using connected components
-                                ///*
+                                //Use binning to find buckets with the most points, these should be the fingertips
+                                Dictionary<int, int> bins = new Dictionary<int, int>();
+
                                 byte lbl = 0;
-                                for (int y = 0; y < Size; y++)
-                                    for (int x = 0; x < Size; x++)
+                                for (int y = 1; y < Size - 1; y++)
+                                    for (int x = 1; x < Size - 1; x++)
                                     {
                                         float y_percent = (float)y / Size;
                                         if (y_percent < 0.35f)
@@ -374,10 +327,14 @@ namespace KinectGestureInterface.Kinect
                                         else*/
                                         if (CurrentImageData[y * Size + x] == 255)
                                         {
+                                            if (!bins.ContainsKey(y / sc * Size / sc + x / sc)) bins[y / sc * Size / sc + x / sc] = 0;
+
+                                            bins[y / sc * Size / sc + x / sc]++;
+
                                             //determine center and dominant axis for blobs, also 3d position for center point
-                                            if (x > 0 && CurrentImageData[y * Size + x - 1] != 0)
+                                            if (CurrentImageData[y * Size + x - 1] != 0)
                                                 CurrentImageData[y * Size + x] = CurrentImageData[y * Size + x - 1];
-                                            else if (y > 0 && CurrentImageData[(y - 1) * Size + x] != 0)
+                                            else if (CurrentImageData[(y - 1) * Size + x] != 0)
                                                 CurrentImageData[y * Size + x] = CurrentImageData[(y - 1) * Size + x];
                                             else
                                             {
@@ -394,19 +351,40 @@ namespace KinectGestureInterface.Kinect
                                         }
                                     }
 
-                                Blobs = Blobs.Where(a => a.Value.Count > 10).OrderByDescending(a => a.Value.Count).Take(5).ToDictionary(a => a.Key, a => a.Value);
+                                //Blobs = Blobs.Where(a => a.Value.Count > 10).OrderByDescending(a => a.Value.Count).Take(5).ToDictionary(a => a.Key, a => a.Value);
 
                                 int col = 0;
                                 System.Drawing.Color[] cols = new System.Drawing.Color[]
                                 {
+                                System.Drawing.Color.Gray,
                                 System.Drawing.Color.Fuchsia,
                                 System.Drawing.Color.Gold,
-                                System.Drawing.Color.Gray,
                                 System.Drawing.Color.Lavender,
                                 System.Drawing.Color.LightCyan,
                                 };
 
-                                foreach (int key in Blobs.Keys)
+                                var fingertip_bins = bins.Where(a => a.Value > sc * sc / 6).OrderByDescending(a => a.Value).ThenByDescending(a => a.Key / ( Size / sc)).ToDictionary(a => a.Key, a => a.Value);
+
+                                //TODO: Further bin the above into 5 bins for the finger tips
+
+                                for (int y = 0; y < Size; y++)
+                                    for (int x = 0; x < Size; x++)
+                                    {
+                                        if (fingertip_bins.ContainsKey(y / sc * Size / sc + x / sc))
+                                        {
+                                            var bin = fingertip_bins[y / sc * Size / sc + x / sc];
+                                            if (bin >= sc * sc - 2)
+                                                col = 2;
+                                            else if (bin >= sc * sc / 8)
+                                                col = 1;
+                                            else
+                                                col = 0;
+
+                                            CurrentHand.SetPixel(x, y, cols[col]);
+                                        }
+                                    }
+
+                                /*foreach (int key in Blobs.Keys)
                                 {
                                     BlobCenters[key] /= Blobs[key].Count;
                                     BlobDepthCenters[key] /= Blobs[key].Count;
@@ -414,9 +392,8 @@ namespace KinectGestureInterface.Kinect
                                     //Get the farthest point from the blob center in 3d
                                     BlobFarthestPoints[key] = Blobs[key].OrderByDescending(a => (a.Value - handCenter).LengthSquared).ThenByDescending(a => a.Key / Size).First().Value;
 
-                                    //CurrentHand.SetPixel((int)BlobCenters[key].X, (int)BlobCenters[key].Y, cols[col++]);
                                 }
-                                //*/
+                                */
 
 
                                 //learn gestures by switching to a recording mode, trying to determine tolerances for a gesture
