@@ -82,6 +82,9 @@
     <Compile Include="KinectHandContour.cs" />
     <Compile Include="KinectHand3D.cs" />
     <Compile Include="KinectHandConvexHull.cs" />
+    <Compile Include="Kinect\SinglePixel.cs" />
+    <Compile Include="Kinect\Dilate.cs" />
+    <Compile Include="Kinect\Erode.cs" />
     <Compile Include="Kinect\ImageMatching.cs" />
     <Compile Include="Kinect\Sensor.cs" />
     <Compile Include="Program.cs" />
