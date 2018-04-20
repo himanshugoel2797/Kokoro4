@@ -42,12 +42,12 @@ namespace TestApplication
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest)); 
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));
             //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
-            EngineManager.StateManager.SetActiveState(nameof(AtmosphereTestVR));
+            //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTestVR));
             //EngineManager.StateManager.SetActiveState(nameof(ForwardPlusTest));
             //EngineManager.StateManager.SetActiveState(nameof(CloudRenderingTest));
             //EngineManager.StateManager.SetActiveState(nameof(SubsurfaceMaterialTest));
             //EngineManager.StateManager.SetActiveState(nameof(TestScene));
-            //EngineManager.StateManager.SetActiveState(nameof(VolumeRayCastingTest));
+            EngineManager.StateManager.SetActiveState(nameof(VolumeRayCastingTest));
 
             //Work on ice/snow rendering//
 

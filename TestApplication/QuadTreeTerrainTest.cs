@@ -80,7 +80,7 @@ namespace TestApplication
                 //GraphicsDevice.Wireframe = true;
 
                 cache = new TextureCache(1024, 64, 64, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba8, PixelType.Byte);
-                terrainRenderer = new TerrainRenderer(5000, grp, new Framebuffer[] { Framebuffer.Default }, 0, 2, 0, ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/TerrainSource/compute.glsl", Noise.Name), cache);
+                terrainRenderer = new TerrainRenderer(5000, grp, new Framebuffer[] { Framebuffer.Default }, 0, 2, 0, ShaderSource.Load(ShaderType.ComputeShader, "Shaders/TerrainSource/compute.glsl", Noise.Name), cache);
 
                 inited = true;
             }

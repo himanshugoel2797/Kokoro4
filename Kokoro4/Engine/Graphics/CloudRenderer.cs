@@ -56,7 +56,7 @@ namespace Kokoro.Engine.Graphics
             SingleScatterHandle.SetResidency(Residency.Resident, AccessMode.Write);
 
             #region Calculate Transmittance
-            ShaderSource trans_compute = ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/Cloud/transmittance.glsl");
+            ShaderSource trans_compute = ShaderSource.Load(ShaderType.ComputeShader, "Shaders/Cloud/transmittance.glsl");
             Transmitance_Precalc = new ShaderProgram(trans_compute);
 
             Transmitance_Precalc.Set("TransCache", TransmitanceHandle);
@@ -68,7 +68,7 @@ namespace Kokoro.Engine.Graphics
             #endregion
 
             #region Calculate Single Scattering
-            ShaderSource single_scatter_compute = ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/Cloud/single_scatter.glsl");
+            ShaderSource single_scatter_compute = ShaderSource.Load(ShaderType.ComputeShader, "Shaders/Cloud/single_scatter.glsl");
             SingleScatter_Precalc = new ShaderProgram(single_scatter_compute);
 
             SingleScatter_Precalc.Set("ScatterCache", SingleScatterHandle);
@@ -79,7 +79,7 @@ namespace Kokoro.Engine.Graphics
             EngineManager.DispatchSyncComputeJob(SingleScatter_Precalc, sideX, sideY, sideZ);
             #endregion
 
-            //AtmosphereShader = new ShaderProgram(ShaderSource.Load( "Graphics/OpenGL/Shaders/Atmosphere/vertex.glsl"))
+            //AtmosphereShader = new ShaderProgram(ShaderSource.Load( "Shaders/Atmosphere/vertex.glsl"))
             //AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Front);
             //AtmosphereRender = new RenderQueue(1, false);
         }

@@ -18,8 +18,17 @@ namespace Kokoro.Engine.Graphics
     public class ShaderSource : IDisposable
     {
         #region Static Methods
+#if DEBUG
+        public const string ShaderPath = @"C:\Users\Himanshu Goel\source\repos\Kokoro4\Resources\OpenGL";
+#endif
+
         public static ShaderSource Load(ShaderType sType, string file)
         {
+            if (!File.Exists(file))
+            {
+                if (File.Exists(Path.Combine(ShaderPath, file)))
+                    file = Path.Combine(ShaderPath, file); 
+            }
             return new ShaderSource(sType, File.ReadAllText(file));
         }
 

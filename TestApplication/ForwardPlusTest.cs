@@ -99,7 +99,7 @@ namespace TestApplication
                     mats.UpdateDone();
                 }
 
-                RenderState = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { transforms }, new UniformBuffer[] { mats }, true, true, DepthFunc.LEqual, 1, -1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, CullFaceMode.None);
+                RenderState = new RenderState(fbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { transforms }, new UniformBuffer[] { mats }, true, true, DepthFunc.LEqual, 1, -1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 1, CullFaceMode.None);
                 RenderState.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
                 RenderState.ShaderProgram.SetUniformBufferMapping("Material_t", 0);
 

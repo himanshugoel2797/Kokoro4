@@ -168,7 +168,7 @@ namespace TestApplication
                     transform_params.UpdateDone();
                 }
 
-                state = new RenderState(gbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { transform_params }, new UniformBuffer[] { }, true, true, DepthFunc.Greater, 1, 0, BlendFactor.One, BlendFactor.Zero, new Vector4(0, 0.5f, 1.0f, 0.0f), 0, CullFaceMode.Back);
+                state = new RenderState(gbuf, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Default/fragment.glsl")), new ShaderStorageBuffer[] { transform_params }, new UniformBuffer[] { }, true, true, DepthFunc.Greater, 1, 0, BlendFactor.One, BlendFactor.Zero, new Vector4(0, 0.5f, 1.0f, 0.0f), 0, CullFaceMode.Back);
                 state.ShaderProgram.SetShaderStorageBufferMapping("transforms", 0);
 
                 queue = new RenderQueue(meshes.Length, false);
@@ -180,7 +180,7 @@ namespace TestApplication
                 handle = ((Framebuffer)gbuf)[FramebufferAttachment.ColorAttachment0].GetHandle(TextureSampler.Default);
                 handle.SetResidency(Residency.Resident);
 
-                fsq_state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Framebuffer/fragment.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 0, CullFaceMode.None);
+                fsq_state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Framebuffer/fragment.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 0, CullFaceMode.None);
 
                 fsq_queue = new RenderQueue(1, false);
                 fsq_queue.ClearAndBeginRecording();

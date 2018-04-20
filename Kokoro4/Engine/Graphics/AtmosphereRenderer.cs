@@ -88,7 +88,7 @@ namespace Kokoro.Engine.Graphics
             MieSingleScatterSamplerHandle.SetResidency(Residency.Resident);
 
             #region Calculate Transmittance
-            ShaderSource trans_compute = ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/Atmosphere/transmittance.glsl");
+            ShaderSource trans_compute = ShaderSource.Load(ShaderType.ComputeShader, "Shaders/Atmosphere/transmittance.glsl");
             Transmitance_Precalc = new ShaderProgram(trans_compute);
 
             Transmitance_Precalc.Set("TransCache", TransmitanceHandle);
@@ -105,7 +105,7 @@ namespace Kokoro.Engine.Graphics
             #endregion
 
             #region Calculate Single Scattering
-            ShaderSource single_scatter_compute = ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/Atmosphere/single_scatter.glsl");
+            ShaderSource single_scatter_compute = ShaderSource.Load(ShaderType.ComputeShader, "Shaders/Atmosphere/single_scatter.glsl");
             SingleScatter_Precalc = new ShaderProgram(single_scatter_compute);
 
             SingleScatter_Precalc.Set("ScatterCache", SingleScatterHandle);
@@ -135,7 +135,7 @@ namespace Kokoro.Engine.Graphics
             #endregion
 
 
-            AtmosphereShader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Atmosphere/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Atmosphere/fragment.glsl"));
+            AtmosphereShader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Atmosphere/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Atmosphere/fragment.glsl"));
             AtmosphereShader.Set("TransCache", TransmitanceSamplerHandle);
             AtmosphereShader.Set("ScatterCache", SingleScatterSamplerHandle);
             AtmosphereShader.Set("MieScatterCache", MieSingleScatterSamplerHandle);

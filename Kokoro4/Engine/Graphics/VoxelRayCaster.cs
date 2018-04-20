@@ -39,7 +39,7 @@ namespace Kokoro.Engine.Graphics
             frontFaceFB = new Framebuffer(w, h);
             frontFaceFB[FramebufferAttachment.ColorAttachment0] = frontFaceTex;
 
-            frontFaceState = new RenderState(frontFaceFB, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/VolumeRayCast/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/VolumeRayCast/fragment.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
+            frontFaceState = new RenderState(frontFaceFB, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/VolumeRayCast/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/VolumeRayCast/fragment.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
             frontFaceQueue = new RenderQueue(10, false);
             frontFaceQueue.ClearAndBeginRecording();
             frontFaceQueue.ClearFramebufferBeforeSubmit = true;
@@ -58,7 +58,7 @@ namespace Kokoro.Engine.Graphics
             backFaceFB = new Framebuffer(w, h);
             backFaceFB[FramebufferAttachment.ColorAttachment0] = backFaceTex;
 
-            backFaceState = new RenderState(backFaceFB, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/VolumeRayCast/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/VolumeRayCast/fragment.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Front);
+            backFaceState = new RenderState(backFaceFB, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/VolumeRayCast/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/VolumeRayCast/fragment.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Front);
             backFaceQueue = new RenderQueue(10, false);
             backFaceQueue.ClearAndBeginRecording();
             backFaceQueue.ClearFramebufferBeforeSubmit = true;
@@ -76,7 +76,7 @@ namespace Kokoro.Engine.Graphics
 
             for (int i = 0; i < fbufs.Length; i++)
             {
-                rayCastState[i] = new RenderState(fbufs[i], new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/VolumeRayCast/raycast.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
+                rayCastState[i] = new RenderState(fbufs[i], new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/VolumeRayCast/raycast.glsl")), null, null, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
                 rayCastQueue[i] = new RenderQueue(10, false);
                 rayCastQueue[i].ClearAndBeginRecording();
                 rayCastQueue[i].RecordDraw(new RenderQueue.DrawData()

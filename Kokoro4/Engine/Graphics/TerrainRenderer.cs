@@ -125,7 +125,7 @@ namespace Kokoro.Engine.Graphics
 
         }
 
-        public TerrainRenderer(float side, MeshGroup grp, Framebuffer[] fbuf, int xindex, int zindex, float yOff, ShaderSource computeShader, TextureCache cache, params string[] libraries) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/TerrainRenderer/vertex.glsl", libraries), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/TerrainRenderer/fragment.glsl", libraries), computeShader, cache)
+        public TerrainRenderer(float side, MeshGroup grp, Framebuffer[] fbuf, int xindex, int zindex, float yOff, ShaderSource computeShader, TextureCache cache, params string[] libraries) : this(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Shaders/TerrainRenderer/vertex.glsl", libraries), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/TerrainRenderer/fragment.glsl", libraries), computeShader, cache)
         {
 
         }

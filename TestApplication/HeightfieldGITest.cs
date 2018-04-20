@@ -123,7 +123,7 @@ namespace TestApplication
                     u_sh[j].SetData(src_u, 0);
                     fbufs[j][FramebufferAttachment.ColorAttachment1] = u_sh[j];
 
-                    RenderState state = new RenderState(fbufs[j], new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/HeightMapGI_A/fragment.glsl")), null, new UniformBuffer[] { v_dash }, false, true, DepthFunc.None, 0, 1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 1, CullFaceMode.Back);
+                    RenderState state = new RenderState(fbufs[j], new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/HeightMapGI_A/fragment.glsl")), null, new UniformBuffer[] { v_dash }, false, true, DepthFunc.None, 0, 1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 1, CullFaceMode.Back);
                     RenderQueue queue = new RenderQueue(10, false);
                     queue.ClearAndBeginRecording();
                     queue.RecordDraw(new RenderQueue.DrawData()
@@ -151,7 +151,7 @@ namespace TestApplication
                 //Build spatial partition of sample points using clustering to optimize
                 //temporal solution, run a pass every frame    
 
-                stateF = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/Framebuffer/fragment.glsl")), null, null, false, true, DepthFunc.None, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.Back);
+                stateF = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Framebuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Framebuffer/fragment.glsl")), null, null, false, true, DepthFunc.None, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.Back);
                 queueF = new RenderQueue(10, false);
                 queueF.ClearAndBeginRecording();
                 queueF.RecordDraw(new RenderQueue.DrawData()
