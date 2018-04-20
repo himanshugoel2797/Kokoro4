@@ -24,8 +24,8 @@ namespace Kokoro.Engine.Graphics
         private ShaderProgram Transmitance_Precalc, SingleScatter_Precalc;
         private ImageHandle TransmitanceHandle, SingleScatterHandle, mie_SingleScatterHandle;
 
-        private RenderState AtmosphereRenderState;
-        private RenderQueue AtmosphereRender;
+        private RenderState[] AtmosphereRenderState;
+        private RenderQueue[] AtmosphereRender;
         private Mesh AtmoSphere; //:^)
         private ShaderProgram AtmosphereShader;
 
@@ -36,7 +36,7 @@ namespace Kokoro.Engine.Graphics
         public TextureHandle TransmitanceSamplerHandle { get; set; }
         public Vector3 SunDir { get; set; }
 
-        public AtmosphereRenderer(Vector3 rayleigh, float rayleighScaleHeight, float mie, float mieScaleHeight, float gnd, float atmos, MeshGroup grp, Framebuffer fbuf)
+        public AtmosphereRenderer(Vector3 rayleigh, float rayleighScaleHeight, float mie, float mieScaleHeight, float gnd, float atmos, MeshGroup grp, params Framebuffer[] fbuf)
         {
             this.rayleigh = rayleigh;
             this.mie = mie;
@@ -50,7 +50,7 @@ namespace Kokoro.Engine.Graphics
             int sideZ = 128;
 
             TextureSampler sampler = new TextureSampler();
-            sampler.SetEnableLinearFilter(true); 
+            sampler.SetEnableLinearFilter(true);
             sampler.SetTileMode(false, false, false);
 
             //populate Transmitance in a compute shader 
@@ -67,7 +67,7 @@ namespace Kokoro.Engine.Graphics
 
             single_scattering_cache = new Texture();
             RawTextureSource single_scatterCacheSrc = new RawTextureSource(3, sideX, sideY, sideZ, 1, PixelFormat.Rgba, PixelInternalFormat.Rgba16f, TextureTarget.Texture3D, PixelType.Float);
-            single_scattering_cache.SetData(single_scatterCacheSrc, 0); 
+            single_scattering_cache.SetData(single_scatterCacheSrc, 0);
             single_scattering_cache.SetEnableLinearFilter(true);
             single_scattering_cache.SetTileMode(false, false);
             SingleScatterHandle = single_scattering_cache.GetImageHandle(0, -1, PixelInternalFormat.Rgba16f);
@@ -140,21 +140,27 @@ namespace Kokoro.Engine.Graphics
             AtmosphereShader.Set("ScatterCache", SingleScatterSamplerHandle);
             AtmosphereShader.Set("MieScatterCache", MieSingleScatterSamplerHandle);
 
-            AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, true, DepthFunc.Greater, 0, 1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, CullFaceMode.Front);
-            AtmosphereRender = new RenderQueue(1, false);
-
+            AtmosphereRenderState = new RenderState[fbuf.Length];
+            AtmosphereRender = new RenderQueue[fbuf.Length];
             AtmoSphere = SphereFactory.Create(grp, 180);
-            AtmosphereRender.BeginRecording();
-            AtmosphereRender.ClearFramebufferBeforeSubmit = !true;
-            AtmosphereRender.RecordDraw(new DrawData()
+
+            for (int i = 0; i < fbuf.Length; i++)
             {
-                Meshes = new MeshData[] { new MeshData() { BaseInstance = 0, InstanceCount = 1, Mesh = AtmoSphere } },
-                State = AtmosphereRenderState
-            });
-            AtmosphereRender.EndRecording();
+                AtmosphereRenderState[i] = new RenderState(fbuf[i], AtmosphereShader, null, null, false, true, DepthFunc.Greater, 0, 1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, CullFaceMode.Front);
+                AtmosphereRender[i] = new RenderQueue(1, false);
+
+                AtmosphereRender[i].BeginRecording();
+                AtmosphereRender[i].ClearFramebufferBeforeSubmit = !true;
+                AtmosphereRender[i].RecordDraw(new DrawData()
+                {
+                    Meshes = new MeshData[] { new MeshData() { BaseInstance = 0, InstanceCount = 1, Mesh = AtmoSphere } },
+                    State = AtmosphereRenderState[i]
+                });
+                AtmosphereRender[i].EndRecording();
+            }
         }
 
-        public void Draw(Matrix4 view, Matrix4 proj, Vector3 position, Vector3 sunDir)
+        public void Draw(Matrix4 view, Matrix4 proj, Vector3 position, Vector3 sunDir, int idx = 0)
         {
             this.SunDir = sunDir;
 
@@ -164,7 +170,7 @@ namespace Kokoro.Engine.Graphics
             AtmosphereShader.Set("Rg", gnd);
             AtmosphereShader.Set("EyePosition", position);
             AtmosphereShader.Set("SunDir", sunDir);
-            AtmosphereRender.Submit();
+            AtmosphereRender[idx].Submit();
         }
     }
 }

@@ -60,15 +60,16 @@ namespace TestApplication
                 Framebuffer fbuf = Framebuffer.Default;
 
                 terrainRenderers = new TerrainRenderer[] {
-                new TerrainRenderer(side, grp, fbuf, 0, 2, off, null, null),
-                new TerrainRenderer(side, grp, fbuf, 0, 2, -off, null, null),
-                new TerrainRenderer(side, grp, fbuf, 0, 1, off, null, null),
-                new TerrainRenderer(side, grp, fbuf, 0, 1, -off, null, null),
-                new TerrainRenderer(side, grp, fbuf, 1, 2, off, null, null),
-                new TerrainRenderer(side, grp, fbuf, 1, 2, -off, null, null),
+                new TerrainRenderer(side, grp, new Framebuffer[] {fbuf }, 0, 2, off, null, null),
+                new TerrainRenderer(side, grp, new Framebuffer[] {fbuf }, 0, 2, -off, null, null),
+                new TerrainRenderer(side, grp,  new Framebuffer[] {fbuf }, 0, 1, off, null, null),
+                new TerrainRenderer(side, grp,  new Framebuffer[] {fbuf }, 0, 1, -off, null, null),
+                new TerrainRenderer(side, grp,  new Framebuffer[] {fbuf }, 1, 2, off, null, null),
+                new TerrainRenderer(side, grp,  new Framebuffer[] {fbuf }, 1, 2, -off, null, null),
                 };
 
-                terrainRenderers[0].Queue.ClearFramebufferBeforeSubmit = true;
+                for (int i = 0; i < terrainRenderers[0].Queue.Length; i++)
+                    terrainRenderers[0].Queue[i].ClearFramebufferBeforeSubmit = true;
 
                 inited = true;
             }

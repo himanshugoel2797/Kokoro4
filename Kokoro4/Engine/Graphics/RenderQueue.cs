@@ -202,6 +202,9 @@ namespace Kokoro.Engine.Graphics
 
         public void Submit()
         {
+            if (isRecording)
+                throw new Exception("Stop recording before submitting!");
+
             if (!transient)
                 while (!multiDrawParams.IsReady) ;    //Wait for the multidraw buffer to finish updating  
 

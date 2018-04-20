@@ -64,7 +64,7 @@ namespace TestApplication
                 float off = side * 0.5f;
                 Framebuffer fbuf = Framebuffer.Default;
 
-                planetRenderer = new PlanetRenderer(grp, Framebuffer.Default, 6360, null);
+                planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { Framebuffer.Default }, 6360, null);
 
                 inited = true;
             }

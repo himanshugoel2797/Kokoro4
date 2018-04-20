@@ -72,7 +72,7 @@ namespace TestApplication
 
                 float side = 500;
                 float off = side * 0.5f;
-                
+
                 var RenderState = new RenderState(fbuf, null, null, null, true, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.None);
                 clearQueue = new RenderQueue(1, false);
                 clearQueue.BeginRecording();
@@ -90,8 +90,9 @@ namespace TestApplication
                 });
                 clearQueue.EndRecording();
 
-                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 8, 20e-3f, 1.2f, 6360, 6420, grp, fbuf);
-                planetRenderer = new PlanetRenderer(grp, fbuf, 6360, renderer);
+                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(19.918e-3f, 13.57e-3f, 5.75e-3f), 8, 20e-3f, 1.2f, 6360, 6420, grp, fbuf);
+                //renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 8, 20e-3f, 1.2f, 6360, 6420, grp, fbuf);
+                planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { fbuf }, 6360, renderer);
 
                 inited = true;
             }
@@ -115,18 +116,18 @@ namespace TestApplication
 
             clearQueue.Submit();
             //if(Vector3.Dot(camera.Direction, r.Normal) <= 0)
-            
+
             //TODO: start designing system to procedurally generate materials given terrain properties
 
             renderer.Draw(camera.View, camera.Projection, camPos, new Vector3((float)System.Math.Sin(angle), (float)System.Math.Cos(angle), 0));
             planetRenderer.Draw(camera.View, camera.Projection);
             fplus.SubmitDraw();
-        } 
+        }
 
         public void Update(double interval)
         {
             camera?.Update(interval);
-            angle += 0.0005f;
+            angle = 0.0005f;
 
         }
     }

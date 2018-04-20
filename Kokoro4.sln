@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SeniorDesign", "SeniorDesig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectGestureInterface", "KinectGestureInterface\KinectGestureInterface.csproj", "{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelTests", "VoxelTests\VoxelTests.csproj", "{90AED938-A77C-45AE-B662-7E33AABC5E2E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +175,18 @@ Global
 		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|x64.Build.0 = Release|Any CPU
 		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|x86.ActiveCfg = Release|Any CPU
 		{94A8D7A3-7447-41D9-8C83-A3EEE1EF549F}.Release|x86.Build.0 = Release|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Debug|x64.ActiveCfg = Debug|x64
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Debug|x64.Build.0 = Debug|x64
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Debug|x86.Build.0 = Debug|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|x64.ActiveCfg = Release|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|x64.Build.0 = Release|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|x86.ActiveCfg = Release|Any CPU
+		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

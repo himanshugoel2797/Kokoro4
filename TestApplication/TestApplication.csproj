@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AtmosphereTestVR.cs" />
     <Compile Include="ForwardPlusTest.cs" />
     <Compile Include="AtmosphereTest.cs" />
     <Compile Include="CloudRenderingTest.cs" />
@@ -109,6 +110,8 @@
     <Compile Include="TerrainGenTest.cs" />
     <Compile Include="TestScene.cs" />
     <Compile Include="TextureStreamingTest.cs" />
+    <Compile Include="VolumeDataTextureSource.cs" />
+    <Compile Include="VolumeRayCastingTest.cs" />
     <Content Include="colormap.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -162,6 +165,9 @@
       <Project>{cfad0f2c-be42-4482-b032-1d72b9c00b98}</Project>
       <Name>Kokoro4</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AdvancedAtmosphere\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

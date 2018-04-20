@@ -317,7 +317,7 @@ namespace Kokoro.Graphics.OpenGL
             }
             set
             {
-                if(colorWrite != value)
+                if (colorWrite != value)
                 {
                     colorWrite = value;
                     GL.ColorMask(colorWrite, colorWrite, colorWrite, colorWrite);
@@ -342,11 +342,11 @@ namespace Kokoro.Graphics.OpenGL
             get
             {
                 return curProg;
-            } 
+            }
             set
             {
                 curProg = value;
-                if(curProg != null)GL.UseProgram(curProg.prog.id);
+                if (curProg != null) GL.UseProgram(curProg.prog.id);
             }
         }
 
@@ -458,6 +458,9 @@ namespace Kokoro.Graphics.OpenGL
 
         public static void DeleteSomeObjects()
         {
+            if (DeletionQueue.Count < 10)
+                return;
+
             for (int i = 0; i < 20 && i < DeletionQueue.Count; i++)
             {
                 if (DeletionQueue.TryDequeue(out var a))

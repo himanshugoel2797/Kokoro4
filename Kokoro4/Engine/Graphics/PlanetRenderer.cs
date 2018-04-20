@@ -15,7 +15,7 @@ namespace Kokoro.Engine.Graphics
         {
             private float radius;
 
-            public PlanetTerrainSide(float side, MeshGroup grp, Framebuffer fbuf, int xindex, int zindex, float yOff, float radius, TextureCache cache, params string[] libs) : base(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/PlanetRenderer/vertex.glsl", libs), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/PlanetRenderer/fragment.glsl", libs), ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/TerrainSource/compute.glsl", Noise.Name), cache)
+            public PlanetTerrainSide(float side, MeshGroup grp, Framebuffer[] fbuf, int xindex, int zindex, float yOff, float radius, TextureCache cache, params string[] libs) : base(side, grp, fbuf, xindex, zindex, yOff, ShaderSource.Load(ShaderType.VertexShader, "Graphics/OpenGL/Shaders/PlanetRenderer/vertex.glsl", libs), ShaderSource.Load(ShaderType.FragmentShader, "Graphics/OpenGL/Shaders/PlanetRenderer/fragment.glsl", libs), ShaderSource.Load(ShaderType.ComputeShader, "Graphics/OpenGL/Shaders/TerrainSource/compute.glsl", Noise.Name), cache)
             {
                 this.radius = radius;
             }
@@ -104,7 +104,7 @@ namespace Kokoro.Engine.Graphics
         private TextureCache cache;
         private AtmosphereRenderer atmosphere;
 
-        public PlanetRenderer(MeshGroup grp, Framebuffer fbuf, float radius, AtmosphereRenderer atmos, params string[] libraries)
+        public PlanetRenderer(MeshGroup grp, Framebuffer[] fbuf, float radius, AtmosphereRenderer atmos, params string[] libraries)
         {
             float side = radius * 2;
             float off = radius;
@@ -125,35 +125,42 @@ namespace Kokoro.Engine.Graphics
 
             foreach (PlanetTerrainSide r in sides)
             {
-                r.State.ShaderProgram.Set("Radius", radius);
-
-                if (atmosphere != null)
+                for (int i = 0; i < r.State.Length; i++)
                 {
-                    r.State.ShaderProgram.Set("Rt", atmosphere.Rt);
-                    r.State.ShaderProgram.Set("Rg", atmosphere.Rg);
-                    r.State.ShaderProgram.Set("TransCache", atmosphere.TransmitanceSamplerHandle);
-                    r.State.ShaderProgram.Set("ScatterCache", atmosphere.SingleScatterSamplerHandle);
-                    r.State.ShaderProgram.Set("MieScatterCache", atmosphere.MieSingleScatterSamplerHandle);
+                    r.State[i].ShaderProgram.Set("Radius", radius);
+
+                    if (atmosphere != null)
+                    {
+                        r.State[i].ShaderProgram.Set("Rt", atmosphere.Rt);
+                        r.State[i].ShaderProgram.Set("Rg", atmosphere.Rg);
+                        r.State[i].ShaderProgram.Set("TransCache", atmosphere.TransmitanceSamplerHandle);
+                        r.State[i].ShaderProgram.Set("ScatterCache", atmosphere.SingleScatterSamplerHandle);
+                        r.State[i].ShaderProgram.Set("MieScatterCache", atmosphere.MieSingleScatterSamplerHandle);
+                    }
                 }
             }
         }
-         
+
         public void Update(Vector3 pos, Vector3 dir)
         {
             foreach (PlanetTerrainSide r in sides)
             {
-                r.State.ShaderProgram.Set("EyePosition", pos);
+                for (int i = 0; i < r.State.Length; i++)
+                    r.State[i].ShaderProgram.Set("EyePosition", pos);
                 r.Update(pos, dir);
             }
         }
 
 
-        public void Draw(Matrix4 view, Matrix4 proj)
+        public void Draw(Matrix4 view, Matrix4 proj, int idx = 0)
         {
             foreach (PlanetTerrainSide r in sides)
             {
-                if(atmosphere != null)r.State.ShaderProgram.Set("SunDir", atmosphere.SunDir);
-                r.Draw(view, proj);
+                if (atmosphere != null)
+                    for (int i = 0; i < r.State.Length; i++)
+                        r.State[i].ShaderProgram.Set("SunDir", atmosphere.SunDir);
+
+                r.Draw(view, proj, idx);
             }
         }
     }

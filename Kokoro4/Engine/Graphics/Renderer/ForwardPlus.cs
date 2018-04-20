@@ -39,6 +39,9 @@ namespace Kokoro.Engine.Graphics.Renderer
         public float FarClip { get { return 1; } }
         public float ClearDepth { get { return 0; } }
 
+        public int Width { get { return w * tile_x_cnt; } }
+        public int Height { get { return h * tile_y_cnt; } }
+
         public const int OutputColorAttachment = 0;
         //TODO: make all resources accesses use functions to retrieve things, thus allowing control of resource access through libraries.
 

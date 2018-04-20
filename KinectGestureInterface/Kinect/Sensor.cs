@@ -23,7 +23,8 @@ namespace KinectGestureInterface.Kinect
         private MultiSourceFrameReader reader;
         private ushort[] DepthFrameData;
 
-        public const int Size = 256;
+        public const int Size = 128;
+        private int img_idx = 0;
 
         public bool IsConnected { get { return kSensor.IsAvailable && kSensor.IsOpen; } }
 
@@ -58,6 +59,9 @@ namespace KinectGestureInterface.Kinect
         public byte[] CurrentImageData { get; private set; }
 
         public ImageMatching Matcher { get; private set; }
+        private int[] History;
+        private object HistoryLock;
+        private int HistoryCurrent = 0;
 
         public Sensor()
         {
@@ -70,6 +74,11 @@ namespace KinectGestureInterface.Kinect
             CurrentHand = new Bitmap(Size, Size);
             CurrentImageData = new byte[Size * Size];
             Matcher = new ImageMatching();
+
+            History = new int[20];
+            HistoryLock = new object();
+            for (int i = 0; i < History.Length; i++)
+                History[i] = -1;
 
             PointBuffer = new ShaderStorageBuffer(5000 * sizeof(float) * 4, true);
 
@@ -117,6 +126,30 @@ namespace KinectGestureInterface.Kinect
             while (!kSensor.IsOpen) ;
             reader = kSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.Color | FrameSourceTypes.Depth | FrameSourceTypes.Infrared);
             reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+        }
+
+        public int CurrentGuess()
+        {
+            int res = -1;
+
+            int[] predictions = new int[11];
+
+            lock (HistoryLock)
+            {
+                for (int i = 0; i < History.Length; i++)
+                {
+                    int off = History[(i + HistoryCurrent) % History.Length] + 1;
+                    predictions[off]++;
+                }
+            }
+
+            for (int i = 0; i < predictions.Length; i++)
+            {
+                if (predictions[i] == predictions.Max() && predictions[i] >= (3 * History.Length) / 4)
+                    return i - 1;
+            }
+
+            return -1;
         }
 
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
@@ -192,7 +225,7 @@ namespace KinectGestureInterface.Kinect
                         var handTipDepth = LeftHandTip;
 
                         //Get handCenter
-                        float weight = 0.55f;
+                        float weight = 0.5f;
                         var handCenter = (handPos * weight + handTipPos * (1 - weight));
                         var handCenterDepth = mapper.MapCameraPointToDepthSpace(new CameraSpacePoint() { X = handCenter.X, Y = handCenter.Y, Z = handCenter.Z });
                         var depthTable = mapper.GetDepthFrameToCameraSpaceTable();
@@ -249,175 +282,139 @@ namespace KinectGestureInterface.Kinect
                                     CameraCoordinates[y * Size + x] = sample;
                                     CurrentImageData[y * Size + x] = 255;
 
+                                    int depth = (int)(Math.Abs(sample.Z - handCenter.Z) * 1000);
+                                    depth = Math.Min(255, depth);
+                                    depth = Math.Max(0, depth);
+
+#if !MTHD_1
+                                    CurrentHand.SetPixel(x, y, System.Drawing.Color.FromArgb(depth, depth, depth));
+#endif
                                 }
                             }
 
                             byte[] res = Dilate.Apply(CurrentImageData, Size, 255);
-                            for (int i = 0; i < 5; i++) res = Erode.Apply(res, Size, 255);
+                            for (int i = 0; i < 3; i++) res = Erode.Apply(res, Size, 255);
                             res = SinglePixel.Apply(res, Size, 255);
                             for (int i = 0; i < 2; i++)
                             {
                                 res = Dilate.Apply(res, Size, 255); //Try to exagerate these differences to completely leave out the other edges
-                                //res = Erode.Apply(res, Size, 255);
-                                //res = Dilate.Apply(res, Size, 255);
                             }
 
-                            //TODO cleanup code and perform matching by comparing density maps
-
-                            bool nonzero = !false;
                             CurrentImageData = res;
                             /*
-                            for (int i = 0; i < res.Length; i++)
-                            {
-                                CurrentImageData[i] = (byte)Math.Max(0, CurrentImageData[i] - res[i]);
-                                if (!nonzero) nonzero = CurrentImageData[i] != 0;
-                            }*/
-                            if (nonzero)
-                            {
+                            for (int y = 0; y < Size; y++)
+                                for (int x = 0; x < Size; x++)
+                                    if (CurrentImageData[y * Size + x] == 255) CurrentHand.SetPixel(x, y, System.Drawing.Color.Black);*/
+#if MTHD_1
+                            int sc = 4;
 
-                                int sc = 4;
+                            //Clear out the region within this circle, as well as everything with Y less than 30% (to eliminate the arm)
+                            Dictionary<int, float> DistanceMap = new Dictionary<int, float>();
 
-                                //Clear out the region within this circle, as well as everything with Y less than 30% (to eliminate the arm)
-                                Dictionary<int, Dictionary<int, Vector3>> Blobs = new Dictionary<int, Dictionary<int, Vector3>>();
-                                Dictionary<int, Vector2> BlobCenters = new Dictionary<int, Vector2>();
-                                Dictionary<int, Vector3> BlobDepthCenters = new Dictionary<int, Vector3>();
-                                Dictionary<int, Vector3> BlobFarthestPoints = new Dictionary<int, Vector3>();
-                                Dictionary<int, float> DistanceMap = new Dictionary<int, float>();
-                                float avgEdgeDistSq = 0;
-
-                                for (int y = 1; y < Size - 1; y++)
-                                    for (int x = 1; x < Size - 1; x++)
-                                    {
-                                        if (CurrentImageData[y * Size + x] == 255)
-                                        {
-                                            //CurrentHand.SetPixel(x, y, System.Drawing.Color.Red);
-                                            DistanceMap[y * Size + x] = new Vector2(x - Size / 2, y - Size / 2).LengthSquared;
-                                        }
-                                    }
-
-                                var tips = DistanceMap.OrderByDescending(a => a.Key / Size).ThenBy(a => a.Value).Take(5).ToArray();
-                                for (int i = 0; i < tips.Length; i++)
+                            for (int y = 1; y < Size - 1; y++)
+                                for (int x = 1; x < Size - 1; x++)
                                 {
-                                    CurrentHand.SetPixel(tips[i].Key % Size, tips[i].Key / Size, System.Drawing.Color.Blue);
+                                    if (CurrentImageData[y * Size + x] == 255)
+                                    {
+                                        //CurrentHand.SetPixel(x, y, System.Drawing.Color.Red);
+                                        DistanceMap[y * Size + x] = new Vector2(x - Size / 2, y - Size / 2).LengthSquared;
+                                    }
                                 }
 
-                                //Extract blobs using connected components
-                                //Use binning to find buckets with the most points, these should be the fingertips
-                                Dictionary<int, int> bins = new Dictionary<int, int>();
+                            var tips = DistanceMap.OrderByDescending(a => a.Key / Size).ThenBy(a => a.Value).Take(5).ToArray();
+                            for (int i = 0; i < tips.Length; i++)
+                            {
+                                CurrentHand.SetPixel(tips[i].Key % Size, tips[i].Key / Size, System.Drawing.Color.Blue);
+                            }
 
-                                byte lbl = 0;
-                                for (int y = 1; y < Size - 1; y++)
-                                    for (int x = 1; x < Size - 1; x++)
+                            //Extract blobs using connected components
+                            //Use binning to find buckets with the most points, these should be the fingertips
+                            Dictionary<int, int> bins = new Dictionary<int, int>();
+
+                            for (int y = 1; y < Size - 1; y++)
+                                for (int x = 1; x < Size - 1; x++)
+                                {
+                                    float y_percent = (float)y / Size;
+                                    if (y_percent < 0.35f)
                                     {
-                                        float y_percent = (float)y / Size;
-                                        if (y_percent < 0.35f)
-                                        {
-                                            CurrentImageData[y * Size + x] = 0;
-                                            CurrentHand.SetPixel(x, y, System.Drawing.Color.Transparent);
-                                            continue;
-                                        }
-
-                                        /*
-                                        var dist_sq = new Vector2(x - Size / 2, y - Size / 2).LengthSquared;
-                                        if (dist_sq <= circle_tip)
-                                        {
-                                            CurrentImageData[y * Size + x] = 0;
-                                            CurrentHand.SetPixel(x, y, System.Drawing.Color.Transparent);
-                                        }
-                                        else*/
-                                        if (CurrentImageData[y * Size + x] == 255)
-                                        {
-                                            if (!bins.ContainsKey(y / sc * Size / sc + x / sc)) bins[y / sc * Size / sc + x / sc] = 0;
-
-                                            bins[y / sc * Size / sc + x / sc]++;
-
-                                            //determine center and dominant axis for blobs, also 3d position for center point
-                                            if (CurrentImageData[y * Size + x - 1] != 0)
-                                                CurrentImageData[y * Size + x] = CurrentImageData[y * Size + x - 1];
-                                            else if (CurrentImageData[(y - 1) * Size + x] != 0)
-                                                CurrentImageData[y * Size + x] = CurrentImageData[(y - 1) * Size + x];
-                                            else
-                                            {
-                                                lbl++;
-                                                CurrentImageData[y * Size + x] = lbl;
-                                                Blobs[lbl] = new Dictionary<int, Vector3>();
-                                                BlobDepthCenters[lbl] = new Vector3(0);
-                                                BlobCenters[lbl] = new Vector2(0);
-                                            }
-
-                                            Blobs[lbl][y * Size + x] = new Vector3(x, y, 0); //CameraCoordinates[y * Size + x];
-                                            BlobCenters[lbl] += new Vector2(x, y);
-                                            BlobDepthCenters[lbl] += Blobs[lbl][y * Size + x];
-                                        }
+                                        CurrentImageData[y * Size + x] = 0;
+                                        CurrentHand.SetPixel(x, y, System.Drawing.Color.Transparent);
+                                        continue;
                                     }
 
-                                //Blobs = Blobs.Where(a => a.Value.Count > 10).OrderByDescending(a => a.Value.Count).Take(5).ToDictionary(a => a.Key, a => a.Value);
+                                    if (CurrentImageData[y * Size + x] == 255)
+                                    {
+                                        if (!bins.ContainsKey(y / sc * Size / sc + x / sc)) bins[y / sc * Size / sc + x / sc] = 0;
 
-                                int col = 0;
-                                System.Drawing.Color[] cols = new System.Drawing.Color[]
-                                {
+                                        bins[y / sc * Size / sc + x / sc]++;
+                                    }
+                                }
+
+                            int col = 0;
+                            System.Drawing.Color[] cols = new System.Drawing.Color[]
+                            {
                                 System.Drawing.Color.Gray,
                                 System.Drawing.Color.Fuchsia,
                                 System.Drawing.Color.Gold,
                                 System.Drawing.Color.Lavender,
                                 System.Drawing.Color.LightCyan,
-                                };
+                            };
 
-                                var fingertip_bins = bins.Where(a => a.Value > sc * sc / 6).OrderByDescending(a => a.Value).ThenByDescending(a => a.Key / ( Size / sc)).ToDictionary(a => a.Key, a => a.Value);
+                            var fingertip_bins = bins.Where(a => a.Value > sc * sc / 6).OrderByDescending(a => a.Value).ThenByDescending(a => a.Key / (Size / sc)).ToDictionary(a => a.Key, a => a.Value);
 
-                                //TODO: Further bin the above into 5 bins for the finger tips
+                            //TODO: Further bin the above into 5 bins for the finger tips
 
-                                for (int y = 0; y < Size; y++)
-                                    for (int x = 0; x < Size; x++)
+                            for (int y = 0; y < Size; y++)
+                                for (int x = 0; x < Size; x++)
+                                {
+                                    if (fingertip_bins.ContainsKey(y / sc * Size / sc + x / sc))
                                     {
-                                        if (fingertip_bins.ContainsKey(y / sc * Size / sc + x / sc))
-                                        {
-                                            var bin = fingertip_bins[y / sc * Size / sc + x / sc];
-                                            if (bin >= sc * sc - 2)
-                                                col = 2;
-                                            else if (bin >= sc * sc / 8)
-                                                col = 1;
-                                            else
-                                                col = 0;
+                                        var bin = fingertip_bins[y / sc * Size / sc + x / sc];
+                                        if (bin >= sc * sc - 2)
+                                            col = 2;
+                                        else if (bin >= sc * sc / 8)
+                                            col = 1;
+                                        else
+                                            col = 0;
 
-                                            CurrentHand.SetPixel(x, y, cols[col]);
-                                        }
+                                        CurrentHand.SetPixel(x, y, cols[col]);
                                     }
-
-                                /*foreach (int key in Blobs.Keys)
-                                {
-                                    BlobCenters[key] /= Blobs[key].Count;
-                                    BlobDepthCenters[key] /= Blobs[key].Count;
-
-                                    //Get the farthest point from the blob center in 3d
-                                    BlobFarthestPoints[key] = Blobs[key].OrderByDescending(a => (a.Value - handCenter).LengthSquared).ThenByDescending(a => a.Key / Size).First().Value;
-
                                 }
-                                */
+#endif
 
+                            //learn gestures by switching to a recording mode, trying to determine tolerances for a gesture
+                            if (Matcher != null)
+                            {
+                                //Console.Clear();
+                                int detected = Matcher.BestMatch(CurrentHand);
 
-                                //learn gestures by switching to a recording mode, trying to determine tolerances for a gesture
-
-
-
-                                //Extract blobs from the above
-                                //Consider increasing the number of pixels included per frame until 4 blobs for y, and 1 for x are obtained, and decreasing if more than 5 pixels are in the smallest blob
-
-
-                                try
+                                lock (HistoryLock)
                                 {
-                                    CurrentHand.Save("hand_proj.png");
+                                    History[HistoryCurrent] = detected;
+                                    HistoryCurrent = (HistoryCurrent + 1) % History.Length;
                                 }
-                                catch (Exception) { }
-                                CurrentHand.Dispose();
-                                CurrentHand = new Bitmap(Size, Size);
                             }
-                        }
 
-                        //Compute the convex hull of these points.
+                            //Extract blobs from the above
+                            //Consider increasing the number of pixels included per frame until 4 blobs for y, and 1 for x are obtained, and decreasing if more than 5 pixels are in the smallest blob
+
+                            try
+                            {
+                                //CurrentHand.Save($"Y{img_idx++}.png");
+                                if (img_idx == 1024)
+                                {
+                                    Environment.Exit(0);
+                                }
+                            }
+                            catch (Exception) { }
+                            CurrentHand.Dispose();
+                            CurrentHand = new Bitmap(Size, Size);
+                        }
                     }
 
+                    //Compute the convex hull of these points.
                 }
+
             }
 
             bodyFrame?.Dispose();

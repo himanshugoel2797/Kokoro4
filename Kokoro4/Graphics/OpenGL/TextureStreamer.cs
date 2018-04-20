@@ -38,7 +38,7 @@ namespace Kokoro.Engine.Graphics
             private void Upload()
             {
                 GPUStateMachine.BindBuffer((OpenTK.Graphics.OpenGL.BufferTarget)BufferTarget.PixelUnpackBuffer, pboId);
-                GL.BufferData((OpenTK.Graphics.OpenGL.BufferTarget) BufferTarget.PixelUnpackBuffer, sz >> (int)System.Math.Pow(curLevel, dims), src.GetPixelData(curLevel), BufferUsageHint.StreamDraw);
+                GL.BufferData((OpenTK.Graphics.OpenGL.BufferTarget) BufferTarget.PixelUnpackBuffer, sz >> (int)System.Math.Pow(curLevel, dims), src.GetPixelData(curLevel), BufferUsageHint.StreamRead);
 
                 switch (dims)
                 {

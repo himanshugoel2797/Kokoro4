@@ -130,6 +130,7 @@
     <Compile Include="Engine\Graphics\ShaderSource.cs" />
     <Compile Include="Engine\Graphics\TerrainRenderer.cs" />
     <Compile Include="Engine\Graphics\TextureCache.cs" />
+    <Compile Include="Engine\Graphics\VoxelRayCaster.cs" />
     <Compile Include="Engine\Light.cs" />
     <Compile Include="Engine\MeshGroup.cs" />
     <Compile Include="Engine\UI\UIControl.cs" />
@@ -196,8 +197,13 @@
     <Compile Include="StateMachine\IState.cs" />
     <Compile Include="StateMachine\StateGroup.cs" />
     <Compile Include="StateMachine\StateManager.cs" />
+    <Compile Include="VR\openvr_api.cs" />
+    <Compile Include="VR\VRRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Graphics\OpenGL\ShaderLibraries\Noise\snoise3d.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -449,6 +455,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Graphics\OpenGL\Shaders\TiledDeferred\compute.glsl" />
+    <None Include="Graphics\OpenGL\Shaders\VolumeRayCast\raycast.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Graphics\OpenGL\Shaders\VolumeRayCast\fragment.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="Graphics\OpenGL\Shaders\VolumeRayCast\vertex.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

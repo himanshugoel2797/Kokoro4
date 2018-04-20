@@ -45,9 +45,9 @@ namespace TestApplication
             //Create renderstate with necessary state
             //Record draw to render queue
             //Perform render
-            int side = 1 << 2;
+            int side = 1 << 6;
 
-            int lim = 100;
+            int lim = 20;
 
             if (!inited)
             {
@@ -65,7 +65,7 @@ namespace TestApplication
                 List<RenderQueue.MeshData> meshList = new List<RenderQueue.MeshData>();
                 List<Matrix4> transforms = new List<Matrix4>();
 
-                octree = new VoxelOctree(0, 1 << 10);
+                octree = new VoxelOctree(0, 1 << 6);
 
                 for (int k = 0; k <= side; k++)
                 {
