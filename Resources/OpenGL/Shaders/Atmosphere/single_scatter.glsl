@@ -17,7 +17,7 @@ uniform int YLen;
 uniform float RayleighScaleHeight;
 uniform float MieScaleHeight;
 
-#define SAMPLE_COUNT 512
+#define SAMPLE_COUNT 1024
 
 bool sphere_dist(in float r, in vec3 pos, in vec3 dir, in float tmax, in float mode, out float t) {
 
@@ -30,7 +30,7 @@ bool sphere_dist(in float r, in vec3 pos, in vec3 dir, in float tmax, in float m
 }
 
 vec4 T(float h, float CosTheta) {
-    return textureLod(TransCache, vec2(CosTheta * 0.5f + 0.5f, (h - Rg) / (Rt - Rg)), 0);
+    return textureLod(TransCache, vec2(acos(CosTheta) / PI, (h - Rg) / (Rt - Rg)), 0);
 }
 
 void main(){
@@ -57,6 +57,7 @@ void main(){
     bool gnd_intersect = sphere_dist(Rg, Pos, Dir, Rg * 4, -1, gndRayLen);
     if(gnd_intersect && gndRayLen >= 0)
         rayLen = gndRayLen;
+        
     float stepLen = abs(rayLen) / SAMPLE_COUNT;
 
     float sunRayLen = 0;
@@ -67,20 +68,11 @@ void main(){
     vec3 radiance = vec3(0);
     vec3 mie_radiance = vec3(0);
     vec4 T_V = vec4(0);
-    
-    bool test = false;
-
-    if(theta == acos(-1))
-            test = true;
 
     for(float i = 0; i < SAMPLE_COUNT && doOp; ++i){
         vec3 curPos = Pos + Dir * i * stepLen; 
         float curHeight = length(curPos);
-
-        //sun_intersect = sphere_dist(Rg, curPos, SunDir, Rg * 4, -1, sunRayLen);
-        //doOp = !(sun_intersect && sunRayLen >= 0);
     
-
         float hr = exp(- (curHeight - Rg) / RayleighScaleHeight) * stepLen;
         float hm = exp(- (curHeight - Rg) / MieScaleHeight) * stepLen;
 
@@ -91,18 +83,19 @@ void main(){
         //Sun transmittance
         vec4 T_L = T(curHeight, cos(delta));
 
-        //Attenuation
-        vec3 tau = (T_L.xyz + T_V.xyz) * Rayleigh + (T_L.www + T_V.www) * Mie * 1.1f;
-        tau = exp(-tau);
+        vec3 cur_T = exp(-(T_V.xyz * Rayleigh + T_V.w * Mie * 1.1f));
 
-        radiance += hr * tau;
-        mie_radiance += hm * tau;
+        //Attenuation
+        vec3 tau = (T_L.xyz * cur_T);
+        
+        radiance += tau * hr;
+        mie_radiance += tau * hm;
     }
 
     vec4 val = vec4(1);
-    val.rgb = Rayleigh * radiance;
+    val.rgb = radiance * Rayleigh;
     imageStore(ScatterCache, ivec3(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + YOff, Layer), val);
     
-    val.rgb = Mie * mie_radiance;
+    val.rgb = mie_radiance * Mie;
     imageStore(MieScatterCache, ivec3(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + YOff, Layer), val);
 }

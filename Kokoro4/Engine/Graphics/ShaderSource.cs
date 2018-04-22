@@ -34,6 +34,11 @@ namespace Kokoro.Engine.Graphics
 
         public static ShaderSource Load(ShaderType sType, string file, params string[] libraryName)
         {
+            if (!File.Exists(file))
+            {
+                if (File.Exists(Path.Combine(ShaderPath, file)))
+                    file = Path.Combine(ShaderPath, file);
+            }
             return new ShaderSource(sType, File.ReadAllText(file), libraryName);
         }
         #endregion

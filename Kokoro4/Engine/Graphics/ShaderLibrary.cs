@@ -53,6 +53,11 @@ namespace Kokoro.Engine.Graphics
 
         public void AddSourceFile(string file)
         {
+            if(!File.Exists(file))
+            {
+                if (File.Exists(Path.Combine(ShaderSource.ShaderPath, file)))
+                    file = Path.Combine(ShaderSource.ShaderPath, file);
+            }
             Sources.Add(File.ReadAllText(file));
         }
 

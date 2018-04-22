@@ -19,8 +19,8 @@ namespace Kokoro.Engine.Graphics
         private Texture single_scattering_cache;
         private Texture mie_single_scattering_cache;
 
-        private const int Transmitance_W = 256;
-        private const int Transmitance_H = 128;
+        private const int Transmitance_W = 128;
+        private const int Transmitance_H = 64;
         private ShaderProgram Transmitance_Precalc, SingleScatter_Precalc;
         private ImageHandle TransmitanceHandle, SingleScatterHandle, mie_SingleScatterHandle;
 
@@ -146,7 +146,7 @@ namespace Kokoro.Engine.Graphics
 
             for (int i = 0; i < fbuf.Length; i++)
             {
-                AtmosphereRenderState[i] = new RenderState(fbuf[i], AtmosphereShader, null, null, false, true, DepthFunc.Greater, 0, 1, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, CullFaceMode.Front);
+                AtmosphereRenderState[i] = new RenderState(fbuf[i], AtmosphereShader, null, null, false, true, DepthFunc.Greater, 1, 0, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha, Vector4.Zero, 0, CullFaceMode.Front);
                 AtmosphereRender[i] = new RenderQueue(1, false);
 
                 AtmosphereRender[i].BeginRecording();

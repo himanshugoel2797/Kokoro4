@@ -80,7 +80,7 @@ namespace Kokoro.Engine.Graphics
             #endregion
 
             //AtmosphereShader = new ShaderProgram(ShaderSource.Load( "Shaders/Atmosphere/vertex.glsl"))
-            //AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, DepthFunc.LEqual, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Front);
+            //AtmosphereRenderState = new RenderState(fbuf, AtmosphereShader, null, null, false, DepthFunc.LEqual, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Front);
             //AtmosphereRender = new RenderQueue(1, false);
         }
 

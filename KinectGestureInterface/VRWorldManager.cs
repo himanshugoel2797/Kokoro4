@@ -41,8 +41,8 @@ namespace KinectGestureInterface
             centerPose = Matrix4.Identity;
             volumePose = Matrix4.Identity;
 
-            var RenderState0 = new RenderState(VRRenderer.LeftFramebuffer, null, null, null, true, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
-            var RenderState1 = new RenderState(VRRenderer.RightFramebuffer, null, null, null, true, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
+            var RenderState0 = new RenderState(VRRenderer.LeftFramebuffer, null, null, null, true, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
+            var RenderState1 = new RenderState(VRRenderer.RightFramebuffer, null, null, null, true, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
             clearQueue = new RenderQueue(2, false);
             clearQueue.BeginRecording();
             clearQueue.ClearFramebufferBeforeSubmit = true;

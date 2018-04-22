@@ -84,9 +84,9 @@ namespace TestApplication
 
                 vrProvider = VRRenderer.Create();
 
-                var RenderState0 = new RenderState(vrProvider.LeftFramebuffer, null, null, null, true, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
-                var RenderState1 = new RenderState(vrProvider.RightFramebuffer, null, null, null, true, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
-                var RenderState2 = new RenderState(fbuf, null, null, null, true, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
+                var RenderState0 = new RenderState(vrProvider.LeftFramebuffer, null, null, null, true, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
+                var RenderState1 = new RenderState(vrProvider.RightFramebuffer, null, null, null, true, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
+                var RenderState2 = new RenderState(fbuf, null, null, null, true, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
                 clearQueue = new RenderQueue(3, false);
                 clearQueue.BeginRecording();
                 clearQueue.ClearFramebufferBeforeSubmit = true;

@@ -2,22 +2,26 @@
 
 layout(rgba16f, bindless_sampler) uniform sampler2D TransCache;
 layout(rgba16f, bindless_image) uniform writeonly image3D ScatterCache;
-layout(rgba16f, bindless_image) uniform writeonly image3D MieScatterCache;
 
 uniform vec3 Rayleigh;
 uniform float Mie;
 
 uniform float Rg;
 uniform float Rt;
+uniform float SunAngularRadius;
+
+uniform int SunAngleCount;
 uniform int Layer;
 uniform int Count;
+
+uniform int SunAngleOff;
 uniform int YOff;
 uniform int YLen;
 
 uniform float RayleighScaleHeight;
 uniform float MieScaleHeight;
 
-#define SAMPLE_COUNT 512
+#define SAMPLE_COUNT 1024
 
 bool sphere_dist(in float r, in vec3 pos, in vec3 dir, in float tmax, in float mode, out float t) {
 
@@ -33,20 +37,30 @@ vec4 T(float h, float CosTheta) {
     return textureLod(TransCache, vec2(CosTheta * 0.5f + 0.5f, (h - Rg) / (Rt - Rg)), 0);
 }
 
+vec4 J() {
+
+}
+
+vec4 R(){
+    
+}
+
 void main(){
     
     float height = float(gl_GlobalInvocationID.x) / float(gl_NumWorkGroups.x - 1);
     float delta = float(gl_GlobalInvocationID.y + YOff) / float(YLen - 1);
     float theta = float(Layer) / float(Count - 1);
+	float sunAngle = SunAngleOff / SunAngleCount;
 
     height = Rg + height * (Rt - Rg);
     delta = acos(delta * 2 - 1);
     theta = acos(theta * 2 - 1);
-    
+    sunAngle = sunAngle * 2 * PI;
+
     //Calculate the light scattering intergral
     vec3 Pos = vec3(0, height, 0);
     vec3 Dir = vec3(sin(theta), cos(theta), 0);
-    vec3 SunDir = vec3(sin(delta), cos(delta), 0);
+    vec3 SunDir = vec3(sin(delta) * cos(sunAngle), sin(delta) * sin(sunAngle), cos(delta));
     
     //Calculate the ray length to the atmosphere
     float rayLen = 0;
@@ -59,6 +73,7 @@ void main(){
         rayLen = gndRayLen;
     float stepLen = abs(rayLen) / SAMPLE_COUNT;
 
+    //Check if the sun is blocked by the ground
     float sunRayLen = 0;
     bool sun_intersect = sphere_dist(Rg, Pos, SunDir, Rg * 4, -1, sunRayLen);
     bool doOp = !(sun_intersect && sunRayLen >= 0);
@@ -81,8 +96,8 @@ void main(){
         //doOp = !(sun_intersect && sunRayLen >= 0);
     
 
-        float hr = exp(- (curHeight - Rg) / RayleighScaleHeight) * stepLen;
-        float hm = exp(- (curHeight - Rg) / MieScaleHeight) * stepLen;
+        float hr = exp(- (curHeight - Rg) / RayleighScaleHeight);
+        float hm = exp(- (curHeight - Rg) / MieScaleHeight);
 
         //Compute the view transmittance
         T_V.xyz += vec3(hr);
@@ -95,8 +110,8 @@ void main(){
         vec3 tau = (T_L.xyz + T_V.xyz) * Rayleigh + (T_L.www + T_V.www) * Mie * 1.1f;
         tau = exp(-tau);
 
-        radiance += hr * tau;
-        mie_radiance += hm * tau;
+        radiance += tau * stepLen;
+        mie_radiance += tau * stepLen;
     }
 
     vec4 val = vec4(1);

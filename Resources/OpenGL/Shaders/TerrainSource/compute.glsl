@@ -39,7 +39,7 @@ void main(){
 
     val.xyz *= val.xyz;
 
-    //val.xyz = vec3(noise(sample_pos * 50));
+    val.xyz /= vec3(exp(ridged_noise(sample_pos * 10)));
 
     imageStore(terrain_fragment, img_coords, val);
 }

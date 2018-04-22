@@ -64,7 +64,7 @@ namespace KinectGestureInterface
                 grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 20, 20);
                 fsq = FullScreenQuadFactory.Create(grp);
                 
-                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/FrameBuffer/fragment.glsl")), null, new UniformBuffer[] { sensorManager.UBO }, false, true, DepthFunc.Always, 0, 1, BlendFactor.One, BlendFactor.Zero, Vector4.One, 0, CullFaceMode.None);
+                state = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBuffer/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/FrameBuffer/fragment.glsl")), null, new UniformBuffer[] { sensorManager.UBO }, false, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.One, 0, CullFaceMode.None);
                 
                 queue = new RenderQueue(10, false);
                 queue.ClearAndBeginRecording();

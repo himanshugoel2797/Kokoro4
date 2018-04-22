@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Kokoro.Engine.Graphics;
+using TestApplication.AdvancedAtmosphere;
 
 namespace TestApplication
 {
@@ -35,19 +36,21 @@ namespace TestApplication
             EngineManager.StateManager.AddState(nameof(ForwardPlusTest), new ForwardPlusTest());
             EngineManager.StateManager.AddState(nameof(SubsurfaceMaterialTest), new SubsurfaceMaterialTest());
             EngineManager.StateManager.AddState(nameof(VolumeRayCastingTest), new VolumeRayCastingTest());
+            EngineManager.StateManager.AddState(nameof(AdvancedAtmosphereTest), new AdvancedAtmosphereTest());
 
             //EngineManager.StateManager.SetActiveState(nameof(HeightfieldGITest));
             //EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
             //EngineManager.StateManager.SetActiveState(nameof(PlanetTerrainRendererTest));
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest)); 
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));
-            //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
+            EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
             //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTestVR));
             //EngineManager.StateManager.SetActiveState(nameof(ForwardPlusTest));
             //EngineManager.StateManager.SetActiveState(nameof(CloudRenderingTest));
             //EngineManager.StateManager.SetActiveState(nameof(SubsurfaceMaterialTest));
             //EngineManager.StateManager.SetActiveState(nameof(TestScene));
-            EngineManager.StateManager.SetActiveState(nameof(VolumeRayCastingTest));
+            //EngineManager.StateManager.SetActiveState(nameof(VolumeRayCastingTest));
+            //EngineManager.StateManager.SetActiveState(nameof(AdvancedAtmosphereTest));
 
             //Work on ice/snow rendering//
 

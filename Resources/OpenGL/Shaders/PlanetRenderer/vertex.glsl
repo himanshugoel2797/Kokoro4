@@ -45,7 +45,7 @@ void main(){
 	vnorm = vpos;
 
 	vpos *= Radius;
-	vpos += vnorm * textureLod(Cache, vec3(vs_uv.x, vs_uv.y, HeightMapData.HeightMaps[gl_InstanceID / 4][gl_InstanceID % 4]), 0).x;
+	vpos += vnorm * exp(textureLod(Cache, vec3(vs_uv.x, vs_uv.y, HeightMapData.HeightMaps[gl_InstanceID / 4][gl_InstanceID % 4]), 0).x * 2);
 
 	gl_Position =  MVP * vec4(vpos.x, vpos.y, vpos.z, 1);
 

@@ -87,7 +87,7 @@ namespace Kokoro.Engine.Graphics.Renderer
             gbuffer[FramebufferAttachment.ColorAttachment0 + OutputColorAttachment] = albedo;
 
             
-            s = new RenderState(destBuffer, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBufferTriangle/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/FrameBufferTriangle/fragment.glsl")), null, null, !true, true, DepthFunc.Always, 1, -1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 1, CullFaceMode.Back);
+            s = new RenderState(destBuffer, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBufferTriangle/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/FrameBufferTriangle/fragment.glsl")), null, null, false, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
 
             q = new RenderQueue(10, false);
 

@@ -3,15 +3,18 @@
 layout(rgba16f, bindless_image) uniform writeonly image2D TransCache;
 
 uniform vec3 Rayleigh;
+uniform vec3 RayleighExtinction;
+uniform float RayleighScaleHeight;
+
 uniform float Mie;
+uniform float MieExtinction;
+uniform float MieScaleHeight;
 
 uniform float Rg;
 uniform float Rt;
 
-uniform float RayleighScaleHeight;
-uniform float MieScaleHeight;
 
-#define SAMPLE_COUNT 512
+#define SAMPLE_COUNT 1024
 
 bool sphere_dist(in float r, in vec3 pos, in vec3 dir, in float tmax, in float mode, out float t) {
 
@@ -44,22 +47,26 @@ void main(){
         rayLen = g_rayLen;
 
     float stepLen = abs(rayLen) / SAMPLE_COUNT;
-    //Analytical integration over the ray length
-    float rayleigh_rhoSum = 0;
-    float mie_rhoSum = 0;
+    
+	//Integration over the ray length
+    float rayleigh_g = 0;
+    float mie_g = 0;
+
     for(float i = 0; i < SAMPLE_COUNT; ++i){
         vec3 curPos = Pos + Dir * i * stepLen; 
         float curHeight = length(curPos) - Rg;
 
-        rayleigh_rhoSum += exp(- curHeight / RayleighScaleHeight) * stepLen;
-        mie_rhoSum += exp(- curHeight / MieScaleHeight) * stepLen;
+		float rayleigh_l = exp(- curHeight / RayleighScaleHeight);
+		float mie_l = exp(- curHeight / MieScaleHeight);
+
+        rayleigh_g += rayleigh_l * stepLen;
+        mie_g += mie_l * stepLen;
     }
 
     //Multiply the sums with the scattering coefficients
     vec4 val = vec4(0);
-    val.rgb = Rayleigh * rayleigh_rhoSum;
-    val.a =  Mie * mie_rhoSum;
-
+    val.rgb = vec3(exp(-(rayleigh_g * RayleighExtinction + mie_g * MieExtinction)));
+    val.a = 1;
 
     imageStore(TransCache, ivec2(gl_GlobalInvocationID.xy), val);
 }
