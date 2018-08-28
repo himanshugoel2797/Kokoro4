@@ -37,13 +37,14 @@ namespace TestApplication
             EngineManager.StateManager.AddState(nameof(SubsurfaceMaterialTest), new SubsurfaceMaterialTest());
             EngineManager.StateManager.AddState(nameof(VolumeRayCastingTest), new VolumeRayCastingTest());
             EngineManager.StateManager.AddState(nameof(AdvancedAtmosphereTest), new AdvancedAtmosphereTest());
+            EngineManager.StateManager.AddState(nameof(PBR.LambertTest), new PBR.LambertTest());
 
             //EngineManager.StateManager.SetActiveState(nameof(HeightfieldGITest));
             //EngineManager.StateManager.SetActiveState(nameof(QuadTreeTerrainTest));
             //EngineManager.StateManager.SetActiveState(nameof(PlanetTerrainRendererTest));
             //EngineManager.StateManager.SetActiveState(nameof(TextureStreamingTest)); 
             //EngineManager.StateManager.SetActiveState(nameof(FenceTest));
-            EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
+            //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
             //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTestVR));
             //EngineManager.StateManager.SetActiveState(nameof(ForwardPlusTest));
             //EngineManager.StateManager.SetActiveState(nameof(CloudRenderingTest));
@@ -51,6 +52,7 @@ namespace TestApplication
             //EngineManager.StateManager.SetActiveState(nameof(TestScene));
             //EngineManager.StateManager.SetActiveState(nameof(VolumeRayCastingTest));
             //EngineManager.StateManager.SetActiveState(nameof(AdvancedAtmosphereTest));
+            EngineManager.StateManager.SetActiveState(nameof(PBR.LambertTest));
 
             //Work on ice/snow rendering//
 

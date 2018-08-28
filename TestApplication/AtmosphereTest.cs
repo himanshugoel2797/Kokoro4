@@ -93,11 +93,11 @@ namespace TestApplication
                 });
                 clearQueue.EndRecording();
 
-                //renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(19.918e-3f, 13.57e-3f, 5.75e-3f), 10.8f, 20e-3f, 1.2f, 3390, 3520, grp, fbuf);
-                //planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { fbuf }, 3390, renderer);
+                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(19.918e-3f, 13.57e-3f, 5.75e-3f), 10.8f, 20e-3f, 1.2f, 3390, 3520, grp, fbuf);
+                planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { fbuf }, 3390, renderer);
 
-                renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 8, 20e-3f, 1.2f, 6360, 6420, grp, fbuf);
-                planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { fbuf }, 6360, renderer);
+                //renderer = new AtmosphereRenderer(new Kokoro.Math.Vector3(5.8e-3f, 1.35e-2f, 3.31e-2f), 7.994f, 20e-3f, 1.2f, 6372.797f, 6472.797f, grp, fbuf);
+                //planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { fbuf }, 6360, renderer);
 
                 inited = true;
             }

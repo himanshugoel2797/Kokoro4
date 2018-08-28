@@ -1,5 +1,6 @@
 ﻿using Kokoro.Engine;
 using Kokoro.StateMachine;
+using Kokoro4.Editor.Communication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ namespace Kokoro.Editor
     class EngineScene : IState
     {
         GameObjectCollection objects;
+        CommunicationManager communicationManager;
 
         public EngineScene()
         {
             objects = new GameObjectCollection();
+            communicationManager = new CommunicationManager();
         }
 
         public void Enter(IState prev)
@@ -48,6 +51,7 @@ namespace Kokoro.Editor
 
         public void Render(double interval)
         {
+            communicationManager.WriteEchoCMD("TEST");
 
         }
 

@@ -29,27 +29,50 @@ vec4 T(float h, float CosTheta) {
     return textureLod(TransCache, vec2(CosTheta * 0.5f + 0.5f, (h - Rg) / (Rt - Rg)), 0);
 }
 
+float RayleighPhase(float mu)
+{
+    return 3.0f / (16.0f * PI) * (1 + mu * mu);
+}
+
+#define g 0.76f
+float MiePhase(float mu)
+{
+    float numerator = (1 - g * g) * (1 + mu * mu);
+    float denom = (2 + g * g) * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f);
+
+    return 3.0f / (8.0f * PI) * numerator / denom;
+}
+
 void Scatter(float height, float sunAngle, float eyeAngle, vec3 sunDir, vec3 eyeDir, out vec4 Ray, out vec4 Mie) {
 	vec3 GndTanDir = normalize(vec3(Rg, -height, 0));
     
-	Ray = texture(ScatterCache, vec3((height - Rg) / (Rt - Rg), sunAngle * 0.5f + 0.5f, eyeAngle * 0.5f + 0.5f));
-	Mie = texture(MieScatterCache, vec3((height - Rg) / (Rt - Rg), sunAngle * 0.5f + 0.5f, eyeAngle * 0.5f + 0.5f));
+	vec3 coord = vec3(0);
+	coord.x = (height - Rg) / (Rt - Rg);
+	coord.y = acos(sunAngle) / PI;
+	coord.z = acos(eyeAngle) / PI;
 
-    float mu = eyeAngle;
-    float g = 0.76f;
-	Ray.rgb *= 3.0f / (16.0f * PI) * (1 + mu * mu);
-	Mie.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
+	Ray = texture(ScatterCache, coord);
+	Mie = texture(MieScatterCache, coord);
+
+	float mu = dot(sunDir, eyeDir);
+	Ray.rgb *= RayleighPhase(mu);
+	Mie.rgb *= MiePhase(mu);
+
+    //float mu = eyeAngle;
+    //float g = 0.76f;
+	//Ray.rgb *= 3.0f / (16.0f * PI) * (1 + mu * mu);
+	//Mie.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
 	
-	float nDL = dot(normalize(EyeDir), sunDir);
-	Ray.rgb *= nDL;
-	Mie.rgb *= nDL;
-	Ray.a = nDL;
-	Mie.a = nDL;
+	//float nDL = dot(normalize(EyeDir), sunDir);
+	//Ray.rgb *= nDL;
+	//Mie.rgb *= nDL;
+	//Ray.a = nDL;
+	//Mie.a = nDL;
 }
 
 void main(){
 
-	vec3 eD = normalize(normalize(EyeDir) * Rt - EyePosition);	//R_v
+	vec3 eD = normalize(EyeDir * Rt - EyePosition);	//R_v
 	vec3 eP = EyePosition;
 
 	float rayDist = 0;
@@ -71,7 +94,7 @@ void main(){
 	vec4 m_data = vec4(0);
 	Scatter(height, sunAngle, eyeAngle, SunDir, eD, r_data, m_data);
 
-	color.rgb = (r_data.rgb + m_data.rgb) * 20;
+	color.rgb = vec3(1, 0.96f, 0.949f) * 15 * (r_data.rgb + m_data.rgb);
 	//color.rgb = r_data.rgb * 20;
 	//color.a = (clamp(exp(-(height - Rg) / (Rt - Rg)), 0, 1));
 	//color.a *= (r_data.a + m_data.a) * 20;

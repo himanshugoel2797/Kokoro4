@@ -75,7 +75,7 @@ namespace KinectGestureInterface.Kinect
             CurrentImageData = new byte[Size * Size];
             Matcher = new ImageMatching();
 
-            History = new int[20];
+            History = new int[30];
             HistoryLock = new object();
             for (int i = 0; i < History.Length; i++)
                 History[i] = -1;

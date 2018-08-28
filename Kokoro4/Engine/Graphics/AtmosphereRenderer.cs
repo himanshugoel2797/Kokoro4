@@ -19,8 +19,8 @@ namespace Kokoro.Engine.Graphics
         private Texture single_scattering_cache;
         private Texture mie_single_scattering_cache;
 
-        private const int Transmitance_W = 128;
-        private const int Transmitance_H = 64;
+        private const int Transmitance_W = 512;
+        private const int Transmitance_H = 512;
         private ShaderProgram Transmitance_Precalc, SingleScatter_Precalc;
         private ImageHandle TransmitanceHandle, SingleScatterHandle, mie_SingleScatterHandle;
 
@@ -45,9 +45,9 @@ namespace Kokoro.Engine.Graphics
             this.gnd = gnd;
             this.atmos = atmos;
 
-            int sideX = 128;
-            int sideY = 128;
-            int sideZ = 128;
+            int sideX = 256;
+            int sideY = 32;
+            int sideZ = 256;
 
             TextureSampler sampler = new TextureSampler();
             sampler.SetEnableLinearFilter(true);

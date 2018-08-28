@@ -33,7 +33,6 @@ void main(){
 		tmp = texture(VolumeData, rayVec + 0.5f).rrrr;
 		tmp.a *= 0.5f;
 		tmp.rgb *= tmp.a;
-
 		color = (1.0f - color.a) * tmp + color;
 
 		if(color.a >= 0.95f)

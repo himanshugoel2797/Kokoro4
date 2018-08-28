@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Kokoro.Graphics.Prefabs;
+using Kokoro.Engine.Graphics.Lights;
 
 #if DEBUG
 using Kokoro.Graphics.OpenGL;
@@ -43,7 +44,9 @@ namespace Kokoro.Engine.Graphics.Renderer
         public int Height { get { return h * tile_y_cnt; } }
 
         public const int OutputColorAttachment = 0;
+
         //TODO: make all resources accesses use functions to retrieve things, thus allowing control of resource access through libraries.
+        private List<IForwardPlusLight> lights;
 
         static ForwardPlus()
         {
@@ -86,8 +89,9 @@ namespace Kokoro.Engine.Graphics.Renderer
             gbuffer[FramebufferAttachment.DepthAttachment] = depth; 
             gbuffer[FramebufferAttachment.ColorAttachment0 + OutputColorAttachment] = albedo;
 
+            lights = new List<IForwardPlusLight>();
             
-            s = new RenderState(destBuffer, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBufferTriangle/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/FrameBufferTriangle/fragment.glsl")), null, null, false, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
+            s = new RenderState(destBuffer, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBufferTriangle/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/FrameBufferTriangle/fragment.glsl")), null, null, false, true, DepthFunc.Always, InverseDepth.Far, InverseDepth.Near, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
 
             q = new RenderQueue(10, false);
 

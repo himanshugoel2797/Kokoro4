@@ -16,6 +16,9 @@ namespace KinectGestureInterface
     {
         MeshGroup grp;
 
+        Vector3 cubeOrt;
+        Quaternion cubeOrient;
+
         VRRenderer VRRenderer;
         RenderQueue clearQueue;
         Matrix4 leftEyeProj, rightEyeProj, centerPose;
@@ -33,6 +36,9 @@ namespace KinectGestureInterface
         public void Enter(IState prev)
         {
             grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 10000, 10000);
+
+            cubeOrt = Vector3.Zero;
+            cubeOrient = Quaternion.Identity;
 
             //Setup VR
             VRRenderer = VRRenderer.Create();
@@ -95,6 +101,38 @@ namespace KinectGestureInterface
             }
             pose = pose * centerPose;
 
+            if (interval == 0)
+            {
+
+                cubeOrient += Quaternion.FromAxisAngle(Vector3.UnitX, 0.05f);
+            }
+            else if (interval == 1)
+            {
+                cubeOrient += Quaternion.FromAxisAngle(Vector3.UnitY, 0.05f);
+            }
+            else if (interval == 2)
+            {
+                cubeOrient += Quaternion.FromAxisAngle(Vector3.UnitZ, 0.05f);
+            }
+            else if (interval == 3)
+            {
+                cubeOrient -= Quaternion.FromAxisAngle(Vector3.UnitX, 0.05f);
+            }
+            else if (interval == 4)
+            {
+                cubeOrient -= Quaternion.FromAxisAngle(Vector3.UnitY, 0.05f);
+            }
+            else if (interval == 5)
+            {
+                cubeOrient -= Quaternion.FromAxisAngle(Vector3.UnitZ, 0.05f);
+            }
+            else if (interval == 9)
+            {
+                centerPose = Matrix4.Invert(pose);
+            }
+
+            var cubeMat = Matrix4.CreateFromQuaternion(cubeOrient);
+
             var leftEyeView = VRRenderer.GetEyeView(true);
             var rightEyeView = VRRenderer.GetEyeView(false);
 
@@ -103,8 +141,8 @@ namespace KinectGestureInterface
 
             clearQueue.Submit();
 
-            voxelRayCaster.Draw(volumePose, leftEyeView * pose, leftEyeProj, 0);
-            voxelRayCaster.Draw(volumePose, rightEyeView * pose, rightEyeProj, 1);
+            voxelRayCaster.Draw(cubeMat * volumePose, leftEyeView * pose, leftEyeProj, 0);
+            voxelRayCaster.Draw(cubeMat * volumePose, rightEyeView * pose, rightEyeProj, 1);
 
             VRRenderer.Submit(true);
             VRRenderer.Submit(false);

@@ -17,7 +17,7 @@ uniform int YLen;
 uniform float RayleighScaleHeight;
 uniform float MieScaleHeight;
 
-#define SAMPLE_COUNT 1024
+#define SAMPLE_COUNT 2048
 
 bool sphere_dist(in float r, in vec3 pos, in vec3 dir, in float tmax, in float mode, out float t) {
 
@@ -33,6 +33,81 @@ vec4 T(float h, float CosTheta) {
     return textureLod(TransCache, vec2(acos(CosTheta) / PI, (h - Rg) / (Rt - Rg)), 0);
 }
 
+float getRayLen(vec3 Pos, vec3 Dir){
+
+    //Calculate the ray length to the atmosphere
+    float rayLen = 0;
+    sphere_dist(Rt, Pos, Dir, Rt * 4, +1, rayLen);
+
+    float g_rayLen = 0;
+    bool g_intersect = sphere_dist(Rg, Pos, Dir, Rt * 4, -1, g_rayLen);
+    if(g_intersect && g_rayLen >= 0 && g_rayLen < rayLen)
+        rayLen = g_rayLen;
+
+    return rayLen;
+}
+
+float RayleighPhase(float mu)
+{
+    return 3.0f / (16.0f * PI) * (1 + mu * mu);
+}
+
+#define g 0.76f
+float MiePhase(float mu)
+{
+    float numerator = (1 - g * g) * (1 + mu * mu);
+    float denom = (2 + g * g) * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f);
+
+    return 3.0f / (8.0f * PI) * numerator / denom;
+}
+
+void ComputeScattering(vec3 P_v, float sigma, vec3 R_v, out vec3 rayleigh_color, out vec3 mie_color)
+{
+    float rayLen = getRayLen(P_v, R_v);
+    float stepLen = rayLen / SAMPLE_COUNT;
+    vec3 sunDir = vec3(sin(sigma), cos(sigma), 0);
+
+    float mie_Tv = 0;
+    float rayleigh_Tv = 0;
+
+    vec3 rayleigh_scatter = vec3(0);
+    vec3 mie_scatter = vec3(0);
+
+    float sunRayLen = 0;
+    bool sun_intersect = sphere_dist(Rg, P_v, sunDir, Rg * 4, -1, sunRayLen);
+    bool doOp = !(sun_intersect && sunRayLen >= 0);
+
+    for(int i = 0; i < SAMPLE_COUNT && doOp; i++)
+    {
+        vec3 Ray = P_v + R_v * i * stepLen;
+        float h = length(Ray);
+
+        float rayleigh_rho = exp(-(h - Rg) / RayleighScaleHeight);
+        float mie_rho = exp(-(h - Rg) / MieScaleHeight);
+
+        rayleigh_Tv += rayleigh_rho * stepLen;
+        mie_Tv += mie_rho * stepLen;
+
+        vec3 rayleigh_Tv_tmp = rayleigh_Tv * Rayleigh;
+        float mie_Tv_tmp = mie_Tv * Mie * 1.1f;
+
+        vec4 T_L = T(h, cos(sigma));//dot(sunDir, normalize(Ray)));
+
+        rayleigh_scatter += rayleigh_rho * exp( - rayleigh_Tv_tmp - T_L.rgb);
+        mie_scatter += mie_rho * exp( - mie_Tv_tmp - T_L.a);
+    }
+
+    rayleigh_scatter *= stepLen;
+    mie_scatter *= stepLen;
+
+    //float mu = PI - dot(R_v, sunDir);
+    //rayleigh_scatter *= RayleighPhase(mu);
+    //mie_scatter *= MiePhase(mu);
+
+    rayleigh_color = Rayleigh * rayleigh_scatter;
+    mie_color = vec3(Mie * mie_scatter);
+}
+
 void main(){
     
     float height = float(gl_GlobalInvocationID.x) / float(gl_NumWorkGroups.x - 1);
@@ -40,14 +115,18 @@ void main(){
     float theta = float(Layer) / float(Count - 1);
 
     height = Rg + height * (Rt - Rg);
-    delta = acos(delta * 2 - 1);
-    theta = acos(theta * 2 - 1);
+    delta = delta * PI;
+    theta = theta * PI;
     
     //Calculate the light scattering intergral
     vec3 Pos = vec3(0, height, 0);
     vec3 Dir = vec3(sin(theta), cos(theta), 0);
-    vec3 SunDir = vec3(sin(delta), cos(delta), 0);
     
+    vec3 rayleigh_color = vec3(0);
+    vec3 mie_color = vec3(0);
+    ComputeScattering(Pos, delta, Dir, rayleigh_color, mie_color);
+
+/*
     //Calculate the ray length to the atmosphere
     float rayLen = 0;
     sphere_dist(Rt, Pos, Dir, Rt * 4, +1, rayLen);
@@ -90,12 +169,12 @@ void main(){
         
         radiance += tau * hr;
         mie_radiance += tau * hm;
-    }
+    }*/
 
     vec4 val = vec4(1);
-    val.rgb = radiance * Rayleigh;
+    val.rgb = rayleigh_color;
     imageStore(ScatterCache, ivec3(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + YOff, Layer), val);
     
-    val.rgb = mie_radiance * Mie;
+    val.rgb = mie_color;
     imageStore(MieScatterCache, ivec3(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + YOff, Layer), val);
 }

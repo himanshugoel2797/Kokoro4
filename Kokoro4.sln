@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectGestureInterface", "K
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelTests", "VoxelTests\VoxelTests.csproj", "{90AED938-A77C-45AE-B662-7E33AABC5E2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro4.Editor.Controls", "Kokoro4.Editor.Controls\Kokoro4.Editor.Controls.csproj", "{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kokoro4.Editor.Communication", "Kokoro4.Editor.Communication\Kokoro4.Editor.Communication.csproj", "{160FC733-183A-46A8-AA09-B151A442D16B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -187,6 +191,30 @@ Global
 		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|x64.Build.0 = Release|Any CPU
 		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|x86.ActiveCfg = Release|Any CPU
 		{90AED938-A77C-45AE-B662-7E33AABC5E2E}.Release|x86.Build.0 = Release|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Debug|x64.Build.0 = Debug|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Debug|x86.Build.0 = Debug|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Release|x64.ActiveCfg = Release|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Release|x64.Build.0 = Release|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Release|x86.ActiveCfg = Release|Any CPU
+		{8BCF4488-279C-47CD-8968-6BA6EA39FC2A}.Release|x86.Build.0 = Release|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Debug|x64.Build.0 = Debug|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Debug|x86.Build.0 = Debug|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Release|x64.ActiveCfg = Release|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Release|x64.Build.0 = Release|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Release|x86.ActiveCfg = Release|Any CPU
+		{160FC733-183A-46A8-AA09-B151A442D16B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -104,6 +104,7 @@
     <Compile Include="CubeTerrainTest.cs" />
     <Compile Include="FenceTest.cs" />
     <Compile Include="HeightfieldGITest.cs" />
+    <Compile Include="PBR\LambertTest.cs" />
     <Compile Include="PlanetTerrainRendererTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

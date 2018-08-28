@@ -36,121 +36,144 @@ vec4 T(float h, float CosTheta) {
     return textureLod(TransCache, vec2(acos(CosTheta) / PI, (h - Rg) / (Rt - Rg)), 0);
 }
 
+float RayleighPhase(float mu)
+{
+    return 3.0f / (16.0f * PI) * (1 + mu * mu);
+}
+
+#define g 0.76f
+float MiePhase(float mu)
+{
+    float numerator = (1 - g * g) * (1 + mu * mu);
+    float denom = (2 + g * g) * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f);
+
+    return 3.0f / (8.0f * PI) * numerator / denom;
+}
+
 void Scatter(float height, float sunAngle, float eyeAngle, vec3 sunDir, vec3 eyeDir, out vec4 Ray, out vec4 Mie) {
 	vec3 GndTanDir = normalize(vec3(Rg, -height, 0));
     
-	Ray = texture(ScatterCache, vec3((height - Rg) / (Rt - Rg), sunAngle * 0.5f + 0.5f, eyeAngle * 0.5f + 0.5f));
-	Mie = texture(MieScatterCache, vec3((height - Rg) / (Rt - Rg), sunAngle * 0.5f + 0.5f, eyeAngle * 0.5f + 0.5f));
+	vec3 coord = vec3(0);
+	coord.x = (height - Rg) / (Rt - Rg);
+	coord.y = acos(sunAngle) / PI;
+	coord.z = acos(eyeAngle) / PI;
 
-    float mu = eyeAngle;
-    float g = 0.76f;
-	Ray.rgb *= 3.0f / (16.0f * PI) * (1 + mu * mu);
-	Mie.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
+	Ray = texture(ScatterCache, coord);
+	Mie = texture(MieScatterCache, coord);
+
+	float mu = dot(sunDir, eyeDir);
+	Ray.rgb *= RayleighPhase(mu);
+	Mie.rgb *= MiePhase(mu);
+
+    //float mu = eyeAngle;
+    //float g = 0.76f;
+	//Ray.rgb *= 3.0f / (16.0f * PI) * (1 + mu * mu);
+	//Mie.rgb *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
 	
-	float nDL = dot(normalize(normal), sunDir);
-	Ray.rgb *= nDL;
-	Mie.rgb *= nDL;
-	Ray.a = nDL;
-	Mie.a = nDL;
+	//float nDL = dot(normalize(normal), sunDir);
+	//Ray.rgb *= nDL;
+	//Mie.rgb *= nDL;
+	//Ray.a = nDL;
+	//Mie.a = nDL;
 }
 
-void WithoutHeightField(float h, out vec4 Ray, out vec4 Mie) {
-	vec3 P_g = normalize(normal) * (Rg + h);
-	vec3 eD = normalize(P_g - EyePosition);	//R_v
-	vec3 eP = EyePosition;
-
-	float rayDist = 0;
-	bool raySphere = sphere_dist(Rt, eP, eD, Rt * 4, -1, rayDist);
-	if(raySphere && rayDist > 0)
-		eP = eP + eD * rayDist;
-
+void WithoutHeightField(vec3 eP, vec3 P_g, vec3 eD, vec3 sunDir, float h, out vec4 Ray, out vec4 Mie) {
 	//Height is limited to the atmosphere
 	float height = clamp(length(eP), Rg, Rt);		//h
+	
+	//Eye angle is based on vertex position
+	float eyeAngle = dot(normalize(eP), eD);		//theta
 
 	//Calculate the view angle, sun angle and eye angle.
 	float sunAngle = dot(normalize(eP), SunDir);	//sigma
 
-	//Eye angle is based on vertex position
-	float eyeAngle = dot(normalize(eP), eD);		//theta
-
-	Scatter(height, sunAngle, eyeAngle, SunDir, eD, Ray, Mie);
+	Scatter(height, sunAngle, eyeAngle, sunDir, eD, Ray, Mie);
 }
 
-void WithHeightField(float h, out vec4 Ray, out vec4 Mie, out vec4 T_r_net, out vec4 T_m_net) {
-	
-	vec3 P_g = normalize(normal) * (Rg + h);
-	vec3 eD = normalize(P_g - EyePosition);	//R_v
-	vec3 eP = EyePosition;
-
-	float rayDist = 0;
-	bool raySphere = sphere_dist(Rt, eP, eD, Rt * 4, -1, rayDist);
-	if(raySphere && rayDist > 0)
-		eP = eP + eD * rayDist;
+void WithHeightField(vec3 eP, vec3 P_g, vec3 eD, vec3 sunDir, float h, out vec4 Ray, out vec4 Mie) {
 
 	//Height is limited to the atmosphere
 	float height = clamp(Rg + h, Rg, Rt);
 
-	//Calculate the view angle, sun angle and eye angle.
-	float sunAngle = dot(normalize(P_g), SunDir);	//sigma
-
 	//Eye angle is based on vertex position
 	float eyeAngle = dot(normalize(eP), eD);	//theta
+	
+	//Calculate the view angle, sun angle and eye angle.
+	float sunAngle = dot(normalize(P_g), SunDir);	//sigma
+	
+	Scatter(height, sunAngle, eyeAngle, sunDir, eD, Ray, Mie);
+}
+
+void Sunlight(vec3 eP, vec3 P_g, vec3 eD, vec3 sunDir, vec4 col, out vec4 I_r_gv, out vec4 I_m_gv)
+{
+	float height = clamp(length(P_g), Rg, Rt);
+	float eyeHeight = clamp(length(eP), Rg, Rt);
+
+	float sunAngle = dot(normalize(P_g), sunDir);	//sigma
 
 	vec4 T_gc = T(height, sunAngle);
-	vec4 T_gv = T(height, dot(normalize(P_g), eD));
-	T_m_net = T_r_net = T_gc * T_gv;
+	
+	float angle_GtoV = dot(normalize(P_g), eD);
+	vec4 T_ga = T(height, angle_GtoV);
+	vec4 T_va = T(eyeHeight, angle_GtoV);
 
-	T_r_net *= exp( -(height - Rg) / 8 );
-	T_m_net *= exp( -(height - Rg) / 1.2 );
+	vec4 T_gv = T_ga - T_va;
 
-	T_r_net.rgb *= vec3(5.8e-3f, 1.35e-2f, 3.31e-2f);
-	T_m_net *= 20e-3f;
+	//line 17
+	vec4 T_net = exp(-T_gc - T_gv);
+	I_r_gv = col * T_net;
+	I_m_gv = col * T_net.aaaa;
 
-	float mu = eyeAngle;
-    float g = 0.76f;
-	T_r_net *= 3.0f / (16.0f * PI) * (1 + mu * mu);
-	T_m_net *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
+	//T_r_net *= exp( -(height - Rg) / 8 );
+	//T_m_net *= exp( -(height - Rg) / 1.2 );
+
+	//T_r_net.rgb *= vec3(5.8e-3f, 1.35e-2f, 3.31e-2f);
+	//T_m_net *= 20e-3f;
+
+	float mu = dot(sunDir, eD);
+	I_r_gv *= RayleighPhase(mu);
+	I_m_gv *= MiePhase(mu);
+    //T_r_net *= 3.0f / (16.0f * PI) * (1 + mu * mu);
+	//T_m_net *= 3.0f / (8.0f * PI) * (1 - g * g) * (1 + mu * mu) / ((2 + g * g)  * pow(1 + g * g - 2 * g * mu, 3.0f / 2.0f));
 	
 
 	//color.rgb = vec3(sunAngle * 0.5f + 0.5f);
-	Scatter(height, sunAngle, eyeAngle, SunDir, eD, Ray, Mie);
 }
 
 void main(){
 
 	float h_orig = texture(Cache, vec3(UV.x, UV.y, HeightMapData.HeightMaps[inst / 4][inst % 4])).r; 
 	float h = clamp(exp(h_orig * 2), 0, Rt - Rg);
+	
+	vec3 P_g = normalize(normal) * (Rg + h);
+	vec3 eD = normalize(P_g - EyePosition);	//R_v
+	vec3 eP = EyePosition;
+	
+	float rayDist = 0;
+	bool raySphere = sphere_dist(Rt, eP, eD, Rt * 4, -1, rayDist);
+	if(raySphere && rayDist > 0)
+		eP = eP + eD * rayDist;
+		
 	float nDL = dot(normalize(normal), SunDir);
+	color.rgb = mix(vec3(0, 0, 0.6f), mix(vec3(0.2f, 0.8f, 0.2f), vec3(0.9f, 0.9f, 0.9f), smoothstep(0.85f, 1.0f, h_orig)) , step(0.7f, h_orig));// + vec3(1.0f, 1.0f, 1.0f) * smoothstep(0.88f, 1.0f, h);
 	
 	vec4 r_data = vec4(0);
 	vec4 m_data = vec4(0);
-	WithoutHeightField(h, r_data, m_data);
+	WithoutHeightField(eP, P_g, eD, SunDir, h, r_data, m_data);
 
 	vec4 off_r_data = vec4(0);
 	vec4 off_m_data = vec4(0);
+	WithHeightField(eP, P_g, eD, SunDir, h, off_r_data, off_m_data);
+	
 	vec4 I_r_gv = vec4(0);
 	vec4 I_m_gv = vec4(0);
-	WithHeightField(h, off_r_data, off_m_data, I_r_gv, I_m_gv);
+	Sunlight(eP, P_g, eD, SunDir, color, I_r_gv, I_m_gv);
 
-	float eyeHeight = clamp(length(EyePosition), Rg, Rt);
-	vec3 eyeToG = normalize(normalize(normal) * (Rg + h) - EyePosition);
-
-	float angle_Zenith_eyeToG = dot(normalize(EyePosition), eyeToG);
-	float angle_Zenith_HToG = dot(normalize(normal), eyeToG);
-
-	vec4 T_eyeToG = T(eyeHeight, angle_Zenith_eyeToG);
-	vec4 T_GToSphere = T(h + Rg, angle_Zenith_eyeToG);
-
-	vec4 irrad = T_eyeToG / T_GToSphere;
-
-	color.rgb = mix(vec3(0, 0, 0.6f), mix(vec3(0.2f, 0.8f, 0.2f), vec3(0.9f, 0.9f, 0.9f), smoothstep(0.85f, 1.0f, h_orig)) , step(0.7f, h_orig));// + vec3(1.0f, 1.0f, 1.0f) * smoothstep(0.88f, 1.0f, h);
+	vec3 rayleigh_f = r_data.rgb - off_r_data.rgb + I_r_gv.rgb * nDL;
+	vec3 mie_f = m_data.rgb - off_m_data.rgb + I_m_gv.rgb * nDL;
 	
-	vec3 rayleigh_f = r_data.rgb - off_r_data.rgb;// + color.rgb * I_r_gv.rgb;
-	vec3 mie_f = m_data.rgb - off_m_data.rgb;// + color.rgb * I_m_gv.rgb;
-	
-	color.rgb = (rayleigh_f + mie_f) * 20;
-	//color.rgb = color.rgb * (irrad.rgb) + (rayleigh_f + mie_f) * 20;
-	color.rgb *= nDL;
+	color.rgb = vec3(1, 0.96f, 0.949f) * 15 * (rayleigh_f + mie_f);
+	//color.rgb *= nDL;
 
 	color.a = 1;
 }
