@@ -47,14 +47,24 @@ namespace Kokoro.Engine.Graphics
 
         public Matrix4 Projection { get; private set; }
         public Matrix4[] ViewMats { get; private set; }
+        public Vector4[] Viewports { get; private set; }
+
+        public int TargetWidth { get; private set; }
+        public int TargetHeight { get; private set; }
 
         public ProbeBase(int probeRes, float near, float far)
         {
             Projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), 1, near, far);
             ViewMats = new Matrix4[6];
+            Viewports = new Vector4[6];
+
+            for (int i = 0; i < Viewports.Length; i++)
+                Viewports[i] = new Vector4(0, i * probeRes, probeRes, probeRes);
+
+            TargetWidth = probeRes;
+            TargetHeight = Viewports.Length * probeRes;
+
             Position = Vector3.Zero;
         }
-
-
     }
 }

@@ -59,6 +59,12 @@ namespace Kokoro4.Demos.PBR
                     for(int x = 0; x < 8; x++)
                         SphereTransforms.Add(Matrix4.CreateTranslation(x * 3, 0, y * 3));
 
+                //TODO: Scene graph based on joint relationships
+                //TODO: Update scene graph based on animations
+                //TODO: Physics engine uses the above scene graph
+                //TODO: The physics engine then builds a render graph from its updated scene graph
+                //TODO: Use the scenegraph to implement an octree construction step for frustum culling
+                //TODO: Dump the render graph
 
                 unsafe
                 {
