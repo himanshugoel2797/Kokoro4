@@ -122,6 +122,7 @@
     <Compile Include="Engine\Graphics\PlanetRenderer.cs" />
     <Compile Include="Engine\Graphics\Prefabs\FullScreenTriangleFactory.cs" />
     <Compile Include="Engine\Graphics\Prefabs\QuadFactory.cs" />
+    <Compile Include="Engine\Graphics\ProbeBase.cs" />
     <Compile Include="Engine\Graphics\ProcessedArrayTextureSource.cs" />
     <Compile Include="Engine\Graphics\RawTextureSource.cs" />
     <Compile Include="Engine\Graphics\Renderer\ForwardPlus.cs" />

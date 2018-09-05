@@ -87,6 +87,9 @@ namespace Kokoro.Engine
             GraphicsDevice.Framebuffer = state.Framebuffer;
             GraphicsDevice.SetDepthRange(state.NearPlane, state.FarPlane);
 
+            for (int i = 0; i < state.Viewports.Length; i++)
+                GraphicsDevice.SetViewport(i, state.Viewports[i].X, state.Viewports[i].Y, state.Viewports[i].Z, state.Viewports[i].W);
+
             if (state.ShaderStorageBufferBindings != null)
             {
                 ShaderStorageBuffer[] pendingBindings = new ShaderStorageBuffer[state.ShaderStorageBufferBindings.Length];

@@ -30,6 +30,7 @@ namespace Kokoro.Engine.Graphics
         public float FarPlane { get; private set; }
         public float NearPlane { get; private set; }
         public CullFaceMode CullMode { get; private set; }
+        public Vector4[] Viewports { get; private set; }
 
         public RenderState(Framebuffer fbuf,
                            ShaderProgram prog,
@@ -44,7 +45,8 @@ namespace Kokoro.Engine.Graphics
                            BlendFactor dst,
                            Vector4 ClearColor,
                            float ClearDepth,
-                           CullFaceMode cullMode)
+                           CullFaceMode cullMode,
+                           Vector4[] viewports = null)
         {
             Framebuffer = fbuf;
             ShaderProgram = prog;
@@ -60,6 +62,11 @@ namespace Kokoro.Engine.Graphics
             CullMode = cullMode;
             ShaderStorageBufferBindings = ssboBindings;
             UniformBufferBindings = uboBindings;
+
+            if (viewports == null)
+                Viewports = new Vector4[] { new Vector4(0, 0, Framebuffer.Width, Framebuffer.Height) };
+            else
+                Viewports = viewports;
         }
     }
 }

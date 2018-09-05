@@ -361,7 +361,6 @@ namespace Kokoro.Graphics.OpenGL
             {
                 curFramebuffer = value;
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, curFramebuffer.id);
-                SetViewport(0, 0, value.Width, value.Height);
             }
         }
 
@@ -565,15 +564,15 @@ namespace Kokoro.Graphics.OpenGL
 
         private static void Window_Resize(object sender, EventArgs e)
         {
-            GPUStateMachine.SetViewport(0, 0, game.ClientSize.Width, game.ClientSize.Height);
+            GPUStateMachine.SetViewport(0, 0, 0, game.ClientSize.Width, game.ClientSize.Height);
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             Input.LowLevel.InputLL.SetWinXY(game.Location.X, game.Location.Y, game.ClientSize.Width, game.ClientSize.Height);
             Framebuffer.RecreateDefaultFramebuffer();
         }
 
-        public static void SetViewport(int x, int y, int width, int height)
+        public static void SetViewport(int idx, float x, float y, float width, float height)
         {
-            GL.Viewport(x, y, width, height);
+            GL.ViewportIndexed(idx, x, y, width, height);
         }
 
         public static void SetVertexArray(VertexArray varray)

@@ -70,6 +70,8 @@ namespace Kokoro.Graphics.OpenGL
 
             framebuffers = new Stack<int>();
             framebuffers.Push(0);
+
+            viewport = new Vector4[6];
         }
 
         #region Buffer object state
@@ -160,14 +162,14 @@ namespace Kokoro.Graphics.OpenGL
         #endregion
 
         #region Viewport State
-        static Vector4 viewport;
-        public static void SetViewport(int x, int y, int width, int height)
+        static Vector4[] viewport;
+        public static void SetViewport(int idx, int x, int y, int width, int height)
         {
-            viewport.X = x;
-            viewport.Y = y;
-            viewport.Z = width;
-            viewport.W = height;
-            GL.Viewport(x, y, width, height);
+            viewport[idx].X = x;
+            viewport[idx].Y = y;
+            viewport[idx].Z = width;
+            viewport[idx].W = height;
+            GL.ViewportIndexed(idx, x, y, width, height);
         }
         #endregion
     }
