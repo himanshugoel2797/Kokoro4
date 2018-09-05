@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AMDCompressonator.cs" />
     <Compile Include="FileManager.cs" />
     <Compile Include="Material\MaterialProcessor.cs" />
     <Compile Include="Mesh\MeshProcessor.cs" />

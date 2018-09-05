@@ -28,10 +28,11 @@ namespace Kokoro4.ContentProcessor.Texture
         public static void Preprocess(string[] args)
         {
             int sh_band_cnt = 0;
-            bool calc_mips = true;
+            int mip_levels = 5;
             string output_file = null;
             string[] input_files = null;
             TextureProcessingTasks task = TextureProcessingTasks.Unknown;
+            string tmp_file = FileManager.GetTempFilePathWithExtension(".png");
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -99,8 +100,17 @@ namespace Kokoro4.ContentProcessor.Texture
                             else
                                 throw new NotSupportedException();
                             break;
-                        case "-nomips":
-                            //Don't precalculate mipmaps
+                        case "-mips":
+                            //Mip chain size
+                            try
+                            {
+                                mip_levels = int.Parse(args[i + 1]);
+                            }
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Expected positive integer after '-mips' argument.");
+                                return;
+                            }
                             break;
                         case "-array":
                             //Following strings are a list of files to be put in the packed array texture.
@@ -181,14 +191,25 @@ namespace Kokoro4.ContentProcessor.Texture
                         }
                         break;
                     case TextureProcessingTasks.ColorCompression:
+                        {
+                            //use BC7
+                            AMDCompressonator.Compress(input_files[i], output_file, 7, mip_levels);
+                        }
+                        break;
                     case TextureProcessingTasks.DepthCompression:
-                        throw new NotImplementedException();
+                        {
+                            //use BC4
+                            AMDCompressonator.Compress(input_files[i], output_file, 4, mip_levels);
+                        }
                         break;
                     case TextureProcessingTasks.DerivativeMap:
                         {
                             DerivativeMap sh = new DerivativeMap();
                             sh.Compute(bmp);
-                            sh.Save(output_file);
+                            sh.Save(tmp_file);
+
+                            //use BC5
+                            AMDCompressonator.Compress(tmp_file, output_file, 5, mip_levels);
                         }
                         break;
                 }

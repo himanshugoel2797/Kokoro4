@@ -108,6 +108,7 @@
     <Compile Include="Engine\Graphics\ArrayTextureSource.cs" />
     <Compile Include="Engine\Graphics\AtmosphereRenderer.cs" />
     <Compile Include="Engine\Graphics\CloudRenderer.cs" />
+    <Compile Include="Engine\Graphics\CompressedTextureSource.cs" />
     <Compile Include="Engine\Graphics\DistanceState.cs" />
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />
     <Compile Include="Engine\Graphics\FramebufferAttachment.cs" />

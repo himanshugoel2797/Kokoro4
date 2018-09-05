@@ -32,7 +32,7 @@ namespace Kokoro.Engine.Graphics
 
         internal ImageHandle(long hndl, Texture parent)
         {
-            this.hndl = hndl; 
+            this.hndl = hndl;
             this.parent = parent;
         }
 
@@ -94,7 +94,7 @@ namespace Kokoro.Engine.Graphics
                 GL.Arb.MakeTextureHandleResident(hndl);
                 isResident = true;
             }
-            else if(residency == Residency.NonResident && isResident)
+            else if (residency == Residency.NonResident && isResident)
             {
                 GL.Arb.MakeTextureHandleNonResident(hndl);
                 isResident = false;
@@ -225,15 +225,67 @@ namespace Kokoro.Engine.Graphics
                 {
                     case 1:
                         if (inited) GL.TextureStorage1D(id, LevelCount, (SizedInternalFormat)internalformat, Width);
-                        if (ptr != IntPtr.Zero) GL.TextureSubImage1D(id, level, src.GetBaseWidth() >> level, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
+                        if (ptr != IntPtr.Zero)
+                        {
+                            switch (internalformat)
+                            {
+                                case PixelInternalFormat.CompressedRedRgtc1:    //BC4
+                                case PixelInternalFormat.CompressedRgRgtc2:     //BC5
+                                case PixelInternalFormat.CompressedRgbaBptcUnorm:    //BC7
+                                    {
+                                        int blockSize = (internalformat == PixelInternalFormat.CompressedRedRgtc1) ? 8 : 16;
+                                        int size = ((src.GetWidth() >> level + 3) / 4) * blockSize;
+                                        GL.CompressedTextureSubImage1D(id, level, src.GetBaseWidth() >> level, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), size, ptr);
+                                    }
+                                    break;
+                                default:
+                                    GL.TextureSubImage1D(id, level, src.GetBaseWidth() >> level, src.GetWidth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
+                                    break;
+                            }
+                        }
                         break;
                     case 2:
                         if (inited) GL.TextureStorage2D(id, LevelCount, (SizedInternalFormat)internalformat, Width, Height);
-                        if (ptr != IntPtr.Zero) GL.TextureSubImage2D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
+                        if (ptr != IntPtr.Zero)
+                        {
+                            switch (internalformat)
+                            {
+                                case PixelInternalFormat.CompressedRedRgtc1:    //BC4
+                                case PixelInternalFormat.CompressedRgRgtc2:     //BC5
+                                case PixelInternalFormat.CompressedRgbaBptcUnorm:    //BC7
+                                    {
+                                        int blockSize = (internalformat == PixelInternalFormat.CompressedRedRgtc1) ? 8 : 16;
+                                        int size = ((src.GetWidth() >> level + 3) / 4) * ((src.GetHeight() >> level + 3) / 4) * blockSize;
+                                        GL.CompressedTextureSubImage2D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), size, ptr);
+                                    }
+                                    break;
+                                default:
+                                    GL.TextureSubImage2D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetWidth() >> level, src.GetHeight() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
+                                    break;
+                            }
+                        }
                         break;
                     case 3:
                         if (inited) GL.TextureStorage3D(id, LevelCount, (SizedInternalFormat)internalformat, Width, Height, Depth);
-                        if (ptr != IntPtr.Zero)GL.TextureSubImage3D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetBaseDepth() >> level, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
+                        if (ptr != IntPtr.Zero)
+                        {
+
+                            switch (internalformat)
+                            {
+                                case PixelInternalFormat.CompressedRedRgtc1:    //BC4
+                                case PixelInternalFormat.CompressedRgRgtc2:     //BC5
+                                case PixelInternalFormat.CompressedRgbaBptcUnorm:    //BC7
+                                    {
+                                        int blockSize = (internalformat == PixelInternalFormat.CompressedRedRgtc1) ? 8 : 16;
+                                        int size = ((src.GetWidth() >> level + 3) / 4) * ((src.GetHeight() >> level + 3) / 4) * src.GetDepth() >> level * blockSize;
+                                        GL.CompressedTextureSubImage3D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetBaseDepth() >> level, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), size, ptr);
+                                    }
+                                    break;
+                                default:
+                                    GL.TextureSubImage3D(id, level, src.GetBaseWidth() >> level, src.GetBaseHeight() >> level, src.GetBaseDepth() >> level, src.GetWidth() >> level, src.GetHeight() >> level, src.GetDepth() >> level, (OpenTK.Graphics.OpenGL.PixelFormat)src.GetFormat(), (OpenTK.Graphics.OpenGL.PixelType)src.GetPixelType(), ptr);
+                                    break;
+                            }
+                        }
                         break;
                 }
             }

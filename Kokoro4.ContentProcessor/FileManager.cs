@@ -17,6 +17,13 @@ namespace Kokoro4.ContentProcessor
         private static string[] MaterialExtns = { "mat" };
         private static string[] MeshExtns = { "fbx" };
 
+        public static string GetTempFilePathWithExtension(string extension)
+        {
+            var path = Path.GetTempPath();
+            var fileName = Path.ChangeExtension(Guid.NewGuid().ToString(), extension);
+            return Path.Combine(path, fileName);
+        }
+
         public static void CompileDirectory(string dir, string targetDir)
         {
             var dirs = Directory.EnumerateDirectories(dir);

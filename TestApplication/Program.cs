@@ -23,6 +23,8 @@ namespace TestApplication
         {
             EngineManager.Name = EngineManager.EngineName;
 
+            CompressedTextureSource.Create("out.dds");
+
             EngineManager.StateManager.AddState(nameof(TestScene), new TestScene());
             EngineManager.StateManager.AddState(nameof(TextureStreamingTest), new TextureStreamingTest());
             EngineManager.StateManager.AddState(nameof(QuadTreeTerrainTest), new QuadTreeTerrainTest());
