@@ -19,7 +19,7 @@ namespace Kokoro.Engine.Graphics
     {
         #region Static Methods
 #if DEBUG
-        public const string ShaderPath = @"C:\Users\Himanshu Goel\source\repos\Kokoro4\Resources\OpenGL";
+        public const string ShaderPath = @"I:\Code\VisualStudio\Kokoro4\Resources\OpenGL";
 #endif
 
         public static ShaderSource Load(ShaderType sType, string file)

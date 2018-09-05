@@ -51,7 +51,7 @@ namespace TestApplication
             //EngineManager.StateManager.SetActiveState(nameof(SubsurfaceMaterialTest));
             //EngineManager.StateManager.SetActiveState(nameof(TestScene));
             //EngineManager.StateManager.SetActiveState(nameof(VolumeRayCastingTest));
-            //EngineManager.StateManager.SetActiveState(nameof(AdvancedAtmosphereTest));
+            //EngineManager.StateManager.SetActiveState(nameof(AtmosphereTest));
             EngineManager.StateManager.SetActiveState(nameof(PBR.LambertTest));
 
             //Work on ice/snow rendering//
