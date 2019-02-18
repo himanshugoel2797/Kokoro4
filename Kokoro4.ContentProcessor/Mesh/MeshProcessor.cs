@@ -178,11 +178,56 @@ namespace Kokoro4.ContentProcessor.Mesh
                 c_indices.Add(indices[i]);
             }
 
-            //TODO optimize all meshes for vertex cache performance and reduced overdraw using AMD's Tootle
+            //use the center of each triangle as a sample point, storing the triangle position and normal
+            if (isStatic)
+            {
+                List<float> gi_pos = new List<float>();
+                List<float> gi_norm = new List<float>();
+
+                for (int i = 0; i < indices.Count; i += 3)
+                {
+                    var i_0 = indices[i];
+                    var i_1 = indices[i + 1];
+                    var i_2 = indices[i + 2];
+
+                    gi_pos.Add((vertices[i_0 * 3] + vertices[i_1 * 3] + vertices[i_2 * 3]) / 3);
+                    gi_pos.Add((vertices[i_0 * 3 + 1] + vertices[i_1 * 3 + 1] + vertices[i_2 * 3 + 1]) / 3);
+                    gi_pos.Add((vertices[i_0 * 3 + 2] + vertices[i_1 * 3 + 2] + vertices[i_2 * 3 + 2]) / 3);
+
+                    gi_norm.Add((normals[i_0 * 3] + normals[i_1 * 3] + normals[i_2 * 3]) / 3);
+                    gi_norm.Add((normals[i_0 * 3 + 1] + normals[i_1 * 3 + 1] + normals[i_2 * 3 + 1]) / 3);
+                    gi_norm.Add((normals[i_0 * 3 + 2] + normals[i_1 * 3 + 2] + normals[i_2 * 3 + 2]) / 3);
+                }
+
+                using (FileStream oFile = File.Open(Path.ChangeExtension(outputFile, "gi_base"), FileMode.Create))
+                using (BinaryWriter w = new BinaryWriter(oFile))
+                {
+                    w.Write(('G' | 'I' << 8 | 'B' << 16 | 'A' << 24));
+                    w.Write(gi_pos.Count * sizeof(float));
+                    w.Write(System.Math.Max(m.BBoxMax.Value.X - m.BBoxMin.Value.X, System.Math.Max(m.BBoxMax.Value.Y - m.BBoxMin.Value.Y, m.BBoxMax.Value.Z - m.BBoxMin.Value.Z)));
+                    w.Write(m.BBoxMin.Value.X);
+                    w.Write(m.BBoxMin.Value.Y);
+                    w.Write(m.BBoxMin.Value.Z);
+
+                    for (int i = 0; i < gi_pos.Count; i++)
+                    {
+                        w.Write(gi_pos[i]);
+                    }
+
+                    for (int i = 0; i < gi_norm.Count; i++)
+                    {
+                        w.Write(gi_norm[i]);
+                    }
+
+                    w.Flush();
+                }
+            }
 
             //Write the compressed data to the file
             if (isStatic)
             {
+                //TODO optimize all meshes for vertex cache performance and reduced overdraw using AMD's Tootle - emit an obj file, then read that data back in
+
                 uint indexOffset = 6 * sizeof(uint);
                 uint vertexOffset = (uint)(indexOffset + c_indices.Count * sizeof(ushort));
                 uint uvOffset = (uint)(vertexOffset + c_vertices.Count * sizeof(float));
@@ -190,8 +235,8 @@ namespace Kokoro4.ContentProcessor.Mesh
                 uint normalLen = (uint)(c_normals.Count * sizeof(uint));
 
                 using (FileStream oFile = File.Open(outputFile, FileMode.Create))
+                using (BinaryWriter w = new BinaryWriter(oFile))
                 {
-                    BinaryWriter w = new BinaryWriter(oFile);
                     w.Write(('M' | 'E' << 8 | 'S' << 16 | 'H' << 24));
                     w.Write(indexOffset);
                     w.Write(vertexOffset);
@@ -220,7 +265,6 @@ namespace Kokoro4.ContentProcessor.Mesh
                     }
 
                     w.Flush();
-                    w.Close();
                 }
             }
         }
@@ -258,7 +302,7 @@ namespace Kokoro4.ContentProcessor.Mesh
         public static void Preprocess(string inputFile, float scale, string outputFile)
         {
             bool isStatic = true;
-            
+
             if (scale == 0) scale = 1;
             if (inputFile == "") throw new Exception();
             if (outputFile == "") outputFile = Path.ChangeExtension(inputFile, isStatic ? "k4_stmesh" : "k4_dymesh");

@@ -568,6 +568,7 @@ namespace Kokoro.Graphics.OpenGL
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             Input.LowLevel.InputLL.SetWinXY(game.Location.X, game.Location.Y, game.ClientSize.Width, game.ClientSize.Height);
             Framebuffer.RecreateDefaultFramebuffer();
+            EngineManager.ResolutionChangedHandler(game.ClientSize.Width, game.ClientSize.Height);
         }
 
         public static void SetViewport(int idx, float x, float y, float width, float height)

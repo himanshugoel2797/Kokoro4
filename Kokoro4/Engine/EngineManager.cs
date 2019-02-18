@@ -23,6 +23,9 @@ namespace Kokoro.Engine
 {
     public static class EngineManager
     {
+        public delegate void ResolutionChangedEvent(int w, int h);
+        public static event ResolutionChangedEvent ResolutionChanged;
+
         public static StateManager StateManager { get; private set; }
         public static MeshGroup CurrentMeshGroup { get; private set; }
 
@@ -52,6 +55,11 @@ namespace Kokoro.Engine
             //Initialize the state machine
             StateManager = new StateManager();
             GraphicsDevice.GameLoop.RegisterIState(new _SceneMan());
+        }
+
+        internal static void ResolutionChangedHandler(int w, int h)
+        {
+            ResolutionChanged(w, h);
         }
 
         public static void RegisterBackgroundTask(Action a)

@@ -76,10 +76,6 @@
       <Project>{057fc073-a455-4235-95ab-0c68fab55d95}</Project>
       <Name>Kokoro.Math</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Kokoro.Physics\Kokoro.Physics.csproj">
-      <Project>{68080327-34e7-4bd9-a5a0-a3ff8386b891}</Project>
-      <Name>Kokoro.Physics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Kokoro4\Kokoro4.csproj">
       <Project>{cfad0f2c-be42-4482-b032-1d72b9c00b98}</Project>
       <Name>Kokoro4</Name>

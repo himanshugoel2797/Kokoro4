@@ -54,14 +54,10 @@ namespace Kokoro.Engine.Graphics.Renderer
             //lib.AddSourceFile("Graphics/Shaders/Deferred/library.glsl");
         }
 
-        public ForwardPlus(int tile_x_cnt, int tile_y_cnt, int w, int h, MeshGroup grp, Framebuffer destFb = null)
+        public void Resize(int w, int h)
         {
-            this.tile_x_cnt = tile_x_cnt;
-            this.tile_y_cnt = tile_y_cnt;
             this.w = w;
             this.h = h;
-            this.destBuffer = (destFb == null) ? Framebuffer.Default : destFb;
-            this.mesh = FullScreenTriangleFactory.Create(grp);
 
             depth = new Texture();
             depth.SetData(new DepthTextureSource(w, h)
@@ -86,11 +82,11 @@ namespace Kokoro.Engine.Graphics.Renderer
             //TODO: need to make adjustments to how draws are submitted in order to support the Z-prepass
 
             gbuffer = new Framebuffer(w, h);
-            gbuffer[FramebufferAttachment.DepthAttachment] = depth; 
+            gbuffer[FramebufferAttachment.DepthAttachment] = depth;
             gbuffer[FramebufferAttachment.ColorAttachment0 + OutputColorAttachment] = albedo;
 
             lights = new List<IForwardPlusLight>();
-            
+
             s = new RenderState(destBuffer, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/FrameBufferTriangle/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/FrameBufferTriangle/fragment.glsl")), null, null, false, true, DepthFunc.Always, InverseDepth.Far, InverseDepth.Near, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
 
             q = new RenderQueue(10, false);
@@ -103,6 +99,18 @@ namespace Kokoro.Engine.Graphics.Renderer
                 State = s
             });
             q.EndRecording();
+        }
+
+        public ForwardPlus(int tile_x_cnt, int tile_y_cnt, int w, int h, MeshGroup grp, Framebuffer destFb = null)
+        {
+            this.tile_x_cnt = tile_x_cnt;
+            this.tile_y_cnt = tile_y_cnt;
+            this.w = w;
+            this.h = h;
+            this.destBuffer = (destFb == null) ? Framebuffer.Default : destFb;
+            this.mesh = FullScreenTriangleFactory.Create(grp);
+
+            Resize(w, h);
         }
 
         public void SubmitDraw()

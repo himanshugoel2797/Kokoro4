@@ -75,6 +75,7 @@
     <Compile Include="Box2.cs" />
     <Compile Include="ColorTools.cs" />
     <Compile Include="ContainmentType.cs" />
+    <Compile Include="Data\SphericalOctree.cs" />
     <Compile Include="Data\QuadTree.cs" />
     <Compile Include="FNV1a.cs" />
     <Compile Include="Half.cs" />

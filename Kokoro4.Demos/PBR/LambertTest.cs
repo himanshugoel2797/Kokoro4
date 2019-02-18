@@ -66,6 +66,18 @@ namespace Kokoro4.Demos.PBR
                 //TODO: Use the scenegraph to implement an octree construction step for frustum culling
                 //TODO: Dump the render graph
 
+                //TODO: First update scene graph implementation
+                //TODO: Then write the code to convert physics scene graph to graphics scene graph
+                //TODO: Perform lighting updates with the lights in the scene graph
+                //TODO: Implement reflection map rendering
+                //TODO: Implement reflection convolution
+                //TODO: Implement PBR
+                //TODO: Implement forward plus for rendering the graph
+                //TODO: Implement physics updates on the scene graph, now that visualization is working
+                //TODO: Implement collisions on the scene graph
+                //TODO: Implement animations on the scene graph (look into importing animation paths)
+                //TODO: Implement soft body physics
+
                 unsafe
                 {
                     WorldTransforms = new ShaderStorageBuffer(sizeof(Matrix4) * SphereTransforms.Count, false);

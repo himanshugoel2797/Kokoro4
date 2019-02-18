@@ -1,5 +1,6 @@
 ﻿using Kokoro.Engine;
 using Kokoro.Math;
+using Kokoro.Physics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,7 +75,7 @@ namespace Kokoro.SceneGraph
             //Update the current transform
             if (Parent != null && dirty)
             {
-                lock(net_transform_lock)
+                lock (net_transform_lock)
                     NetTransform = Parent.NetTransform * Transform;
 
                 dirty = false;
