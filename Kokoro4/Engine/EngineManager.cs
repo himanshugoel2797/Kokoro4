@@ -59,7 +59,7 @@ namespace Kokoro.Engine
 
         internal static void ResolutionChangedHandler(int w, int h)
         {
-            ResolutionChanged(w, h);
+            ResolutionChanged?.Invoke(w, h);
         }
 
         public static void RegisterBackgroundTask(Action a)

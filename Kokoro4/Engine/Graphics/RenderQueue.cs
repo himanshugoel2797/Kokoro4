@@ -190,7 +190,7 @@ namespace Kokoro.Engine.Graphics
                     }
 
                     //Move the data pointer forward
-                    data_ui += (1 + bkt.meshes.Count);
+                    data_ui += (1 + 5 * bkt.meshes.Count);
                 }
             }
 

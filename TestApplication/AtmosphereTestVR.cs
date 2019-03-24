@@ -129,8 +129,8 @@ namespace TestApplication
                 planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { fbuf, vrProvider.LeftFramebuffer, vrProvider.RightFramebuffer }, 6360, renderer);
 
 
-                leftEyeProj = vrProvider.GetEyeProjection(true, 0.01f, 1000f);
-                rightEyeProj = vrProvider.GetEyeProjection(false, 0.01f, 1000f);
+                leftEyeProj = vrProvider.GetEyeProjection(true, 0.01f);
+                rightEyeProj = vrProvider.GetEyeProjection(false, 0.01f);
 
                 centerPose = Matrix4.Identity;
 

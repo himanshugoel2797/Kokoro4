@@ -107,17 +107,18 @@ namespace Kokoro.VR
                 vMax = 1,
             };
 
+            //vr.GetControllerStateWithPose(ETrackingUniverseOrigin.TrackingUniverseStanding, 0, )
+
             GraphicsDevice.Cleanup.Add(Dispose);
         }
 
-        public Matrix4 GetEyeProjection(bool isLeft, float nearZ, float farZ)
+        public Matrix4 GetEyeProjection(bool isLeft, float nearZ)
         {
-            var mat = vr.GetProjectionMatrix(isLeft ? EVREye.Eye_Left : EVREye.Eye_Right, nearZ, farZ);
+            float t = 0, b = 0, l = 0, r = 0;
 
-            return Matrix4.Transpose(new Matrix4(mat.m0, mat.m1, mat.m2, mat.m3,
-                               mat.m4, mat.m5, mat.m6, mat.m7,
-                               mat.m8, mat.m9, mat.m10, mat.m11,
-                               mat.m12, mat.m13, mat.m14, mat.m15));
+            vr.GetProjectionRaw(isLeft ? EVREye.Eye_Left : EVREye.Eye_Right, ref l, ref r, ref t, ref b);
+            var m = Matrix4.CreatePerspectiveOffCenter(l, r, b, t, nearZ);
+            return m;
         }
 
         public Matrix4 GetEyeView(bool isLeft)

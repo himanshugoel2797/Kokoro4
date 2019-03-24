@@ -675,6 +675,64 @@ namespace Kokoro.Math
         #endregion
 
         #region CreatePerspectiveOffCenter
+        /// <summary>
+        /// Creates an perspective projection matrix.
+        /// </summary>
+        /// <param name="left">Left edge of the view frustum</param>
+        /// <param name="right">Right edge of the view frustum</param>
+        /// <param name="bottom">Bottom edge of the view frustum</param>
+        /// <param name="top">Top edge of the view frustum</param>
+        /// <param name="zNear">Distance to the near clip plane</param>
+        /// <param name="result">A projection matrix that transforms camera space to raster space</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown under the following conditions:
+        /// <list type="bullet">
+        /// <item>zNear is negative or zero</item>
+        /// <item>zFar is negative or zero</item>
+        /// <item>zNear is larger than zFar</item>
+        /// </list>
+        /// </exception>
+        public static void CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float zNear, out Matrix4 result)
+        {
+            if (zNear <= 0)
+                throw new ArgumentOutOfRangeException("zNear");
+            
+            float x = (2.0f) / (right - left);
+            float y = (-2.0f) / (top - bottom);
+            float a = (right + left) / (right - left);
+            float b = (top + bottom) / (top - bottom);
+            //float c = -(zFar + zNear) / (zFar - zNear);
+            //float d = -(2.0f * zFar * zNear) / (zFar - zNear);
+
+            result = new Matrix4(x, 0, 0, 0,
+                                 0, y, 0, 0,
+                                 a, b, 0, -1,
+                                 0, 0, zNear, 0);
+        }
+        
+        /// <summary>
+        /// Creates an perspective projection matrix.
+        /// </summary>
+        /// <param name="left">Left edge of the view frustum</param>
+        /// <param name="right">Right edge of the view frustum</param>
+        /// <param name="bottom">Bottom edge of the view frustum</param>
+        /// <param name="top">Top edge of the view frustum</param>
+        /// <param name="zNear">Distance to the near clip plane</param>
+        /// <returns>A projection matrix that transforms camera space to raster space</returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown under the following conditions:
+        /// <list type="bullet">
+        /// <item>zNear is negative or zero</item>
+        /// <item>zFar is negative or zero</item>
+        /// <item>zNear is larger than zFar</item>
+        /// </list>
+        /// </exception>
+        public static Matrix4 CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float zNear)
+        {
+            Matrix4 result;
+            CreatePerspectiveOffCenter(left, right, bottom, top, zNear, out result);
+            return result;
+        }
 
         /// <summary>
         /// Creates an perspective projection matrix.

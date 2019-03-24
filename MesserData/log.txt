@@ -1,0 +1,4 @@
+ERROR: Bad Image Format: Modules\Kokoro4.Native.dll
+ERROR: Bad Image Format: Modules\openvr_api.dll
+Initializing PlanetModule.
+Initialized.
