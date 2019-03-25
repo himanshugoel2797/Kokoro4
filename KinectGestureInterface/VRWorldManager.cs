@@ -19,7 +19,7 @@ namespace KinectGestureInterface
         Vector3 cubeOrt;
         Quaternion cubeOrient;
 
-        VRRenderer VRRenderer;
+        VRClient VRRenderer;
         RenderQueue clearQueue;
         Matrix4 leftEyeProj, rightEyeProj, centerPose;
         Keyboard keybd;
@@ -42,8 +42,8 @@ namespace KinectGestureInterface
 
             //Setup VR
             VRRenderer = VRRenderer.Create();
-            leftEyeProj = VRRenderer.GetEyeProjection(true, 0.01f, 1000f);
-            rightEyeProj = VRRenderer.GetEyeProjection(false, 0.01f, 1000f);
+            leftEyeProj = VRRenderer.GetEyeProjection(VRHand.Left, 0.01f);
+            rightEyeProj = VRRenderer.GetEyeProjection(VRHand.Right, 0.01f);
             centerPose = Matrix4.Identity;
             volumePose = Matrix4.Identity;
 
@@ -133,8 +133,8 @@ namespace KinectGestureInterface
 
             var cubeMat = Matrix4.CreateFromQuaternion(cubeOrient);
 
-            var leftEyeView = VRRenderer.GetEyeView(true);
-            var rightEyeView = VRRenderer.GetEyeView(false);
+            var leftEyeView = VRRenderer.GetEyeView(VRHand.Left);
+            var rightEyeView = VRRenderer.GetEyeView(VRHand.Right);
 
             leftEyeView = EngineManager.View * leftEyeView;
             rightEyeView = EngineManager.View * rightEyeView;
@@ -144,8 +144,8 @@ namespace KinectGestureInterface
             voxelRayCaster.Draw(cubeMat * volumePose, leftEyeView * pose, leftEyeProj, 0);
             voxelRayCaster.Draw(cubeMat * volumePose, rightEyeView * pose, rightEyeProj, 1);
 
-            VRRenderer.Submit(true);
-            VRRenderer.Submit(false);
+            VRRenderer.Submit(VRHand.Left);
+            VRRenderer.Submit(VRHand.Right);
         }
 
         public void Update(double interval)

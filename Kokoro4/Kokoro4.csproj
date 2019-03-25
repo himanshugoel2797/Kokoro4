@@ -208,7 +208,7 @@
     <Compile Include="StateMachine\StateManager.cs" />
     <Compile Include="VR\Controller.cs" />
     <Compile Include="VR\openvr_api.cs" />
-    <Compile Include="VR\VRRenderer.cs" />
+    <Compile Include="VR\VRClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\$(Platform)\$(Configuration)\Kokoro4.Native.dll">

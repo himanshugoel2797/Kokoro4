@@ -746,7 +746,7 @@ namespace Kokoro.Math
 
         public Quaternion ToQuaternion ()
         {
-            return new Quaternion (ref this);
+            return new Quaternion (this);
         }
 
         #endregion

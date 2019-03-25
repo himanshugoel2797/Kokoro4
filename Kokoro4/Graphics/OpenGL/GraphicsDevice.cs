@@ -17,6 +17,7 @@ using Kokoro.Engine.Graphics;
 using Cloo;
 using Kokoro.Engine;
 using System.Collections.Concurrent;
+using OpenTK.Graphics;
 
 namespace Kokoro.Graphics.OpenGL
 {
@@ -376,7 +377,11 @@ namespace Kokoro.Graphics.OpenGL
 
         static GraphicsDevice()
         {
-            game = new GameWindow(1280, 720);
+            GraphicsContextFlags flags = GraphicsContextFlags.Default;
+#if !Debug
+            flags |= (GraphicsContextFlags)0x8; //Disable error checking
+#endif
+            game = new GameWindow(1280, 720, GraphicsMode.Default, "Game Window", OpenTK.GameWindowFlags.Default, OpenTK.DisplayDevice.Default, 0, 0, flags);
 
             game.Resize += Window_Resize;
             game.Load += Game_Load;
@@ -582,7 +587,7 @@ namespace Kokoro.Graphics.OpenGL
             GL.BindVertexArray(varray.id);
         }
 
-        #region Shader Buffers
+#region Shader Buffers
         public static void SetShaderStorageBufferBinding(ShaderStorageBuffer buf, int index)
         {
             if (buf == null) return;
@@ -599,9 +604,9 @@ namespace Kokoro.Graphics.OpenGL
             GPUStateMachine.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.Size);
         }
 
-        #endregion
+#endregion
 
-        #region Indirect call buffers
+#region Indirect call buffers
         public static void SetMultiDrawParameterBuffer(GPUBuffer buf)
         {
             GL.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.DrawIndirectBuffer, buf.id);
@@ -621,9 +626,9 @@ namespace Kokoro.Graphics.OpenGL
         {
             SetParameterBuffer(buf.buf);
         }
-        #endregion
+#endregion
 
-        #region Compute Jobs
+#region Compute Jobs
         public static void DispatchSyncComputeJob(ShaderProgram prog, int x, int y, int z)
         {
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
@@ -641,9 +646,9 @@ namespace Kokoro.Graphics.OpenGL
             _comp_queue.ReleaseGLObjects(prog.Objects, _comp_events);
             while (_comp_events.Count > 10) _comp_events.RemoveAt(0);
         }
-        #endregion
+#endregion
 
-        #region Draw calls
+#region Draw calls
         public static void Draw(Engine.Graphics.PrimitiveType type, int first, int count, bool indexed)
         {
             if (count == 0) return;
@@ -687,9 +692,9 @@ namespace Kokoro.Graphics.OpenGL
             else
                 GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, (IntPtr)byteOffset, (IntPtr)countOffset, maxCount, 5 * sizeof(int) /*Each entry is formatted as index data, so work accordingly*/);
         }
-        #endregion
+#endregion
 
-        #region Depth Range
+#region Depth Range
         private static double _far = 0, _near = 0;
         public static void SetDepthRange(double near, double far)
         {
@@ -703,7 +708,7 @@ namespace Kokoro.Graphics.OpenGL
             near = _near;
             far = _far;
         }
-        #endregion
+#endregion
 
         public static void Clear()
         {

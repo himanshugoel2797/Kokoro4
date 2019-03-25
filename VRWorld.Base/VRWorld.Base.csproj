@@ -70,7 +70,16 @@
     <Compile Include="SphereVRScene.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="manifests\actions.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="App.config" />
+    <None Include="manifests\default_holographic_controller.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="manifests\default_vive_controller.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kokoro.Math\Kokoro.Math.csproj">

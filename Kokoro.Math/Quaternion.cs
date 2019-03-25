@@ -68,7 +68,7 @@ namespace Kokoro.Math
             : this(new Vector3(x, y, z), w)
         { }
 
-        public Quaternion(ref Matrix3 matrix)
+        public Quaternion(Matrix3 matrix)
         {
             double scale = System.Math.Pow(matrix.Determinant, 1.0d / 3.0d);
             float x, y, z;

@@ -29,7 +29,7 @@ namespace TestApplication
         private Vector3 camPos;
         private bool updateCamPos = true;
 
-        private VRRenderer vrProvider;
+        private VRClient vrProvider;
         private Keyboard keybd;
 
         AtmosphereRenderer renderer;
@@ -82,7 +82,7 @@ namespace TestApplication
                 float side = 500;
                 float off = side * 0.5f;
 
-                vrProvider = VRRenderer.Create();
+                vrProvider = VRClient.Create();
 
                 var RenderState0 = new RenderState(vrProvider.LeftFramebuffer, null, null, null, true, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
                 var RenderState1 = new RenderState(vrProvider.RightFramebuffer, null, null, null, true, true, DepthFunc.Always, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.UnitW, 0, CullFaceMode.None);
@@ -129,8 +129,8 @@ namespace TestApplication
                 planetRenderer = new PlanetRenderer(grp, new Framebuffer[] { fbuf, vrProvider.LeftFramebuffer, vrProvider.RightFramebuffer }, 6360, renderer);
 
 
-                leftEyeProj = vrProvider.GetEyeProjection(true, 0.01f);
-                rightEyeProj = vrProvider.GetEyeProjection(false, 0.01f);
+                leftEyeProj = vrProvider.GetEyeProjection(VRHand.Left, 0.01f);
+                rightEyeProj = vrProvider.GetEyeProjection(VRHand.Right, 0.01f);
 
                 centerPose = Matrix4.Identity;
 
@@ -165,8 +165,8 @@ namespace TestApplication
             }
             pose = pose * centerPose;
 
-            var leftEyeView = vrProvider.GetEyeView(true);
-            var rightEyeView = vrProvider.GetEyeView(false);
+            var leftEyeView = vrProvider.GetEyeView(VRHand.Left);
+            var rightEyeView = vrProvider.GetEyeView(VRHand.Right);
             
             leftEyeView = camera.View * leftEyeView;
             rightEyeView = camera.View * rightEyeView;
@@ -178,8 +178,8 @@ namespace TestApplication
             planetRenderer.Draw(leftEyeView * pose, leftEyeProj, 0);
             planetRenderer.Draw(leftEyeView * pose, leftEyeProj, 1);
             planetRenderer.Draw(rightEyeView * pose, rightEyeProj, 2);
-            vrProvider.Submit(true);
-            vrProvider.Submit(false);
+            vrProvider.Submit(VRHand.Left);
+            vrProvider.Submit(VRHand.Right);
             fplus.SubmitDraw();
         }
 
