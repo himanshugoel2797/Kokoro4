@@ -82,7 +82,7 @@ namespace Kokoro.Engine.Graphics
         public unsafe byte* Update()
         {
             if (stream) curRung = (curRung + 1) % rungs;
-            while (!readyFence[curRung].Raised(0)) ;
+            while (!readyFence[curRung].Raised(0)) ;// System.Threading.Thread.Sleep(1);
             return (byte*)buf.GetPtr() + curRung * size;
         }
 

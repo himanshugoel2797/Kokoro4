@@ -31,6 +31,11 @@ namespace Kokoro.Engine.Graphics
                 return true;
             }
 
+            GL.WaitSync(id, WaitSyncFlags.None, (long)All.TimeoutIgnored);
+            GL.DeleteSync(id);
+            raised = true;
+            return true;
+/*
             if (timeout == 0)
             {
                 WaitSyncStatus s = WaitSyncStatus.WaitFailed;
@@ -53,7 +58,7 @@ namespace Kokoro.Engine.Graphics
                     return true;
                 }
                 else return false;
-            }
+            }*/
         }
 
         #region IDisposable Support

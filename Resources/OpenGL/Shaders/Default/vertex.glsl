@@ -6,6 +6,7 @@ layout(location = 2) in vec2 vs_normal;
 // Output data ; will be interpolated for each fragment.
 out vec2 UV;
 out vec3 normal;
+flat out int drawID;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 View;
@@ -24,6 +25,7 @@ void main(){
 
 	// UV of the vertex. No special space for this one.
 	UV = vs_uv;
+	drawID = gl_DrawID;
 	//UV = (vs_pos.xz/vec2(50)+vec2(1,1))/2.0;
 
 	vec2 n = vs_normal / 100.0f * PI/180.0f;

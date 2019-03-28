@@ -13,7 +13,6 @@ namespace Kokoro.Physics
     {
         public PhysicsData PhysicsData;
         public EngineRenderable RenderableData;
-        public LightData LightData;
         public BoundingBox Bounds;
 
         public bool Active { get; set; }

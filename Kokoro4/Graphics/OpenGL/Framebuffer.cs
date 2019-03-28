@@ -47,13 +47,25 @@ namespace Kokoro.Engine.Graphics
             GraphicsDevice.Cleanup.Add(Dispose);
         }
 
+        public void Blit(Framebuffer src, bool blitColor, bool blitDepth, bool linearFilter)
+        {
+            GL.BlitNamedFramebuffer(src.id, this.id, 0, 0, src.Width, src.Height, 0, 0, Width, Height, (blitColor ? ClearBufferMask.ColorBufferBit : 0) | (blitDepth ? ClearBufferMask.DepthBufferBit : 0), linearFilter ? BlitFramebufferFilter.Linear : BlitFramebufferFilter.Nearest);
+        }
+
         public Texture this[FramebufferAttachment attachment]
         {
             set
             {
-                bindings[attachment] = value;
-
-                GL.NamedFramebufferTexture(id, (OpenTK.Graphics.OpenGL.FramebufferAttachment)attachment, value.id, value.WriteLevel);
+                if (value == null)
+                {
+                    bindings.Remove(attachment);
+                    GL.NamedFramebufferTexture(id, (OpenTK.Graphics.OpenGL.FramebufferAttachment)attachment, 0, 0);
+                }
+                else
+                {
+                    bindings[attachment] = value;
+                    GL.NamedFramebufferTexture(id, (OpenTK.Graphics.OpenGL.FramebufferAttachment)attachment, value.id, value.WriteLevel);
+                }
 
                 if (attachment != FramebufferAttachment.DepthAttachment)
                 {

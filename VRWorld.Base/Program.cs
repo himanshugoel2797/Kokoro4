@@ -15,7 +15,7 @@ namespace VRWorld.Base
 
             EngineManager.StateManager.AddState(nameof(SphereVRScene), new SphereVRScene());
             EngineManager.StateManager.SetActiveState(nameof(SphereVRScene));
-            EngineManager.Run(60, 60);
+            EngineManager.Run(90, 90);
             EngineManager.Exit();
         }
     }

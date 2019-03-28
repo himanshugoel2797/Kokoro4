@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kokoro.Math;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Kokoro.Engine.Graphics
 {
-    public class ShaderGroup
+    public interface ILight
     {
-        private Dictionary<int, ShaderProgram> program;
+        int TypeIndex { get; }
+        bool Intersect(BoundingBox box);
     }
 }

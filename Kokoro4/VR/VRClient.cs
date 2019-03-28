@@ -350,7 +350,7 @@ namespace Kokoro.VR
             var tPose = new TrackedDevicePose_t[1];
             var gPose = new TrackedDevicePose_t[0];
 
-
+            
             var err = cr.WaitGetPoses(tPose, gPose);
             if (err != EVRCompositorError.None)
                 throw new Exception();
