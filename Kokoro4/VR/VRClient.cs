@@ -643,8 +643,6 @@ namespace Kokoro.VR
                                         bmp.SetPixel(x, y, Color.FromArgb(*(im_dat++), *(im_dat++), *(im_dat++), *(im_dat++)));
                                     }
 
-                                bmp.Save("test.png");
-
                                 BitmapTextureSource textureSource = new BitmapTextureSource(bmp, 1);
                                 var t = new Texture();
                                 t.SetData(textureSource, 0);

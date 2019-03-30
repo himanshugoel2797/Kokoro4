@@ -52,7 +52,7 @@ namespace VRWorld.Base
                 deferred = new TexturelessDeferred(vr.Width, vr.Height, new Framebuffer[] { vr.LeftFramebuffer, vr.RightFramebuffer }, new Matrix4[] { vr_data[VRHand.Left.Value].Projection, vr_data[VRHand.Right.Value].Projection });
             }
             {
-                meshGroup = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 30000, 30000);
+                meshGroup = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 80000, 80000);
                 sphere = SphereFactory.Create(meshGroup);
 
                 int mat_idx = deferred.RegisterMaterial(new PBRMetalnessMaterial("Sphere_default_mat")
@@ -97,8 +97,8 @@ namespace VRWorld.Base
 
             var pl = new PointLight();
             pl.Position = new Vector3(0, 0, 0);
-            pl.Radius = 80;
-            pl.Intensity = 1;
+            pl.Radius = 0.1f;
+            pl.Intensity = 1f;
             pl.Color = new Vector3(1, 1, 1);
             deferred.RegisterLight(pl);
         }
@@ -154,7 +154,7 @@ namespace VRWorld.Base
             vr.LeftFramebuffer.Blit(deferred.Resources[0].AccumulatorBuffer, true, false, true);
             vr.RightFramebuffer.Blit(deferred.Resources[1].AccumulatorBuffer, true, false, true);
 
-            Framebuffer.Default.Blit(vr.RightFramebuffer, true, false, true);
+            Framebuffer.Default.Blit(vr.LeftFramebuffer, true, false, true);
             for (int i = 0; i < 2; i++)
                 vr.Submit(VRHand.Get(i));
 

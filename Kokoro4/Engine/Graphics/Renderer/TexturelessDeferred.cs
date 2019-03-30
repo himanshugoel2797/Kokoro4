@@ -61,12 +61,12 @@ namespace Kokoro.Engine.Graphics.Renderer
             public Framebuffer Output { get; internal set; }
             public Framebuffer GBuffer { get; internal set; }
             public Framebuffer AccumulatorBuffer { get; internal set; }
-            
+
             public Texture Depth { get; internal set; }
             public Texture UVs { get; internal set; }
             public Texture MaterialIDs { get; internal set; }
             public Texture Accumulator { get; internal set; }
-            
+
             public ShaderProgram[] Programs { get; internal set; }
             public RenderState StaticMeshRender { get; internal set; }
             public Matrix4 Projection { get; internal set; }
@@ -92,7 +92,8 @@ namespace Kokoro.Engine.Graphics.Renderer
         public const int MaterialIDAttachment = 1;
         public const int TileSz = 16;
         public const int MaxLights = 32;
-
+        public const int MaxMaterials = 4096;
+        public const int MaxTotalLights = 4096;
 
         MeshGroup fst_mem;
         Mesh fst;
@@ -117,8 +118,18 @@ namespace Kokoro.Engine.Graphics.Renderer
                     //Light clustering
                     Resources[i].LightRaster = new CPULightRaster(w / TileSz, h / TileSz, MaxLights);
                 }
-                
+
                 {
+                    //Accumulator
+                    Resources[i].Accumulator = new Texture();
+                    Resources[i].Accumulator.SetData(new FramebufferTextureSource(w, h, 1)
+                    {
+                        InternalFormat = PixelInternalFormat.Rgba16f,
+                        PixelType = PixelType.HalfFloat
+                    }, 0);
+
+                    Resources[i].AccumulatorBuffer = new Framebuffer(w, h);
+                    Resources[i].AccumulatorBuffer[FramebufferAttachment.ColorAttachment0] = Resources[i].Accumulator;
                     //Depth
                     Resources[i].Depth = new Texture();
                     Resources[i].Depth.SetData(new DepthTextureSource(w, h)
@@ -152,23 +163,19 @@ namespace Kokoro.Engine.Graphics.Renderer
                     Resources[i].Programs = new ShaderProgram[ProgramIndex.Count];
                     Resources[i].Programs[ProgramIndex.StaticMesh] = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/TexturelessDeferred/gbuffer_static_frag.glsl"));
                     Resources[i].Programs[ProgramIndex.StaticMesh].Set("Projection", proj[i]);
-
-                    //Accumulator
-                    Resources[i].Accumulator = new Texture();
-                    Resources[i].Accumulator.SetData(new FramebufferTextureSource(w, h, 1)
-                    {
-                        InternalFormat = PixelInternalFormat.Rgba16f,
-                        PixelType = PixelType.Float
-                    }, 0);
-
-                    Resources[i].AccumulatorBuffer = new Framebuffer(w, h);
-                    Resources[i].AccumulatorBuffer[FramebufferAttachment.ColorAttachment0] = Resources[i].Accumulator;
+                    
                 }
             }
         }
 
         public TexturelessDeferred(int w, int h, Framebuffer[] destFb, Matrix4[] proj)
         {
+            if (w % TileSz != 0)
+                w += TileSz - w % TileSz;
+
+            if (h % TileSz != 0)
+                h += TileSz - h % TileSz;
+
             Outputs = destFb;
             lights = new List<ILight>();
             Materials = new Dictionary<short, List<Material>>();
@@ -177,11 +184,11 @@ namespace Kokoro.Engine.Graphics.Renderer
             fst_mem = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 30, 30);
             fst = FullScreenQuadFactory.Create(fst_mem);
 
-            int tile_cnt = (w / TileSz + 1) * (h / TileSz + 1);
+            int tile_cnt = (w / TileSz) * (h / TileSz);
 
             lightShaders = new ShaderProgram[LightShaderIndex.Count];
-            lightShaders[LightShaderIndex.Point] = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/PBR/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/PBR/point_light.glsl", $"#define MAX_LIGHT_CNT {MaxLights * tile_cnt}\n#define MAT_CNT {10}\n"));
-            light_ssbo = new ShaderStorageBuffer(MaxLights * tile_cnt * 64, true);
+            lightShaders[LightShaderIndex.Point] = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/PBR/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/PBR/point_light.glsl", $"#define MAX_TOTAL_LIGHT_CNT {MaxTotalLights}\n#define MAX_LIGHT_CNT {MaxLights}\n#define MAT_CNT {MaxMaterials}\n"));
+            light_ssbo = new ShaderStorageBuffer(MaxTotalLights * 64, true);
             materialParams = new ShaderStorageBuffer(16384, true);
             que = new RenderQueue(100, true);
 
@@ -203,72 +210,24 @@ namespace Kokoro.Engine.Graphics.Renderer
         public void Update(Matrix4[] view)
         {
             if (view.Length != Outputs.Length) throw new Exception("View matrix array must be the same length as the number of outputs.");
+            //TODO Upload the lights
+
             var mat_arr = Materials.ToArray();
             for (int i = 0; i < Outputs.Length; i++)
+            //for (int i = 1; i >= 0; i--)
             {
                 for (int j = 0; j < ProgramIndex.Count; j++)
                     Resources[i].Programs[j].Set("View", view[i]);
 
+                //Resources[i].AccumulatorBuffer.Blit(Resources[1].GBuffer, true, false, true);
                 //Compute the corners
-                var iVP = Matrix4.Invert(Resources[i].Projection * view[i]);
-                var VP = Resources[i].Projection * view[i];
+                var VP = view[i] * Resources[i].Projection;
+                var iVP = Matrix4.Invert(VP);
+
+                //TODO: Get rid of lights that don't intersect the bounding value at all
 
                 //Prepare the cpu raster
                 Resources[i].LightRaster.StartRender(VP);
-                
-                //First filter lights by global aabb
-                //Then render them out
-
-                //Compute bounds for each tile
-                List<BoundingBox> bounds = new List<BoundingBox>();
-                for (int y = 0; y < Height; y += TileSz)
-                    for (int x = 0; x < Width; x += TileSz)
-                    {
-                        float x_ndc = (float)x / Width * 2 - 1;
-                        float y_ndc = (float)y / Height * 2 - 1;
-                        float w_ndc = 16.0f / Width * 2 - 1;
-                        float h_ndc = 16.0f / Height * 2 - 1;
-
-                        var frust_corners = new Vector4[]
-                        {
-                            new Vector4(x_ndc, y_ndc, 0, 1),
-                            new Vector4(x_ndc, y_ndc, 1, 1),
-                            new Vector4(x_ndc, y_ndc + h_ndc, 0, 1),
-                            new Vector4(x_ndc, y_ndc + h_ndc, 1, 1),
-                            new Vector4(x_ndc + w_ndc, y_ndc, 0, 1),
-                            new Vector4(x_ndc + w_ndc, y_ndc, 1, 1),
-                            new Vector4(x_ndc + w_ndc, y_ndc + h_ndc, 0, 1),
-                            new Vector4(x_ndc + w_ndc, y_ndc + h_ndc, 1, 1),
-                        };
-
-                        //Faces = ((x,y,0),(x+,y,0),(x+,y+,0),(x,y+,0))
-                        //        ((x,y,1),(x+,y,1),(x+,y+,1),(x,y+,1))
-                        //        ((x,y,0),(x,y+,0),(x,y+,1),(x,y,1))
-                        //        ((x+,y,0),(x+,y+,0),(x+,y+,1),(x+,y,1))
-                        //        ((x,y,0),(x+,y,0),(x+,y,1),(x,y,1))
-                        //        ((x,y+,0),(x+,y+,0),(x+,y+,1),(x+,y,1))
-                        //Store plane as normal, distance
-                        Vector3 max = Vector3.One * float.MinValue;
-                        Vector3 min = Vector3.One * float.MaxValue;
-                        for (int q = 0; q < frust_corners.Length; q++)
-                        {
-                            var m = Vector4.Transform(frust_corners[q], iVP);
-                            m = m / m.W;
-                            frust_corners[q] = m;
-
-                            if (m.X > max.X) max.X = m.X;
-                            if (m.Y > max.Y) max.Y = m.Y;
-                            if (m.Z > max.Z) max.Z = m.Z;
-
-                            if (m.X < min.X) min.X = m.X;
-                            if (m.Y < min.Y) min.Y = m.Y;
-                            if (m.Z < min.Z) min.Z = m.Z;
-                        }
-
-                        var bbox = new BoundingBox(min, max);
-
-                        bounds.Add(bbox);
-                    }
 
                 //Group the lights based on type
                 Dictionary<int, List<ILight>> groupedLights = new Dictionary<int, List<ILight>>();
@@ -277,47 +236,30 @@ namespace Kokoro.Engine.Graphics.Renderer
                     if (!groupedLights.ContainsKey(lights[j].TypeIndex))
                         groupedLights[lights[j].TypeIndex] = new List<ILight>();
                     groupedLights[lights[j].TypeIndex].Add(lights[j]);
+
+                    //Render the lights to the cpu raster
+                    if (lights[j].TypeIndex == LightShaderIndex.Point)
+                    {
+                        var pL = (PointLight)lights[j];
+                        Resources[i].LightRaster.GetSphere(pL.MaxEffectiveRadius, out var verts, out var indices);
+                        if (!Resources[i].LightRaster.Render(new Vector4(pL.Position, 1), verts, indices, (ushort)j))
+                            groupedLights[lights[j].TypeIndex].Remove(lights[j]);
+                    }
                 }
 
-                //Determine maximum size for material SSBO
-                int max_size = 0;
-                int max_mat_cnt = 10;
-                foreach (KeyValuePair<short, List<Material>> matType in Materials)
-                {
-                    if (matType.Value.First().PropertySize * matType.Value.Count > max_size)
-                        max_size = matType.Value.First().PropertySize * matType.Value.Count;
-                    if (matType.Value.Count > max_mat_cnt)
-                        max_mat_cnt = matType.Value.Count;
-                }
-
+                Resources[i].LightRaster.FinishUpdate();
 
                 for (int q = 0; q < groupedLights.Count; q++)
                 {
                     var lightGroup = groupedLights.ElementAt(q).Value;
                     var light_type_index = groupedLights.ElementAt(q).Key;
-
-                    int maxLights = 0;  //Track the largest required light information buffer
-
-                    //Cluster lights into tiles
-                    List<List<ILight>> visibleLights = new List<List<ILight>>();
-                    for (int k = 0; k < bounds.Count; k++)
-                    {
-                        visibleLights.Add(new List<ILight>());
-                        for (int j = 0; j < lightGroup.Count; j++)
-                            if (lightGroup[j].Intersect(bounds[k]))
-                            {
-                                visibleLights[k].Add(lightGroup[j]);
-                                if (visibleLights[k].Count > maxLights)
-                                    maxLights = visibleLights[k].Count;
-                            }
-                    }
-
-                    if (maxLights == 0) //Being 0 means that there were no lights that passed the test
+                    if (lightGroup.Count == 0)
                         continue;
 
-
+                    //Build a render state
+                    RenderState state = new RenderState(Resources[i].AccumulatorBuffer, lightShaders[LightShaderIndex.Get(light_type_index)], new ShaderStorageBuffer[] { materialParams, light_ssbo, Resources[i].LightRaster.LightData }, null, false, true, DepthFunc.Always, InverseDepth.Far, InverseDepth.Near, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
+                    
                     //Invoke the light shaders for each specified material type
-
                     for (int mat_idx = 0; mat_idx < mat_arr.Length; mat_idx++)
                     {
                         var matType = mat_arr[mat_idx];
@@ -339,7 +281,7 @@ namespace Kokoro.Engine.Graphics.Renderer
                                     b_ptr += mat_props.Length;
                                 }
 
-                                for (int j = matType.Value.Count; j < max_mat_cnt; j++)
+                                for (int j = matType.Value.Count; j < MaxMaterials; j++)
                                     b_ptr += prop_sz;
                             }
 
@@ -347,8 +289,6 @@ namespace Kokoro.Engine.Graphics.Renderer
                         }
 
 
-                        //Build a render state
-                        RenderState state = new RenderState(Resources[i].AccumulatorBuffer, lightShaders[LightShaderIndex.Get(light_type_index)], new ShaderStorageBuffer[] { materialParams, light_ssbo }, null, false, true, DepthFunc.Always, InverseDepth.Far, InverseDepth.Near, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
 
                         //Provide the depth buffer, UV buffer and material ID buffer as inputs
                         var depthBuf = Resources[i].Depth.GetHandle(TextureSampler.Default);
@@ -371,6 +311,7 @@ namespace Kokoro.Engine.Graphics.Renderer
                         if (light_type_index == LightShaderIndex.Point)
                             lightShaders[LightShaderIndex.Get(light_type_index)].Set("min_intensity", PointLight.Threshold);
 
+                        que.ClearFramebufferBeforeSubmit = true;
                         que.ClearAndBeginRecording();
                         que.RecordDraw(new RenderQueue.DrawData()
                         {
@@ -387,55 +328,9 @@ namespace Kokoro.Engine.Graphics.Renderer
                         });
                         que.EndRecording();
 
-                        //Upload the lights
-                        unsafe
-                        {
-                            var l_b_ptr = light_ssbo.Update();
-                            float* l_f_ptr = (float*)l_b_ptr;
-                            for (int idx = 0; idx < bounds.Count; idx++)
-                            {
-                                var bound = bounds[idx];
-                                var lightSet = visibleLights[idx++];
-                                if (light_type_index == LightShaderIndex.Point)
-                                {
-                                    for (int l_p_idx = 0; l_p_idx < 2; l_p_idx++)
-                                    {
-                                        if (lightSet.Count == 0)
-                                        {
-                                            l_f_ptr += 4 * MaxLights;
-                                            continue;
-                                        }
 
-                                        for (int l_idx = 0; l_idx < lightSet.Count; l_idx++)
-                                        {
-                                            var l = lightSet[l_idx];
-                                            var p_l = (PointLight)l;
-                                            if (l_p_idx == 0)
-                                            {
-                                                l_f_ptr[0] = p_l.Position.X;
-                                                l_f_ptr[1] = p_l.Position.Y;
-                                                l_f_ptr[2] = p_l.Position.Z;
-                                                l_f_ptr[3] = p_l.Radius;
-                                                l_f_ptr += 4;
-                                            }
-                                            else if (l_p_idx == 1)
-                                            {
-                                                l_f_ptr[0] = p_l.Color.X;
-                                                l_f_ptr[1] = p_l.Color.Y;
-                                                l_f_ptr[2] = p_l.Color.Z;
-                                                l_f_ptr[3] = p_l.Intensity;
-                                                l_f_ptr += 4;
-                                            }
-                                        }
-
-                                        l_f_ptr += 4 * (MaxLights - lightSet.Count);
-                                    }
-                                }
-                            }
-                            light_ssbo.UpdateDone();
-                        }
-
-                        //Submit a draw to compute the lighting
+                        //Submit a full screen quad to compute the lighting
+                        OpenTK.Graphics.OpenGL.GL.Finish();
                         que.Submit();
 
                         for (int j = 0; j < matType.Value.Count; j++)

@@ -10,6 +10,5 @@ namespace Kokoro.Engine.Graphics
     public interface ILight
     {
         int TypeIndex { get; }
-        bool Intersect(BoundingBox box);
     }
 }

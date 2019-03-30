@@ -1,11 +1,9 @@
-//layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
-
 layout(location = 0) out vec4 accum_data;
 
-//layout(rgba16f, bindless_image) uniform coherent restrict image2D accum;
-layout(rgba16f, bindless_sampler) uniform sampler2D uvBuf;
-layout(rgba16f, bindless_sampler) uniform sampler2D mID_Buf;
-layout(r32f, bindless_sampler) uniform sampler2D depthBuf;
+layout(bindless_sampler) uniform sampler2D uvBuf;
+layout(bindless_sampler) uniform sampler2D mID_Buf;
+
+flat in int inst_id;
 
 uniform int mat_idx;
 uniform float min_intensity;
@@ -14,21 +12,26 @@ uniform mat4 iVP;
 uniform mat4 VP;
 uniform int tile_sz;
 
-layout (binding = 0, std140) buffer MaterialParams
+
+layout (binding = 0, std430) buffer MaterialParams
 { 
     uvec2 albedo[MAT_CNT];
     uvec2 metal_roughness_deriv[MAT_CNT];
 } materialParams;
 
-layout (binding = 1, std140) buffer Lights
+layout (binding = 1, std430) buffer Lights
 { 
-    uvec4 pos_r[MAX_LIGHT_CNT];
-    uvec2 col_i[MAX_LIGHT_CNT];
+    uvec4 pos_r[MAX_TOTAL_LIGHT_CNT];
+    uvec2 col_i[MAX_TOTAL_LIGHT_CNT];
 } lights;
 
+layout (binding = 2, std430) buffer LightIndices{
+    uint light_indices[];
+} lightIndices;
+
 void main(){
-    ivec2 pos = ivec2(/*gl_GlobalInvocationID.xy*/gl_FragCoord.xy);// + ivec2(bbox_min.xy);
-    ivec2 bbox_min = ivec2(gl_FragCoord.xy) - ivec2(gl_FragCoord.xy) % ivec2(tile_sz);
+    ivec2 pos = ivec2(gl_FragCoord.xy - 0.5f);
+    ivec2 pos_tile = ivec2((pos - pos % tile_sz) / tile_sz.xx);
     
     //uvBuf contains (uv.x, uv.y, norm.x, norm.y)
     vec4 uvBuf_dat = texelFetch(uvBuf, pos, 0);
@@ -42,10 +45,12 @@ void main(){
     //material ID
     vec4 matID_data = texelFetch(mID_Buf, pos, 0);
     int matID = int(matID_data.x * 4096.0f);
-    float depth = matID_data.y * 100.0f;//texelFetch(depthBuf, pos, 0).x;
+    float depth = matID_data.y * 100.0f;
 
     //light ID
-    //int lightID = int(gl_GlobalInvocationID.z);
+    int lightAccessIdx = (pos_tile.y * (int(im_sz.x) / tile_sz) + pos_tile.x);
+    uint lightCnt = lightIndices.light_indices[lightAccessIdx];//, (lightAccessIdx % 2) * 16, 16);
+    //int lightID = lightIndices.light_indices[] inst_id;
 
     /*if(matID == mat_idx){
         matID = matID % 1024;
@@ -67,5 +72,5 @@ void main(){
         imageStore(accum, pos, accum_val + world_pos);
     }*/
     //imageStore(accum, pos, uvBuf_dat);
-    accum_data = vec4(depth);//(bbox_min.xyxy / tile_sz) / (im_sz.xyxy / tile_sz);
+    accum_data = vec4(uv.x,uv.y,1,1);//(bbox_min.xyxy / tile_sz) / (im_sz.xyxy / tile_sz);
 }
