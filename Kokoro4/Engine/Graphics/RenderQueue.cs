@@ -226,7 +226,8 @@ namespace Kokoro.Engine.Graphics
 
                     EngineManager.SetRenderState(bkt.State); //State has been already set if ClearFramebufferBeforeSubmit is true.
 
-                    EngineManager.SetCurrentMeshGroup(bkt.meshes[0].Mesh.Parent);
+                    if (bkt.meshes[0].Mesh != null)
+                        EngineManager.SetCurrentMeshGroup(bkt.meshes[0].Mesh.Parent);
 
                     GraphicsDevice.SetMultiDrawParameterBuffer(multiDrawParams);
                     GraphicsDevice.SetParameterBuffer(multiDrawParams);

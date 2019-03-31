@@ -15,6 +15,28 @@ using Kokoro.Graphics.OpenGL;
 
 namespace Kokoro.Engine.Graphics.Renderer
 {
+    public class LightShaderIndex
+    {
+        public static readonly LightShaderIndex Point = new LightShaderIndex(0);
+        public static readonly LightShaderIndex Count = new LightShaderIndex(1);
+
+        public int Value { get; private set; }
+        private LightShaderIndex(int idx)
+        {
+            Value = idx;
+        }
+
+        public static LightShaderIndex Get(int idx)
+        {
+            return new LightShaderIndex(idx);
+        }
+
+        public static implicit operator int(LightShaderIndex idx)
+        {
+            return idx.Value;
+        }
+    }
+
     public class TexturelessDeferred
     {
         public class ProgramIndex
@@ -29,28 +51,6 @@ namespace Kokoro.Engine.Graphics.Renderer
             }
 
             public static implicit operator int(ProgramIndex idx)
-            {
-                return idx.Value;
-            }
-        }
-
-        class LightShaderIndex
-        {
-            public static readonly LightShaderIndex Point = new LightShaderIndex(0);
-            public static readonly LightShaderIndex Count = new LightShaderIndex(1);
-
-            public int Value { get; private set; }
-            private LightShaderIndex(int idx)
-            {
-                Value = idx;
-            }
-
-            public static LightShaderIndex Get(int idx)
-            {
-                return new LightShaderIndex(idx);
-            }
-
-            public static implicit operator int(LightShaderIndex idx)
             {
                 return idx.Value;
             }
@@ -71,7 +71,7 @@ namespace Kokoro.Engine.Graphics.Renderer
             public RenderState StaticMeshRender { get; internal set; }
             public Matrix4 Projection { get; internal set; }
 
-            public CPULightRaster LightRaster { get; internal set; }
+            public GPULightRaster LightRaster { get; internal set; }
 
             internal BoundingFrustum Bounds { get; set; }
         }
@@ -98,7 +98,6 @@ namespace Kokoro.Engine.Graphics.Renderer
         MeshGroup fst_mem;
         Mesh fst;
         RenderQueue que;
-        ShaderStorageBuffer light_ssbo;
         ShaderStorageBuffer materialParams;
 
 
@@ -116,7 +115,7 @@ namespace Kokoro.Engine.Graphics.Renderer
                 {
                     //TODO: potentially bugged if width and height are not multiples of TileSz
                     //Light clustering
-                    Resources[i].LightRaster = new CPULightRaster(w / TileSz, h / TileSz, MaxLights);
+                    Resources[i].LightRaster = new GPULightRaster(w / TileSz, h / TileSz, MaxLights, MaxTotalLights);
                 }
 
                 {
@@ -163,7 +162,7 @@ namespace Kokoro.Engine.Graphics.Renderer
                     Resources[i].Programs = new ShaderProgram[ProgramIndex.Count];
                     Resources[i].Programs[ProgramIndex.StaticMesh] = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Default/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/TexturelessDeferred/gbuffer_static_frag.glsl"));
                     Resources[i].Programs[ProgramIndex.StaticMesh].Set("Projection", proj[i]);
-                    
+
                 }
             }
         }
@@ -188,7 +187,6 @@ namespace Kokoro.Engine.Graphics.Renderer
 
             lightShaders = new ShaderProgram[LightShaderIndex.Count];
             lightShaders[LightShaderIndex.Point] = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/PBR/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/PBR/point_light.glsl", $"#define MAX_TOTAL_LIGHT_CNT {MaxTotalLights}\n#define MAX_LIGHT_CNT {MaxLights}\n#define MAT_CNT {MaxMaterials}\n"));
-            light_ssbo = new ShaderStorageBuffer(MaxTotalLights * 64, true);
             materialParams = new ShaderStorageBuffer(16384, true);
             que = new RenderQueue(100, true);
 
@@ -205,29 +203,32 @@ namespace Kokoro.Engine.Graphics.Renderer
         public void RegisterLight(ILight l)
         {
             lights.Add(l);
+            for (int i = 0; i < Resources.Length; i++)
+                Resources[i].LightRaster.AddLight(l);
         }
 
         public void Update(Matrix4[] view)
         {
             if (view.Length != Outputs.Length) throw new Exception("View matrix array must be the same length as the number of outputs.");
-            //TODO Upload the lights
+
+            for (int i = 0; i < Outputs.Length; i++)
+                for (int j = 0; j < ProgramIndex.Count; j++)
+                    Resources[i].Programs[j].Set("View", view[i]);
+        }
+
+        public void Submit(Matrix4[] view)
+        {
+            if (view.Length != Outputs.Length) throw new Exception("View matrix array must be the same length as the number of outputs.");
 
             var mat_arr = Materials.ToArray();
             for (int i = 0; i < Outputs.Length; i++)
-            //for (int i = 1; i >= 0; i--)
             {
-                for (int j = 0; j < ProgramIndex.Count; j++)
-                    Resources[i].Programs[j].Set("View", view[i]);
-
-                //Resources[i].AccumulatorBuffer.Blit(Resources[1].GBuffer, true, false, true);
                 //Compute the corners
                 var VP = view[i] * Resources[i].Projection;
                 var iVP = Matrix4.Invert(VP);
 
-                //TODO: Get rid of lights that don't intersect the bounding value at all
-
                 //Prepare the cpu raster
-                Resources[i].LightRaster.StartRender(VP);
+                Resources[i].LightRaster.Render(view[i], Resources[i].Projection);
 
                 //Group the lights based on type
                 Dictionary<int, List<ILight>> groupedLights = new Dictionary<int, List<ILight>>();
@@ -241,13 +242,8 @@ namespace Kokoro.Engine.Graphics.Renderer
                     if (lights[j].TypeIndex == LightShaderIndex.Point)
                     {
                         var pL = (PointLight)lights[j];
-                        Resources[i].LightRaster.GetSphere(pL.MaxEffectiveRadius, out var verts, out var indices);
-                        if (!Resources[i].LightRaster.Render(new Vector4(pL.Position, 1), verts, indices, (ushort)j))
-                            groupedLights[lights[j].TypeIndex].Remove(lights[j]);
                     }
                 }
-
-                Resources[i].LightRaster.FinishUpdate();
 
                 for (int q = 0; q < groupedLights.Count; q++)
                 {
@@ -257,8 +253,8 @@ namespace Kokoro.Engine.Graphics.Renderer
                         continue;
 
                     //Build a render state
-                    RenderState state = new RenderState(Resources[i].AccumulatorBuffer, lightShaders[LightShaderIndex.Get(light_type_index)], new ShaderStorageBuffer[] { materialParams, light_ssbo, Resources[i].LightRaster.LightData }, null, false, true, DepthFunc.Always, InverseDepth.Far, InverseDepth.Near, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
-                    
+                    RenderState state = new RenderState(Resources[i].AccumulatorBuffer, lightShaders[LightShaderIndex.Get(light_type_index)], new ShaderStorageBuffer[] { materialParams, Resources[i].LightRaster.LightData }, null, false, true, DepthFunc.Always, InverseDepth.Far, InverseDepth.Near, BlendFactor.One, BlendFactor.One, Vector4.Zero, 0, CullFaceMode.Back);
+
                     //Invoke the light shaders for each specified material type
                     for (int mat_idx = 0; mat_idx < mat_arr.Length; mat_idx++)
                     {
@@ -267,28 +263,24 @@ namespace Kokoro.Engine.Graphics.Renderer
                         unsafe
                         {
                             var b_ptr = materialParams.Update();
-                            for (int k = 0; k < matType.Value.First().PropertyCount; k++)
+                            for (int j = 0; j < matType.Value.Count; j++)
                             {
+                                matType.Value[j].MakeResident();
+
                                 int prop_sz = 0;
-                                for (int j = 0; j < matType.Value.Count; j++)
+                                for (int k = 0; k < matType.Value.First().PropertyCount; k++)
                                 {
-                                    matType.Value[j].MakeResident();
                                     var mat_props = matType.Value[j].GetProperty(k);
                                     fixed (byte* mat_props_b = mat_props)
                                         Buffer.MemoryCopy(mat_props_b, b_ptr, mat_props.Length, mat_props.Length);
 
-                                    prop_sz = mat_props.Length;
+                                    prop_sz += mat_props.Length;
                                     b_ptr += mat_props.Length;
                                 }
-
-                                for (int j = matType.Value.Count; j < MaxMaterials; j++)
-                                    b_ptr += prop_sz;
                             }
 
                             materialParams.UpdateDone();
                         }
-
-
 
                         //Provide the depth buffer, UV buffer and material ID buffer as inputs
                         var depthBuf = Resources[i].Depth.GetHandle(TextureSampler.Default);
@@ -304,9 +296,11 @@ namespace Kokoro.Engine.Graphics.Renderer
                         lightShaders[LightShaderIndex.Get(light_type_index)].Set("mID_Buf", mID_Buf);
 
                         lightShaders[LightShaderIndex.Get(light_type_index)].Set("im_sz", new Vector2(Width, Height));
+                        lightShaders[LightShaderIndex.Get(light_type_index)].Set("mat_type", matType.Key);
                         lightShaders[LightShaderIndex.Get(light_type_index)].Set("iVP", iVP);
                         lightShaders[LightShaderIndex.Get(light_type_index)].Set("VP", VP);
                         lightShaders[LightShaderIndex.Get(light_type_index)].Set("tile_sz", TileSz);
+                        lightShaders[LightShaderIndex.Get(light_type_index)].Set("LightIndices", Resources[i].LightRaster.LightIndicesImage);
 
                         if (light_type_index == LightShaderIndex.Point)
                             lightShaders[LightShaderIndex.Get(light_type_index)].Set("min_intensity", PointLight.Threshold);
@@ -328,9 +322,7 @@ namespace Kokoro.Engine.Graphics.Renderer
                         });
                         que.EndRecording();
 
-
                         //Submit a full screen quad to compute the lighting
-                        OpenTK.Graphics.OpenGL.GL.Finish();
                         que.Submit();
 
                         for (int j = 0; j < matType.Value.Count; j++)
@@ -340,6 +332,5 @@ namespace Kokoro.Engine.Graphics.Renderer
 
             }
         }
-
     }
 }

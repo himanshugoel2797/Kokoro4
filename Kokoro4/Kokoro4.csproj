@@ -125,6 +125,7 @@
     <Compile Include="Engine\Graphics\ProbeBase.cs" />
     <Compile Include="Engine\Graphics\ProcessedArrayTextureSource.cs" />
     <Compile Include="Engine\Graphics\RawTextureSource.cs" />
+    <Compile Include="Engine\Graphics\Renderer\GPULightRaster.cs" />
     <Compile Include="Engine\Graphics\Renderer\CPULightRaster.cs" />
     <Compile Include="Engine\Graphics\Renderer\SimpleStaticMeshRenderer.cs" />
     <Compile Include="Engine\Graphics\Renderer\TexturelessDeferred.cs" />

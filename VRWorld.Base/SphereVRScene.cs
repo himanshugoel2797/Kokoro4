@@ -151,6 +151,7 @@ namespace VRWorld.Base
                 vr_data[i].staticMeshRenderer.Submit();
             }
 
+            deferred.Submit(new Matrix4[] { leftEyeView * pose.PoseMatrix, rightEyeView * pose.PoseMatrix });
             vr.LeftFramebuffer.Blit(deferred.Resources[0].AccumulatorBuffer, true, false, true);
             vr.RightFramebuffer.Blit(deferred.Resources[1].AccumulatorBuffer, true, false, true);
 
