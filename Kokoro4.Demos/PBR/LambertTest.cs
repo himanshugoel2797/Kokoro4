@@ -5,6 +5,8 @@ using Kokoro.Engine.Input;
 using Kokoro.Graphics.OpenGL;
 using Kokoro.Graphics.Prefabs;
 using Kokoro.Math;
+using Kokoro.SceneGraph;
+using Kokoro.SceneGraph.Generators;
 using Kokoro.StateMachine;
 using System;
 using System.Collections.Generic;
@@ -20,11 +22,10 @@ namespace Kokoro4.Demos.PBR
         private FirstPersonCamera camera;
         private MeshGroup grp;
         private Mesh sphere;
-        private RenderQueue clearQueue;
-        private RenderState renderState;
 
-        private ShaderStorageBuffer WorldTransforms;
         private UniformBuffer Textures;
+        private ShaderProgram Shader;
+        private FlatGenerator Renderer;
 
         private Keyboard keybd;
 
@@ -55,11 +56,17 @@ namespace Kokoro4.Demos.PBR
                 grp = new MeshGroup(MeshGroupVertexFormat.X32F_Y32F_Z32F, 30000, 30000);
                 sphere = SphereFactory.Create(grp);
 
-                List<Matrix4> SphereTransforms = new List<Matrix4>();
+                Node graphRoot = new Node(null, "Root", 1);
 
                 for (int y = 0; y < 8; y++)
                     for (int x = 0; x < 8; x++)
-                        SphereTransforms.Add(Matrix4.CreateTranslation(x * 3, 0, y * 3));
+                    {
+                        var node = new Node(graphRoot, $"{x},{y}", 1);
+                        node.Visible = true;
+                        node.Transform = Matrix4.CreateTranslation(x * 3, 0, y * 3);
+                        node.Mesh = sphere;
+                    }
+                graphRoot.UpdateTree();
 
                 //TODO: Scene graph based on joint relationships
                 //TODO: Update scene graph based on animations
@@ -82,25 +89,9 @@ namespace Kokoro4.Demos.PBR
 
                 unsafe
                 {
-                    WorldTransforms = new ShaderStorageBuffer(sizeof(Matrix4) * SphereTransforms.Count, false);
-
-                    var b_ptr = WorldTransforms.Update();
-                    var matrices = SphereTransforms.ToArray();
-                    fixed (Matrix4* mats = matrices)
-                    {
-                        long* s = (long*)mats;
-                        long* d = (long*)b_ptr;
-
-                        for (int i = 0; i < sizeof(Matrix4) * matrices.Length / sizeof(long); i++)
-                        {
-                            d[i] = s[i];
-                        }
-                    }
-                    WorldTransforms.UpdateDone();
-
                     Textures = new UniformBuffer(false);
 
-                    b_ptr = Textures.Update();
+                    var b_ptr = Textures.Update();
                     long* l_ptr = (long*)b_ptr;
                     l_ptr[0] = Texture.Default.GetHandle(TextureSampler.Default);
                     Textures.UpdateDone();
@@ -108,23 +99,9 @@ namespace Kokoro4.Demos.PBR
                     Texture.Default.GetHandle(TextureSampler.Default).SetResidency(Residency.Resident);
                 }
 
-                renderState = new RenderState(Framebuffer.Default, new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Lambert/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Lambert/fragment.glsl")), new ShaderStorageBuffer[] { WorldTransforms }, new UniformBuffer[] { Textures }, true, true, DepthFunc.Greater, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.None);
-                clearQueue = new RenderQueue(1, false);
-                clearQueue.BeginRecording();
-                clearQueue.ClearFramebufferBeforeSubmit = true;
-                clearQueue.RecordDraw(new RenderQueue.DrawData()
-                {
-                    Meshes = new RenderQueue.MeshData[] {
-                        new RenderQueue.MeshData(){
-                            BaseInstance = 0,
-                            InstanceCount = SphereTransforms.Count,
-                            Mesh = sphere
-                        }
-                    },
-                    State = renderState
-                });
-                clearQueue.EndRecording();
-
+                Shader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Lambert/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Lambert/fragment.glsl"));
+                Renderer = new FlatGenerator(Framebuffer.Default, Shader, new UniformBuffer[] { Textures }, null);
+                Renderer.Render(graphRoot, 1);
                 inited = true;
             }
 
@@ -133,10 +110,9 @@ namespace Kokoro4.Demos.PBR
                 GraphicsDevice.Wireframe = !GraphicsDevice.Wireframe;
             }
 
-            renderState.ShaderProgram.Set("View", EngineManager.View);
-            renderState.ShaderProgram.Set("Projection", EngineManager.Projection);
-
-            clearQueue.Submit();
+            Shader.Set("View", EngineManager.View);
+            Shader.Set("Projection", EngineManager.Projection);
+            Renderer.Submit(1);
         }
 
         public void Update(double interval)

@@ -37,7 +37,7 @@ namespace Kokoro.SceneGraph
             {
                 return _transform;
             }
-            protected set
+            set
             {
                 lock (_transform_lock)
                 {
@@ -53,6 +53,10 @@ namespace Kokoro.SceneGraph
 
         public ulong LayerMask { get; set; }
 
+        public bool Visible { get; set; }
+
+        public Mesh Mesh { get; set; }
+
         public string Name { get; set; }
 
         public Node(Node parent, string name, ulong layers)
@@ -62,6 +66,7 @@ namespace Kokoro.SceneGraph
             net_transform_lock = new object();
 
             Parent = parent;
+            if (parent != null) parent.Children.Add(this);
             Children = new List<Node>();
             Transform = Matrix4.Identity;
             NetTransform = Transform;
