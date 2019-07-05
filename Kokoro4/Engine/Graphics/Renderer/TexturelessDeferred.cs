@@ -113,7 +113,6 @@ namespace Kokoro.Engine.Graphics.Renderer
                 Resources[i].Projection = proj[i];
 
                 {
-                    //TODO: potentially bugged if width and height are not multiples of TileSz
                     //Light clustering
                     Resources[i].LightRaster = new GPULightRaster(w / TileSz, h / TileSz, MaxLights, MaxTotalLights);
                 }
@@ -237,12 +236,6 @@ namespace Kokoro.Engine.Graphics.Renderer
                     if (!groupedLights.ContainsKey(lights[j].TypeIndex))
                         groupedLights[lights[j].TypeIndex] = new List<ILight>();
                     groupedLights[lights[j].TypeIndex].Add(lights[j]);
-
-                    //Render the lights to the cpu raster
-                    if (lights[j].TypeIndex == LightShaderIndex.Point)
-                    {
-                        var pL = (PointLight)lights[j];
-                    }
                 }
 
                 for (int q = 0; q < groupedLights.Count; q++)

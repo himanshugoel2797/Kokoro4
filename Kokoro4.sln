@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VRWorldTests", "VRWorldTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRWorld.Base", "VRWorld.Base\VRWorld.Base.csproj", "{1EAF2093-9FC6-4A40-9C89-C9665026E4C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPURayTracing", "CPURayTracing\CPURayTracing.csproj", "{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -293,6 +295,18 @@ Global
 		{1EAF2093-9FC6-4A40-9C89-C9665026E4C0}.Release|x64.Build.0 = Release|x64
 		{1EAF2093-9FC6-4A40-9C89-C9665026E4C0}.Release|x86.ActiveCfg = Release|Any CPU
 		{1EAF2093-9FC6-4A40-9C89-C9665026E4C0}.Release|x86.Build.0 = Release|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Debug|x64.ActiveCfg = Debug|x64
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Debug|x64.Build.0 = Debug|x64
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Debug|x86.Build.0 = Debug|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Release|x64.ActiveCfg = Release|x64
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Release|x64.Build.0 = Release|x64
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Release|x86.ActiveCfg = Release|Any CPU
+		{8A58CF6F-54FE-4276-8778-FA690E7DE6C3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

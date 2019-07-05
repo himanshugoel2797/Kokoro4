@@ -40,6 +40,10 @@ uniform int tile_sz;
 flat in int inst_id;
 in vec2 UV;
 
+vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVec){
+    return specColor + (1.0f - specColor) * pow(1.0f - clamp(dot(lightDir, halfVec), 0.0f, 1.0f), 5);
+}
+
 void main(){
     ivec2 pos = ivec2(gl_FragCoord.xy);
     ivec2 pos_tile = ivec2(pos / tile_sz.xx);
@@ -78,6 +82,15 @@ void main(){
         vec4 world_pos = iVP * vec4(pos.x / im_sz.x * 2 - 1, pos.y / im_sz.y * 2 - 1, depth, 1);
 
         //Compute the lighting
+        //Compute diffuse lighting
+        vec3 dotNL = dot(normal, lightDir) * albedo * lightColor;
+
+        //Fresnel is based on the metalness
+        //Fresnel color is based on the metalness value range
+        float f_o = (metal_roughness_deriv.x == 0) ? 0.04f : 0.15f;
+        vec3 F = fresnel(specColor, lightDir, halfVec) * ((specPower + 2) / 8 ) * pow(saturate(dot(normal, halfVec)), specPower) * dotNL;
+
+        //Combine diffuse and specular
 
         accum_data = world_pos;
     }

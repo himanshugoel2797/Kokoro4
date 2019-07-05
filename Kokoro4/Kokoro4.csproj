@@ -127,6 +127,7 @@
     <Compile Include="Engine\Graphics\RawTextureSource.cs" />
     <Compile Include="Engine\Graphics\Renderer\GPULightRaster.cs" />
     <Compile Include="Engine\Graphics\Renderer\CPULightRaster.cs" />
+    <Compile Include="Engine\Graphics\Renderer\ImperfectMapRenderer.cs" />
     <Compile Include="Engine\Graphics\Renderer\SimpleStaticMeshRenderer.cs" />
     <Compile Include="Engine\Graphics\Renderer\TexturelessDeferred.cs" />
     <Compile Include="Engine\Graphics\RenderQueue.cs" />
@@ -143,10 +144,9 @@
     <Compile Include="Engine\UI\UIRenderer.cs" />
     <Compile Include="Engine\UI\UIRoot.cs" />
     <Compile Include="Engine\Voxel\Chunk.cs" />
-    <Compile Include="Engine\Voxel\RLEData.cs" />
     <Compile Include="Engine\Graphics\BitmapTextureSource.cs" />
+    <Compile Include="Engine\Voxel\ChunkManager.cs" />
     <Compile Include="Engine\Voxel\Voxelizer.cs" />
-    <Compile Include="Engine\Voxel\VoxelOctree.cs" />
     <Compile Include="Engine\WeakAction.cs" />
     <Compile Include="Graphics\OpenGL\AsyncComputeProgram.cs" />
     <Compile Include="Graphics\OpenGL\AsyncComputeSource.cs" />
@@ -205,7 +205,6 @@
     <Compile Include="StateMachine\IState.cs" />
     <Compile Include="StateMachine\StateGroup.cs" />
     <Compile Include="StateMachine\StateManager.cs" />
-    <Compile Include="VR\Controller.cs" />
     <Compile Include="VR\openvr_api.cs" />
     <Compile Include="VR\VRClient.cs" />
   </ItemGroup>
