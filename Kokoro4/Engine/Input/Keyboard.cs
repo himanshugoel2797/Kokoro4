@@ -14,10 +14,18 @@ namespace Kokoro.Engine.Input
     /// </summary>
     public class Keyboard
     {
-        public Dictionary<string, Key> KeyMap;
-        private static Dictionary<Key, Action> handlers;
+        private Dictionary<string, Key> KeyMap;
+        private Dictionary<string, Action> upHandlers;
+        private Dictionary<string, Action> downHandlers;
 
-        static Keyboard() { handlers = new Dictionary<Key, Action>(); }
+        private static Dictionary<Key, Action> _supHandlers;
+        private static Dictionary<Key, Action> _sdownHandlers;
+
+        static Keyboard()
+        {
+            _sdownHandlers = new Dictionary<Key, Action>();
+            _supHandlers = new Dictionary<Key, Action>();
+        }
 
         public Keyboard(string configFile)
         {
@@ -25,11 +33,25 @@ namespace Kokoro.Engine.Input
             KeyMap = new Dictionary<string, Key>();
             XmlSerializer xSer = new XmlSerializer(typeof(Dictionary<string, Key>));
             KeyMap = (Dictionary<string, Key>)xSer.Deserialize(s);
+
+            upHandlers = new Dictionary<string, Action>();
+            downHandlers = new Dictionary<string, Action>();
+        }
+
+        public void Register(string name, Action downHandler, Action upHandler, Key defaultKey)
+        {
+            if (!KeyMap.ContainsKey(name))
+                KeyMap[name] = defaultKey;
+
+            if(upHandler != null)upHandlers[name] = upHandler;
+            if(downHandler != null)downHandlers[name] = downHandler;
         }
 
         public Keyboard()
         {
             KeyMap = new Dictionary<string, Key>();
+            upHandlers = new Dictionary<string, Action>();
+            downHandlers = new Dictionary<string, Action>();
         }
 
         public void SaveKeyMap(string configFile)
@@ -49,11 +71,26 @@ namespace Kokoro.Engine.Input
             return IsKeyDown(KeyMap[name]);
         }
 
+        public void Forward()
+        {
+            _supHandlers.Clear();
+            foreach(var kvp in upHandlers)
+            {
+                _supHandlers[KeyMap[kvp.Key]] = kvp.Value;
+            }
+
+            _sdownHandlers.Clear();
+            foreach (var kvp in downHandlers)
+            {
+                _sdownHandlers[KeyMap[kvp.Key]] = kvp.Value;
+            }
+        }
+
         internal static void Update()
         {
             InputLL.UpdateKeyboard();
 
-            foreach (KeyValuePair<Key, Action> handler in handlers)
+            foreach (KeyValuePair<Key, Action> handler in _sdownHandlers)
             {
                 if (IsKeyDown(handler.Key)) handler.Value();
             }
@@ -72,17 +109,6 @@ namespace Kokoro.Engine.Input
         internal static bool IsKeyDown(Key k)
         {
             return InputLL.KeyDown(k);
-        }
-
-        /// <summary>
-        /// Register a Key event handler
-        /// </summary>
-        /// <param name="handler">The handler to register</param>
-        /// <param name="k">The key to register it to</param>
-        internal static void RegisterKeyHandler(Action handler, Key k)
-        {
-            if (!handlers.ContainsKey(k)) handlers.Add(k, handler);
-            else handlers[k] += handler;
         }
 
     }

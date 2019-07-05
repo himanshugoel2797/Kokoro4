@@ -30,7 +30,12 @@ namespace Kokoro4.Demos.PBR
 
         public void Enter(IState prev)
         {
-
+            if (keybd == null)
+            {
+                keybd = new Keyboard();
+                keybd.Register("ToggleWireframe", null, null, Key.W);
+            }
+            keybd.Forward();
         }
 
         public void Exit(IState next)
@@ -42,9 +47,6 @@ namespace Kokoro4.Demos.PBR
         {
             if (!inited)
             {
-                keybd = new Keyboard();
-                keybd.KeyMap["ToggleWireframe"] = Key.W;
-
                 camera = new FirstPersonCamera(keybd, new Vector3(43.74f, 15.3f, 9.07f), new Vector3(-0.951f, -0.309f, 4.1572e-08f), "FPV");
                 camera.Enabled = true;
                 EngineManager.AddCamera(camera);
@@ -55,8 +57,8 @@ namespace Kokoro4.Demos.PBR
 
                 List<Matrix4> SphereTransforms = new List<Matrix4>();
 
-                for(int y = 0; y < 8; y++)
-                    for(int x = 0; x < 8; x++)
+                for (int y = 0; y < 8; y++)
+                    for (int x = 0; x < 8; x++)
                         SphereTransforms.Add(Matrix4.CreateTranslation(x * 3, 0, y * 3));
 
                 //TODO: Scene graph based on joint relationships

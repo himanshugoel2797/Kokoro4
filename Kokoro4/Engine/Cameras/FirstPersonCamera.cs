@@ -43,14 +43,14 @@ namespace Kokoro.Engine.Cameras
         {
             //Setup default key bindings
             this.kbd = kbd;
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.ForwardBinding)) kbd.KeyMap.Add(FirstPersonCamera.ForwardBinding, Key.Up);
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.BackwardBinding)) kbd.KeyMap.Add(FirstPersonCamera.BackwardBinding, Key.Down);
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.LeftBinding)) kbd.KeyMap.Add(FirstPersonCamera.LeftBinding, Key.Left);
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.RightBinding)) kbd.KeyMap.Add(FirstPersonCamera.RightBinding, Key.Right);
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.UpBinding)) kbd.KeyMap.Add(FirstPersonCamera.UpBinding, Key.PageUp);
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.DownBinding)) kbd.KeyMap.Add(FirstPersonCamera.DownBinding, Key.PageDown);
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.AccelerateBinding)) kbd.KeyMap.Add(FirstPersonCamera.AccelerateBinding, Key.Home);
-            if (!kbd.KeyMap.ContainsKey(FirstPersonCamera.DecelerateBinding)) kbd.KeyMap.Add(FirstPersonCamera.DecelerateBinding, Key.End);
+            kbd.Register(FirstPersonCamera.ForwardBinding, null, null, Key.Up);
+            kbd.Register(FirstPersonCamera.BackwardBinding, null, null, Key.Down);
+            kbd.Register(FirstPersonCamera.LeftBinding, null, null, Key.Left);
+            kbd.Register(FirstPersonCamera.RightBinding, null, null, Key.Right);
+            kbd.Register(FirstPersonCamera.UpBinding, null, null, Key.PageUp);
+            kbd.Register(FirstPersonCamera.DownBinding, null, null, Key.PageDown);
+            kbd.Register(FirstPersonCamera.AccelerateBinding, null, null, Key.Home);
+            kbd.Register(FirstPersonCamera.DecelerateBinding, null, null, Key.End);
 
             this.Position = Position;
             this.Direction = Direction;

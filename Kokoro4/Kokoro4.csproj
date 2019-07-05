@@ -107,8 +107,7 @@
     <Compile Include="Engine\GameObject.cs" />
     <Compile Include="Engine\GameObjectCollection.cs" />
     <Compile Include="Engine\Graphics\ArrayTextureSource.cs" />
-    <Compile Include="Engine\Graphics\AtmosphereRenderer.cs" />
-    <Compile Include="Engine\Graphics\CloudRenderer.cs" />
+    <Compile Include="Engine\Graphics\Effects\AtmosphereRenderer.cs" />
     <Compile Include="Engine\Graphics\CompressedTextureSource.cs" />
     <Compile Include="Engine\Graphics\DistanceState.cs" />
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />
@@ -119,7 +118,6 @@
     <Compile Include="Engine\Graphics\Lights\PointLight.cs" />
     <Compile Include="Engine\Graphics\Material.cs" />
     <Compile Include="Engine\Graphics\Materials\PBRMetalnessMaterial.cs" />
-    <Compile Include="Engine\Graphics\PlanetRenderer.cs" />
     <Compile Include="Engine\Graphics\Prefabs\FullScreenTriangleFactory.cs" />
     <Compile Include="Engine\Graphics\Prefabs\QuadFactory.cs" />
     <Compile Include="Engine\Graphics\ProbeBase.cs" />
@@ -136,17 +134,12 @@
     <Compile Include="Engine\Graphics\ShaderLibrary.cs" />
     <Compile Include="Engine\Graphics\ShaderProgram.cs" />
     <Compile Include="Engine\Graphics\ShaderSource.cs" />
-    <Compile Include="Engine\Graphics\TerrainRenderer.cs" />
     <Compile Include="Engine\Graphics\TextureCache.cs" />
-    <Compile Include="Engine\Graphics\VoxelRayCaster.cs" />
     <Compile Include="Engine\MeshGroup.cs" />
     <Compile Include="Engine\UI\UIControl.cs" />
     <Compile Include="Engine\UI\UIRenderer.cs" />
     <Compile Include="Engine\UI\UIRoot.cs" />
-    <Compile Include="Engine\Voxel\Chunk.cs" />
     <Compile Include="Engine\Graphics\BitmapTextureSource.cs" />
-    <Compile Include="Engine\Voxel\ChunkManager.cs" />
-    <Compile Include="Engine\Voxel\Voxelizer.cs" />
     <Compile Include="Engine\WeakAction.cs" />
     <Compile Include="Graphics\OpenGL\AsyncComputeProgram.cs" />
     <Compile Include="Graphics\OpenGL\AsyncComputeSource.cs" />
@@ -183,7 +176,6 @@
     <Compile Include="Graphics\OpenGL\ShaderLibraries\Noise.cs" />
     <Compile Include="Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Graphics\OpenGL\ShaderSource.cs" />
-    <Compile Include="Engine\Graphics\SimplexNoise.cs" />
     <Compile Include="Graphics\OpenGL\ShaderType.cs" />
     <Compile Include="Graphics\OpenGL\SparseTexture.cs" />
     <Compile Include="Graphics\OpenGL\Texture.cs" />

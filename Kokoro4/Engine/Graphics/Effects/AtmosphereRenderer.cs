@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Kokoro.Engine.Graphics.RenderQueue;
 
-namespace Kokoro.Engine.Graphics
+namespace Kokoro.Engine.Graphics.Effects
 {
     public class AtmosphereRenderer
     {
