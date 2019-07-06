@@ -55,6 +55,11 @@ namespace Kokoro.SceneGraph
 
         public bool Visible { get; set; }
 
+        /// <summary>
+        /// Stop traversal of the tree here for visibility testing
+        /// </summary>
+        public bool VisibilityLimiter { get; set; }
+
         public Mesh Mesh { get; set; }
 
         public string Name { get; set; }

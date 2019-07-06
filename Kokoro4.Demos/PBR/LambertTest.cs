@@ -34,7 +34,7 @@ namespace Kokoro4.Demos.PBR
             if (keybd == null)
             {
                 keybd = new Keyboard();
-                keybd.Register("ToggleWireframe", null, null, Key.W);
+                keybd.Register("ToggleWireframe", null, () => GraphicsDevice.Wireframe = !GraphicsDevice.Wireframe, Key.W);
             }
             keybd.Forward();
         }
@@ -99,15 +99,10 @@ namespace Kokoro4.Demos.PBR
                     Texture.Default.GetHandle(TextureSampler.Default).SetResidency(Residency.Resident);
                 }
 
-                Shader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Lambert/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Lambert/fragment.glsl"));
+                Shader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Lighting/Lambert/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Lighting/Lambert/fragment.glsl"));
                 Renderer = new FlatGenerator(Framebuffer.Default, Shader, new UniformBuffer[] { Textures }, null);
                 Renderer.Render(graphRoot, 1);
                 inited = true;
-            }
-
-            if (keybd.IsKeyReleased("ToggleWireframe"))
-            {
-                GraphicsDevice.Wireframe = !GraphicsDevice.Wireframe;
             }
 
             Shader.Set("View", EngineManager.View);

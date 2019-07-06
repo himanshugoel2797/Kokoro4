@@ -110,7 +110,6 @@
     <Compile Include="Engine\GameObject.cs" />
     <Compile Include="Engine\GameObjectCollection.cs" />
     <Compile Include="Engine\Graphics\ArrayTextureSource.cs" />
-    <Compile Include="Engine\Graphics\Effects\AtmosphereRenderer.cs" />
     <Compile Include="Engine\Graphics\CompressedTextureSource.cs" />
     <Compile Include="Engine\Graphics\DistanceState.cs" />
     <Compile Include="Engine\Graphics\EngineRenderable.cs" />

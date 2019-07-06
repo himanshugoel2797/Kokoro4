@@ -378,8 +378,10 @@ namespace Kokoro.Graphics.OpenGL
         static GraphicsDevice()
         {
             GraphicsContextFlags flags = GraphicsContextFlags.Default;
-#if !Debug
+#if !DEBUG
             flags |= (GraphicsContextFlags)0x8; //Disable error checking
+#else
+            flags |= GraphicsContextFlags.Debug;
 #endif
             game = new GameWindow(1280, 720, GraphicsMode.Default, "Game Window", OpenTK.GameWindowFlags.Default, OpenTK.DisplayDevice.Default, 0, 0, flags);
 
@@ -412,19 +414,33 @@ namespace Kokoro.Graphics.OpenGL
                 gl_name = GL.GetString(StringName.Version);
 
             game.Title = gameName + $" | {renderer_name} | { gl_name }";
+            GL.Enable(EnableCap.DebugOutput);
+            GL.DebugMessageInsert(DebugSourceExternal.DebugSourceApplication, DebugType.DebugTypePortability, 1, DebugSeverity.DebugSeverityNotification, 5, "test");
 #endif
             game.Run(ups, fps);
         }
 
         static string gl_name = "";
         static string renderer_name = "";
+#if DEBUG
+        static double renderCnt = 0;
+        static double updateCnt = 0;
+        static DateTime startTime;
+#endif
         public static void SwapBuffers()
         {
 #if DEBUG
             if (renderer_name == "")
                 renderer_name = GL.GetString(StringName.Renderer);
 
-            game.Title = gameName + $" | {renderer_name} | {gl_name} | FPS : {game.RenderFrequency:F2}, UPS : {game.UpdateFrequency:F2}";
+            if (renderCnt == 0) startTime = DateTime.Now;
+            renderCnt++;
+            if ((DateTime.Now - startTime) > TimeSpan.FromMilliseconds(500))
+            {
+                game.Title = gameName + $" | {renderer_name} | {gl_name} | FPS : {(renderCnt * 2):F2}, UPS : {(updateCnt * 2):F2}";
+                renderCnt = 0;
+                updateCnt = 0;
+            }
 #endif
             game.SwapBuffers();
         }
@@ -488,6 +504,33 @@ namespace Kokoro.Graphics.OpenGL
             Input.LowLevel.InputLL.IsFocused(Window.Focused);
             Engine.Input.Mouse.Update();
             Engine.Input.Keyboard.Update();
+
+#if DEBUG
+            updateCnt++;
+            int len = GL.GetInteger((GetPName)All.MaxDebugMessageLength);
+            StringBuilder str = new StringBuilder(len);
+            if (GL.GetDebugMessageLog(1, len, out var source, out var type, out var id, out var severity, out var strlen, str) > 0)
+            {
+                var consoleCol = Console.ForegroundColor;
+                switch (severity)
+                {
+                    case DebugSeverity.DebugSeverityHigh:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    case DebugSeverity.DebugSeverityLow:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        break;
+                    case DebugSeverity.DebugSeverityMedium:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+                    case DebugSeverity.DebugSeverityNotification:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+                }
+                Console.WriteLine($"[{type}][{source}] {str}");
+                Console.ForegroundColor = consoleCol;
+            }
+#endif
 
             Update?.Invoke(e.Time);
         }
@@ -587,7 +630,7 @@ namespace Kokoro.Graphics.OpenGL
             GL.BindVertexArray(varray.id);
         }
 
-#region Shader Buffers
+        #region Shader Buffers
         public static void SetShaderStorageBufferBinding(ShaderStorageBuffer buf, int index)
         {
             if (buf == null) return;
@@ -604,9 +647,9 @@ namespace Kokoro.Graphics.OpenGL
             GPUStateMachine.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.UniformBuffer, buf.buf.id, index, (IntPtr)(buf.GetReadyOffset()), (IntPtr)buf.Size);
         }
 
-#endregion
+        #endregion
 
-#region Indirect call buffers
+        #region Indirect call buffers
         public static void SetMultiDrawParameterBuffer(GPUBuffer buf)
         {
             GL.BindBuffer(OpenTK.Graphics.OpenGL.BufferTarget.DrawIndirectBuffer, buf.id);
@@ -626,9 +669,9 @@ namespace Kokoro.Graphics.OpenGL
         {
             SetParameterBuffer(buf.buf);
         }
-#endregion
+        #endregion
 
-#region Compute Jobs
+        #region Compute Jobs
         public static void DispatchSyncComputeJob(ShaderProgram prog, int x, int y, int z)
         {
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
@@ -646,9 +689,9 @@ namespace Kokoro.Graphics.OpenGL
             _comp_queue.ReleaseGLObjects(prog.Objects, _comp_events);
             while (_comp_events.Count > 10) _comp_events.RemoveAt(0);
         }
-#endregion
+        #endregion
 
-#region Draw calls
+        #region Draw calls
         public static void Draw(Engine.Graphics.PrimitiveType type, int first, int count, bool indexed)
         {
             if (count == 0) return;
@@ -692,9 +735,9 @@ namespace Kokoro.Graphics.OpenGL
             else
                 GL.Arb.MultiDrawArraysIndirectCount((ArbIndirectParameters)type, (IntPtr)byteOffset, (IntPtr)countOffset, maxCount, 5 * sizeof(int) /*Each entry is formatted as index data, so work accordingly*/);
         }
-#endregion
+        #endregion
 
-#region Depth Range
+        #region Depth Range
         private static double _far = 0, _near = 0;
         public static void SetDepthRange(double near, double far)
         {
@@ -708,7 +751,7 @@ namespace Kokoro.Graphics.OpenGL
             near = _near;
             far = _far;
         }
-#endregion
+        #endregion
 
         public static void Clear()
         {

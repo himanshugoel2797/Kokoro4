@@ -94,6 +94,11 @@ namespace Kokoro.Engine.Input
             {
                 if (IsKeyDown(handler.Key)) handler.Value();
             }
+
+            foreach (KeyValuePair<Key, Action> handler in _supHandlers)
+            {
+                if (IsKeyReleased(handler.Key)) handler.Value();
+            }
         }
 
         /// <summary>
