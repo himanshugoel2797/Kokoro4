@@ -1,6 +1,10 @@
 ﻿using Kokoro.Engine;
 using Kokoro.Engine.Cameras;
 using Kokoro.Engine.Graphics;
+using Kokoro.Engine.Graphics.Effects;
+using Kokoro.Engine.Graphics.Lights;
+using Kokoro.Engine.Graphics.Materials;
+using Kokoro.Engine.Graphics.Renderer;
 using Kokoro.Engine.Input;
 using Kokoro.Graphics.OpenGL;
 using Kokoro.Graphics.Prefabs;
@@ -23,9 +27,12 @@ namespace Kokoro4.Demos.PBR
         private MeshGroup grp;
         private Mesh sphere;
 
-        private UniformBuffer Textures;
+        private ShaderStorageBuffer Textures;
         private ShaderProgram Shader;
         private FlatGenerator Renderer;
+        private TexturelessDeferred Deferred;
+        private ReflectionTracing Reflection;
+        private Framebuffer ReflectionBuffer;
 
         private Keyboard keybd;
 
@@ -68,8 +75,6 @@ namespace Kokoro4.Demos.PBR
                     }
                 graphRoot.UpdateTree();
 
-                //TODO: Scene graph based on joint relationships
-                //TODO: Update scene graph based on animations
                 //TODO: Physics engine uses the above scene graph
                 //TODO: The physics engine then builds a render graph from its updated scene graph
                 //TODO: Use the scenegraph to implement an octree construction step for frustum culling
@@ -89,25 +94,61 @@ namespace Kokoro4.Demos.PBR
 
                 unsafe
                 {
-                    Textures = new UniformBuffer(false);
+                    Textures = new ShaderStorageBuffer(4096, false);
 
                     var b_ptr = Textures.Update();
-                    long* l_ptr = (long*)b_ptr;
-                    l_ptr[0] = Texture.Default.GetHandle(TextureSampler.Default);
+                    uint* l_ptr = (uint*)b_ptr;
+                    l_ptr[0] = 1;
                     Textures.UpdateDone();
 
                     Texture.Default.GetHandle(TextureSampler.Default).SetResidency(Residency.Resident);
                 }
 
-                Shader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Lighting/Lambert/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Lighting/Lambert/fragment.glsl"));
-                Renderer = new FlatGenerator(Framebuffer.Default, Shader, new UniformBuffer[] { Textures }, null);
+                Deferred = new TexturelessDeferred(1280, 720, new Framebuffer[] { Framebuffer.Default }, new Matrix4[] { EngineManager.VisibleCamera.Projection });
+                /*Deferred.RegisterLight(new PointLight()
+                {
+                    Color = Vector3.One,
+                    Intensity = 10,
+                    Position = Vector3.UnitY * 2,
+                    Radius = 1
+                });*/
+                Deferred.RegisterLight(new PointLight()
+                {
+                    Color = Vector3.One,
+                    Intensity = 1000,
+                    Position = Vector3.UnitY * 10 + Vector3.UnitX * 13.5f + Vector3.UnitZ * 13.5f,
+                    Radius = 1
+                });
+
+                Deferred.RegisterMaterial(new PBRMetalnessMaterial("SphereMat")
+                {
+                    Albedo = Texture.Default,
+                    MetalRoughnessDerivative = Texture.Default,
+                    AlbedoSampler = TextureSampler.Default,
+                    MetalRoughnessDerivativeSampler = TextureSampler.Default,
+                    Enabled = true,
+                });
+
+                Shader = new ShaderProgram(ShaderSource.Load(ShaderType.VertexShader, "Shaders/Lighting/TexturelessDeferred/vertex.glsl"), ShaderSource.Load(ShaderType.FragmentShader, "Shaders/Lighting/TexturelessDeferred/fragment.glsl"));
+
+                Renderer = new FlatGenerator(Deferred.Resources[0].GBuffer, Shader, null, new ShaderStorageBuffer[] { Textures });
                 Renderer.Render(graphRoot, 1);
+
+                //Reflection = new ReflectionTracing(1280, 720, Deferred.Resources[0].WorldPos, Deferred.Resources[0].UVs, Deferred.Resources[0].MaterialIDs);
+                //ReflectionBuffer = new Framebuffer(1280, 720);
+                //ReflectionBuffer[FramebufferAttachment.ColorAttachment0] = Reflection.MaterialIDs;
+
+
                 inited = true;
             }
 
             Shader.Set("View", EngineManager.View);
             Shader.Set("Projection", EngineManager.Projection);
             Renderer.Submit(1);
+            Deferred.Submit(new Matrix4[] { EngineManager.View }, new Vector3[] { camera.Position });
+            //Reflection.Render(new Matrix4[] { EngineManager.View }, new Matrix4[] { EngineManager.Projection }, new Vector3[] { camera.Position });
+            Framebuffer.Default.Blit(Deferred.Resources[0].AccumulatorBuffer, true, false, true);
+            //Framebuffer.Default.Blit(ReflectionBuffer, true, false, true);
         }
 
         public void Update(double interval)

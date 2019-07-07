@@ -6,12 +6,14 @@ layout(location = 2) in vec2 vs_normal;
 // Output data ; will be interpolated for each fragment.
 out vec2 UV;
 out vec3 normal;
+out vec3 pos;
+flat out uint drawID;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 View;
 uniform mat4 Projection;
 
-layout (std140) buffer transforms
+layout (std430, binding = 0) buffer transforms_t
 { 
   mat4 World[MAX_DRAWS_UBO];
 } Transforms;
@@ -19,13 +21,14 @@ layout (std140) buffer transforms
 void main(){
 
 	// Output position of the vertex, in clip space : MVP * position
-	mat4 MVP = Projection * View * Transforms.World[gl_BaseInstance + gl_InstanceID];
-	gl_Position =  MVP * vec4(vs_pos.x, vs_pos.y, vs_pos.z, 1);
+	vec4 worldPos = Transforms.World[gl_BaseInstance + gl_InstanceID] * vec4(vs_pos.x, vs_pos.y, vs_pos.z, 1);
+	gl_Position =  Projection * View * worldPos;
 
 	// UV of the vertex. No special space for this one.
 	UV = vs_uv;
-	//UV = (vs_pos.xz/vec2(50)+vec2(1,1))/2.0;
-
+	drawID = gl_DrawID;
+	pos = worldPos.xyz;
+	
 	vec2 n = vs_normal / 100.0f * PI/180.0f;
 	normal.x = cos(n.x) * sin(n.y);
 	normal.y = sin(n.x) * sin(n.y);

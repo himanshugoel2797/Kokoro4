@@ -24,7 +24,7 @@ namespace Kokoro.SceneGraph.Generators
             ssbo_set.Add(transforms);
             if(ssbos != null)ssbo_set.AddRange(ssbos);
 
-            state = new RenderState(dest, prog, ssbo_set.ToArray(), ubos, true, true, DepthFunc.Greater, 1, 0, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.None);
+            state = new RenderState(dest, prog, ssbo_set.ToArray(), ubos, true, true, DepthFunc.Greater, 1, -1, BlendFactor.One, BlendFactor.Zero, Vector4.Zero, 0, CullFaceMode.Back);
             queue = new RenderQueue(maxDraws, true);
             queue.ClearFramebufferBeforeSubmit = true;
         }

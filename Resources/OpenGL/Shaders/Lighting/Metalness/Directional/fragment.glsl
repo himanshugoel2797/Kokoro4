@@ -1,4 +1,4 @@
-﻿// Interpolated values from the vertex shaders
+// Interpolated values from the vertex shaders
 in vec2 UV;
 
 // Ouput data

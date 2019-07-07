@@ -18,6 +18,7 @@ using Cloo;
 using Kokoro.Engine;
 using System.Collections.Concurrent;
 using OpenTK.Graphics;
+using System.IO;
 
 namespace Kokoro.Graphics.OpenGL
 {
@@ -607,6 +608,7 @@ namespace Kokoro.Graphics.OpenGL
             GL.Enable(EnableCap.TextureCubeMapSeamless);
             GL.Enable(EnableCap.DepthTest);
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
+            
             Load?.Invoke();
         }
 
@@ -743,7 +745,7 @@ namespace Kokoro.Graphics.OpenGL
         {
             _far = far;
             _near = near;
-            GL.NV.DepthRange(near, far);
+            //GL.NV.DepthRange(near, far);
         }
 
         public static void GetDepthRange(out double near, out double far)
@@ -772,9 +774,31 @@ namespace Kokoro.Graphics.OpenGL
             System.Drawing.Imaging.BitmapData bmpData;
 
             bmpData = bmp.LockBits(new Rectangle(0, 0, t.Width, t.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            GPUStateMachine.BindTexture(0, (OpenTK.Graphics.OpenGL.TextureTarget)t.texTarget, t.id);
-            GL.GetTexImage((OpenTK.Graphics.OpenGL.TextureTarget)t.texTarget, 0, (OpenTK.Graphics.OpenGL.PixelFormat)Engine.Graphics.PixelFormat.Bgra, (OpenTK.Graphics.OpenGL.PixelType)Engine.Graphics.PixelType.UnsignedInt8888Reversed, bmpData.Scan0);
-            GPUStateMachine.UnbindTexture(0, (OpenTK.Graphics.OpenGL.TextureTarget)t.texTarget);
+
+            switch (t.ptype)
+            {
+                case Engine.Graphics.PixelType.HalfFloat:
+                    GL.GetTextureImage(t.id, 0, (OpenTK.Graphics.OpenGL.PixelFormat)Engine.Graphics.PixelFormat.Bgra, (OpenTK.Graphics.OpenGL.PixelType)Engine.Graphics.PixelType.UnsignedInt8888Reversed, bmpData.Stride * bmpData.Height, bmpData.Scan0);
+                    break;
+                case Engine.Graphics.PixelType.UnsignedInt:
+                    {
+                        GL.GetTextureImage(t.id, 0, (OpenTK.Graphics.OpenGL.PixelFormat)t.format, (OpenTK.Graphics.OpenGL.PixelType)Engine.Graphics.PixelType.UnsignedInt, bmpData.Stride * bmpData.Height, bmpData.Scan0);
+                        unsafe
+                        {
+                            uint* data = (uint*)bmpData.Scan0;
+                            var f = File.OpenWrite("pixels.txt");
+                            var fs = new StreamWriter(f);
+                            for(int y = 0; y < bmp.Height; y++)
+                            {
+                                for (int x = 0; x < bmp.Width; x++)
+                                    fs.Write($" {*(data++)}");
+                                fs.WriteLine();
+                            }
+                            fs.Close();
+                        }
+                    }
+                    break;
+            }
             bmp.UnlockBits(bmpData);
 
             bmp.RotateFlip(RotateFlipType.Rotate180FlipX);

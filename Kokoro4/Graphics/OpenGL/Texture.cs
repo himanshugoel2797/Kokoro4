@@ -139,6 +139,7 @@ namespace Kokoro.Engine.Graphics
         internal PixelInternalFormat internalformat;
         internal TextureTarget texTarget;
         internal PixelFormat format;
+        internal PixelType ptype;
 
         private int _writeLevel;
         private int _baseReadLevel;
@@ -216,6 +217,7 @@ namespace Kokoro.Engine.Graphics
                 this.format = src.GetFormat();
                 this.internalformat = src.GetInternalFormat();
                 this.texTarget = src.GetTextureTarget();
+                this.ptype = src.GetPixelType();
             }
 
             if (src.GetTextureTarget() != TextureTarget.TextureBuffer)
